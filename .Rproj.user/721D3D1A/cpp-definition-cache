@@ -1,0 +1,383 @@
+[
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/MongeAlgorithm.cpp",
+        "file_last_write": 1619316897.0,
+        "definitions": [
+            {
+                "usr": "c:@F@Monge_Rcpp#&I#S0_#S0_#&d#S1_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "Monge_Rcpp(Rcpp::NumericMatrix &, Rcpp::NumericVector &, Rcpp::NumericVector &, double &, double &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/MongeAlgorithm.cpp",
+                "line": 24,
+                "column": 12
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+        "file_last_write": 1619315310.0,
+        "definitions": [
+            {
+                "usr": "c:@F@div0#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "div0(Eigen::VectorXd, Eigen::VectorXd)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 12,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@proxdiv#d#I#I#I#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 48,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@updateK#I#I#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "updateK(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 73,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@StabilizedScaling_Rcpp#I#I#I#I#I#d#d#I#I#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "StabilizedScaling_Rcpp(int, int, int, int, int, double, double, int, int, int, int)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 110,
+                "column": 12
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/getOptimN.cpp",
+        "file_last_write": 1619310958.0,
+        "definitions": [
+            {
+                "usr": "c:@F@getNtSW#I#I#I#I#I#I#&I#S0_#S0_#&d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "getNtSW(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::List, Rcpp::List, Rcpp::NumericVector, Rcpp::NumericVector, int &, int &, int &, double &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/getOptimN.cpp",
+                "line": 6,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@getNtNO#I#I#I#I#I#I#&I#S0_#S0_#&d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "getNtNO(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::List, Rcpp::List, Rcpp::NumericVector, Rcpp::NumericVector, int &, int &, int &, double &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/getOptimN.cpp",
+                "line": 60,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@getNtSWNO#I#I#I#I#I#I#I#I#I#I#&I#S0_#S0_#&d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "getNtSWNO(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::List, Rcpp::List, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::List, Rcpp::List, Rcpp::NumericVector, Rcpp::NumericVector, int &, int &, int &, double &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/getOptimN.cpp",
+                "line": 114,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/getOptimN.h",
+        "file_last_write": 1619310958.0,
+        "definitions": []
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/shifts.cpp",
+        "file_last_write": 1619310963.0,
+        "definitions": [
+            {
+                "usr": "c:@F@CalcSWShift#I#I#I#&I#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "CalcSWShift(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/shifts.cpp",
+                "line": 5,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@CalcNOShift#I#I#I#&I#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "CalcNOShift(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/shifts.cpp",
+                "line": 110,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/shifts.h",
+        "file_last_write": 1619313386.0,
+        "definitions": []
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+        "file_last_write": 1619316772.0,
+        "definitions": [
+            {
+                "usr": "c:@S@node",
+                "kind": 3,
+                "parent_name": "",
+                "name": "node",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 7,
+                "column": 8
+            },
+            {
+                "usr": "c:@S@node@F@is_root#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "is_root",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 32,
+                "column": 10
+            },
+            {
+                "usr": "c:@S@node@F@pos#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "pos",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 43,
+                "column": 9
+            },
+            {
+                "usr": "c:@F@key#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "key(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 69,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@size#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "size(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 70,
+                "column": 15
+            },
+            {
+                "usr": "c:@F@nb#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "nb(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 71,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@newnode#I#d#d#d#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "newnode(int, double, double, double, np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 75,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@push#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "push(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 82,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@update#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "update(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 92,
+                "column": 4
+            },
+            {
+                "usr": "c:@S@node@F@rot#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "rot",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 100,
+                "column": 12
+            },
+            {
+                "usr": "c:@S@node@F@splay#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "splay",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 123,
+                "column": 10
+            },
+            {
+                "usr": "c:@F@le#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "le(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 143,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@re#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "re(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 152,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@find#*$@S@node#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "find(np, double, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 174,
+                "column": 4
+            },
+            {
+                "usr": "c:@S@TH",
+                "kind": 3,
+                "parent_name": "",
+                "name": "TH",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 225,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@insert#&*$@S@node#S1_#d#d#I#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "insert(np &, np, double, double, int, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 253,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@insert#&*$@S@node#S1_#S1_#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "insert(np &, np, np, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 287,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@merge#&*$@S@node#S1_#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "merge(np &, np, double, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 323,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@treegkr_dfs#&$@S@Tree#&$@N@std@S@vector>#d#$@N@std@S@allocator>#d#&I#S5_#&$@N@std@S@vector>#$@S@TH#$@N@std@S@allocator>#S8_#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "treegkr_dfs(Tree &, std::vector<double> &, Rcpp::NumericVector &, Rcpp::NumericVector &, std::vector<TH> &, int, int)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 349,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@getKeysLengths#*$@S@node#&I#S2_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "getKeysLengths(np, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 526,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@treegkr_Rcpp#&I#S0_#S0_#S0_#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "treegkr_Rcpp(Rcpp::List &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 566,
+                "column": 12
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.cpp",
+        "file_last_write": 1619310733.0,
+        "definitions": [
+            {
+                "usr": "c:@F@Nw_Corner_Rule#I#I#I#&I#S0_#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "Nw_Corner_Rule(Rcpp::NumericMatrix, Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.cpp",
+                "line": 5,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@UnbalancedToBalanced#&I#S0_#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "UnbalancedToBalanced(Rcpp::NumericMatrix &, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.cpp",
+                "line": 143,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@GetIndexGroups#I#I#&I#S0_#S0_#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "GetIndexGroups(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::List &, Rcpp::List &, Rcpp::List &, Rcpp::List &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.cpp",
+                "line": 220,
+                "column": 6
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.h",
+        "file_last_write": 1619310714.0,
+        "definitions": []
+    },
+    {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilTree.cpp",
+        "file_last_write": 1619310717.0,
+        "definitions": [
+            {
+                "usr": "c:@S@Tree",
+                "kind": 3,
+                "parent_name": "",
+                "name": "Tree",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilTree.cpp",
+                "line": 5,
+                "column": 8
+            },
+            {
+                "usr": "c:@S@Tree@F@add_edge#I#I#d#",
+                "kind": 7,
+                "parent_name": "Tree",
+                "name": "add_edge(int, int, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilTree.cpp",
+                "line": 22,
+                "column": 10
+            }
+        ]
+    }
+]

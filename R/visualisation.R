@@ -1,0 +1,396 @@
+#' @importFrom grDevices hcl.colors rainbow
+#' @importFrom graphics Axis image lines plot polygon points segments text
+#'
+## usethis namespace: start
+#' @useDynLib unbalancedTransport, .registration = TRUE
+## usethis namespace: end
+NULL
+#'
+#'
+#'
+## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+## usethis namespace: end
+NULL
+
+
+## usethis namespace: start
+#' @import RcppEigen
+## usethis namespace: end
+NULL
+
+
+
+
+#' Plotting an unbalanced optimal transport plan
+#'
+#' @param transportPlan A numeric matrix.
+#' @param import A numeric vector.
+#' @param export A numeric vector.
+#'
+#'
+#' @export
+plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
+
+    # If no import or export vector is given, only the transport plan is plotted
+    if(is.null(import) | is.null(export)){
+        transportPlan <- t(transportPlan[nrow(transportPlan):1,])
+
+        image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
+              col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
+        att2 <- ((1):(nrow(transportPlan)-1))/(nrow(transportPlan)-1)
+        att2 <- att2[seq(1,length(att2), length.out = 10)]
+        lab2 <- nrow(transportPlan):1
+        lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
+        att1 <- ((1):(ncol(transportPlan)-1))/(ncol(transportPlan)-1)
+        att1 <- att1[seq(1,length(att1), length.out = 10)]
+        lab1 <- 1:ncol(transportPlan)
+        lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
+        Axis(side = 2, at = att2, labels = lab2)
+        Axis(side = 1, at = att1, labels = lab1)
+
+
+    }else{
+
+        # Distance between import/export vectors and transport plan
+        emptyColRow <- max(1, max(nrow(transportPlan), ncol(transportPlan))/20)
+
+        leftCol <- export
+        leftCol[(length(leftCol)+1):(length(leftCol)+1+emptyColRow)] <- NaN
+
+        # Binding the import vector to the transport plan
+        addRows <- matrix(rep(NaN, ncol(transportPlan)*emptyColRow), ncol = ncol(transportPlan))
+        printObj <- rbind(transportPlan, addRows ,import)
+
+        # Binding the export vector to the transport plan
+        addCols <- matrix(rep(NaN, nrow(printObj)*emptyColRow), nrow = nrow(printObj))
+        printObj <- cbind(leftCol, addCols, printObj)
+        printObj <- t(printObj[nrow(printObj):1,])
+
+        # Plotting the transport plan with import and export vectors
+        image(printObj, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
+              col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
+
+        # Adding the labels and axes.
+        att2 <- ((emptyColRow+1):(nrow(printObj)-1))/(nrow(printObj)-1)
+        att2 <- att2[seq(1,length(att2), length.out = 10)]
+        lab2 <- nrow(transportPlan):1
+        lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
+        att1 <- ((emptyColRow+1):(ncol(printObj)-1))/(ncol(printObj)-1)
+        att1 <- att1[seq(1,length(att1), length.out = 10)]
+        lab1 <- 1:ncol(transportPlan)
+        lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
+        Axis(side = 2, at = att2, labels = lab2)
+        Axis(side = 1, at = att1, labels = lab1)
+
+    }
+
+}
+
+
+
+#' Plotting dense 1D transport
+#'
+#' @param transportMap A numeric matrix.
+#' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric supply vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric demand vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#' @param X Discretization underlying the supply and demand mearsures.
+#'
+#'
+#' @export
+plot1DTransport <- function(transportMap,supplyList, demandList, X){
+
+    # Number of color intervals
+    numIntervals <- 50
+
+
+    colors <- rainbow(numIntervals, s = 1, v = 1, start = 0, end = max(1, numIntervals - 1)/numIntervals, alpha = 1, rev = FALSE)
+
+    # Plotting the supply and demand measures
+    plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", xlab = "Position", ylab = "Mass")
+    lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
+
+    #firstSupp <- supplyList[[2]][1]
+    #firstDem <- demandList[[2]][1]
+
+    # Plot the intervals for different colors
+    for( i in 1:numIntervals){
+
+        # Calculating the interval of X
+        colSuppInter <- rep(1, length(X))
+        colSuppInter[(i-1)/numIntervals > X | i/numIntervals < X] <- 0
+
+        # Restricting the transport map on the interval
+        subK <- transportMap * colSuppInter
+
+        # Adding the color intervals
+        lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "h", col = colors[i])
+        lines(demandList[[2]], subK %*% demandList[[3]], type = "h", col = colors[i])
+
+        #polygon(c(firstSup´p,supplyList[[2]]),c(0,t(subK) %*% supplyList[[3]]), col = colors[i])
+        #polygon(c(firstDem,demandList[[2]]), c(0,subK %*% demandList[[3]]), col = colors[i])
+
+        lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "l", col = "black")
+        lines(demandList[[2]], subK %*% demandList[[3]], type = "l", col = "black")
+
+    }
+
+    lines(supplyList[[2]], t(transportMap) %*% supplyList[[3]], type = "l", col = "red")
+    lines(demandList[[2]], transportMap %*% demandList[[3]], type = "l", col = "blue")
+
+    lines(supplyList[[2]], rep(0, length(supplyList[[2]])), type = "l", col = "black")
+
+
+}
+
+
+#' Next Layer
+#'
+#' This calculates the coordinates of the tree nodes in the next layer.
+#'
+#' @param treeDF A tree in data.frame format
+#' @param coordinates The coordinates of the tree nodes as data.frame
+#' @param node The current node index
+#' @param layer The current layer
+#'
+#' @return data.frame with coordinates and information for all tree nodes
+#'
+nextLayer <- function(treeDF, coordinates ,node, layer){
+
+    children <- treeDF[treeDF$parent ==node,]$child
+    numChildren <- length(children)
+
+    if(numChildren == 0){
+        return(coordinates)
+    }
+    # maximum and minimum x coordinate for the next layer
+    maxX <- coordinates[coordinates$node == node,]$maxX
+    minX <- coordinates[coordinates$node == node,]$minX
+
+    # distance between each child nodes
+    distance = (maxX-minX)/numChildren
+
+    # computing the x-cooridantes of the child nodes.
+    for(i in 0:(numChildren-1)){
+        coordinates[nrow(coordinates)+1,] <- c(children[i+1], maxX-(i+0.5)*distance,
+                                               layer, maxX-(i*distance), maxX - (i+1)*distance, node )
+        # Compute the next layer for each child.
+        coordinates = nextLayer(treeDF, coordinates, children[i+1], layer-1)
+    }
+
+    return(coordinates)
+
+
+}
+
+
+#' findPath
+#'
+#' Finding the path between a node and a node in its subtree.
+#'
+#' @param from node at which the path starts
+#' @param to node at which the path ends. Must be in the subtree of 'from'
+#' @param treeDF tree in data.frame format
+#'
+#' @return A list of nodes from 'from' to 'to'
+#'
+findPath <- function(from, to, treeDF){
+
+    # if the node has children, check if one of them is the wanted node
+    if(length(treeDF[treeDF$parent == from,]$child) > 0){
+        children <- treeDF[treeDF$parent == from,]$child
+
+        # if one child is the wanted node, return the current node and the child
+        if(to %in% children){
+            return(c(from,to))
+        }
+
+        # if non of the children is the wanted node, search in all child nodes
+        for(i in 1:length(children)){
+            path <- findPath(children[i], to, treeDF)
+            # if the node is found in a child node, add the current node to the return list
+            if(!is.null(path)){
+                return(c(from,path))
+            }
+        }
+
+        return(NULL)
+    }else{
+        return(NULL)
+    }
+
+}
+
+
+#' Tree plot
+#'
+#' Plotting a tree structure. Supply and demand values as well as the transport plan
+#' can be plotted in one graph.
+#'
+#' @param tree A tree in list format: The root node followed by multiple vectors of the form
+#' (parent, child, weight)
+#' @param tList The transport list (optional)
+#' @param supply A numeric supply vector (optional)
+#' @param demand A numeric demand vector (optional)
+#'
+#' @export
+#'
+#' @examples
+#' tree <- list(1, c(1, 2, 1), c(2, 3, 1), c(3, 4, 1), c(3, 5, 1),
+#' c(2, 6, 1), c(1, 7, 1), c(7, 8, 1), c(7, 9, 1),
+#' c(9, 10, 1), c(9, 11, 1), c(11, 12, 1), c(11, 13, 1))
+#'
+#' plotTree(tree)
+#'
+#'
+#' supply <- c(0,0,1,2,0,0,0,0,0,0,0,0,0)
+#' demand <- c(0,0,0,0,0,1,0,1,0,0,0,1,1)
+#'
+#' plotTree(tree, supply = supply, demand = demand)
+#'
+#'
+#' tList = list(c(3,6,1), c(4,8,1))
+#' plotTree(tree, tList, supply, demand)
+#'
+#'
+plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
+
+    if(length(tList) == 0){
+        tList <- NULL
+    }
+
+    # create a tree data frame
+    treeDF <- as.data.frame(do.call(rbind, tree[-1]))
+    colnames(treeDF) <- c("parent", "child", "weight")
+    treeDF <- treeDF[order(treeDF$parent),]
+
+    rootNode <- tree[1]
+
+
+
+    # initiate a data frame to hold the coordianates for the tree nodes
+    coordinates <- data.frame(c(rootNode, 0, 0, 100,-100,-1))
+    colnames(coordinates) <- c("node", "x", "layer", "maxX", "minX", "parent")
+
+    # compute all coordinates
+    coordinates <- nextLayer(treeDF, coordinates, rootNode, -1)
+
+    maxLayer <- min(coordinates$layer)
+
+    # add the supply to the coordiantes
+    if(!is.null(supply) & !is.null(demand)){
+        supDem <- supply-demand
+        coordinates$supply <- supDem[coordinates$node]
+    }
+
+
+    # create an empty plot
+    plot(1, type = "n", xlab = "", ylab = "", xlim = c(-100, 100), ylim = c(maxLayer,0), axes = FALSE)
+
+
+
+    # plot the edges
+    for(i in 1:nrow(treeDF)){
+        segments(coordinates[coordinates$node == treeDF[i,]$parent,]$x,
+                 coordinates[coordinates$node == treeDF[i,]$parent,]$layer,
+                 coordinates[coordinates$node == treeDF[i,]$child,]$x,
+                 coordinates[coordinates$node == treeDF[i,]$child,]$layer)
+    }
+
+
+
+    # If a transport plan is given, plot the transport paths as arrows
+    if(!is.null(tList)){
+
+        treeDF$tMass <- rep(0, nrow(treeDF))
+
+        for(i in 1:length(tList)){
+            # Finding a path for each transport list entry
+            pathTo <- unlist(findPath(tList[[i]][1], tList[[i]][2], treeDF))
+            pathFrom <- NULL
+
+            # If the path was not found, the receiving node is not a child of the
+            # origin node
+            if(is.null(pathTo)){
+
+                # compute the paths from the trees root node to each of the two nodes.
+                # The path between the two nodes can be computed from these two paths.
+                pathTo <- unlist(findPath(rootNode, tList[[i]][2], treeDF))
+                pathFrom <- unlist(findPath(rootNode, tList[[i]][1], treeDF))
+
+                while(length(pathFrom) > 1 & length(pathTo) > 1 & pathFrom[2] == pathTo[2]){
+                    pathTo <- pathTo[-1]
+                    pathFrom <- pathFrom[-1]
+
+                }
+
+
+            }
+
+            if(length(pathTo) > 1){
+
+                for(j in 1:(length(pathTo)-1)){
+                    treeDF[(treeDF$parent == pathTo[j] & treeDF$child == pathTo[j+1]),]$tMass =
+                        tList[[i]][3] + treeDF[(treeDF$parent == pathTo[j] & treeDF$child == pathTo[j+1]),]$tMass
+                }
+
+            }
+            if(length(pathFrom) > 1){
+                for(j in 1:(length(pathFrom)-1)){
+                    treeDF[(treeDF$parent == pathFrom[j] & treeDF$child == pathFrom[j+1]),]$tMass =
+                        - tList[[i]][3] + treeDF[(treeDF$parent == pathFrom[j] & treeDF$child == pathFrom[j+1]),]$tMass
+
+                }
+
+            }
+
+
+        }
+
+
+        arrowsDF <- treeDF[treeDF$tMass != 0, ]
+        # Plotting the arrows.
+        # The line width indicates the amount of mass moves along that edge.
+        for(i in 1:nrow(arrowsDF)){
+
+            fromX <- coordinates[coordinates$node == arrowsDF[i,]$parent,]$x
+            fromY <- coordinates[coordinates$node == arrowsDF[i,]$parent,]$layer
+            toX <- coordinates[coordinates$node == arrowsDF[i,]$child,]$x
+            toY <- coordinates[coordinates$node == arrowsDF[i,]$child,]$layer
+
+            shape::Arrows(fromX, fromY, toX, toY, arr.adj = 1, arr.type = "curved",
+                   lwd = abs(arrowsDF[i,]$tMass), code = 1.5+0.5*sign(arrowsDF[i,]$tMass) )
+
+        }
+    }
+
+    # If the supply and demand are not given, plot all nodes in black.
+    if(is.null(supply) | is.null(demand)){
+        points(coordinates$x, coordinates$layer,pch = 19 )
+
+    # Otherwise plot supply nodes in green and demand nodes in blue.
+    # The radius of the node indicates the amount of supply / demand: The bigger the node
+    # the more mass is supplied or demanded.
+    # Nodes without supply or demand are plotted in black.
+    }else{
+        points(coordinates[coordinates$supply  == 0, ]$x, coordinates[coordinates$supply  == 0, ]$layer,
+               pch = 19 )
+
+        points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "green")
+
+        points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "blue")
+
+
+    }
+
+    # Adding the keys to the plot.
+    text(coordinates$x, coordinates$layer, labels = coordinates$node, pos = 4)
+
+}
+
