@@ -1,5 +1,6 @@
 #' @importFrom grDevices hcl.colors rainbow
 #' @importFrom graphics Axis image lines plot polygon points segments text
+#' @importFrom diagram curvedarrow
 #'
 ## usethis namespace: start
 #' @useDynLib unbalancedTransport, .registration = TRUE
@@ -20,6 +21,96 @@ NULL
 NULL
 
 
+#' Plotting transport between points given by a distance matrix
+#'
+#' @param distanceMatrix A numeric distance matrix.
+#' @param transportPlan A numeric matrix.
+#' @param supply A numeric vector.
+#' @param demand A numeric vector.
+#' @param creationDestructionCost A numeric vector giving the cost for mass creation and destruction.
+#'
+#'
+#' @export
+plotTransportByCost <- function(distanceMatrix, transportPlan = NULL, supply = NULL, demand = NULL,  creationDestructionCost = rep(0, length(x))){
+
+    numPoints <- sum(dim(distanceMatrix))
+
+    # expand creation/destruction cost to a vector
+    if(length(creationDestructionCost) == 1){
+
+        creationDestructionCost <- rep(creationDestructionCost, numPoints)
+
+    }
+
+    # calcualte the positions
+    positions <- positionsByEigenvalue(distanceMatrix)
+    print("Positions:")
+    print(positions)
+
+    # if the positions are in 1 dimension, add a second by using a 0L vector as
+    # y coordinates
+    if(is.null(dim(positions))){
+        x <- positions
+        y <- rep(0, length(positions))
+
+    # otherwise, use the projection on the first two dimensions
+    }else{
+        x <- positions[,1]
+        y <- positions[,2]
+    }
+    dim <- length(x)
+
+    if(!is.null(supply) & !is.null(demand)){
+        supDem <- supply-demand
+    }
+
+    # create an empty plot
+    plot(1, type = "n", xlab = "", ylab = "",
+         xlim = c(min(x)-0.3*abs(max(x)-min(x)),max(x)+0.3*abs(max(x)-min(x))),
+         ylim =c(min(y)-0.3*abs(max(y)-min(y)),max(y)+0.3*abs(max(y)-min(y))),
+         asp = 1)
+
+
+    # if a transport plan is given, add arrows to indicate mass transport
+    if(!is.null(transportPlan)){
+
+        # plot circles as indicators for the creation/destruction cost
+        theta = seq(0, 2 * pi, length = 200)
+        for (i in 1:dim){
+            lines(x = creationDestructionCost[i] * cos(theta) + x[i], y = creationDestructionCost[i] * sin(theta) + y[i], col = "grey")
+
+            for (j in 1:dim){
+                if (transportPlan[[i,j]]>0 && i != j){
+                    curvedarrow(c(x[i],y[i]),c(x[j],y[j]), lwd = transportPlan[[i,j]],
+                                         arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
+                                         curve = 0.2)
+                }
+            }
+        }
+    }
+
+    # add the points
+    if(is.null(supply) | is.null(demand)){
+        points(x, y ,pch = 19 )
+
+
+    }else{
+
+        # if supply and demand values are given, the color indicates the supply
+        # and the size indicates the mass at each point
+
+        points(x[which(supDem == 0 )],y[which(supDem == 0)],  pch = 19 )
+
+        points(x[which(supDem > 0 )],y[which(supDem > 0)],
+               pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
+
+        points(x[which(supDem < 0 )],y[which(supDem < 0)],
+               pch = 19, cex = supply[which(supply < 0)],  col = "dodgerblue3")
+
+
+    }
+
+}
 
 
 #' Plotting an unbalanced optimal transport plan
@@ -114,8 +205,8 @@ plot1DTransport <- function(transportMap,supplyList, demandList, X){
     plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", xlab = "Position", ylab = "Mass")
     lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
 
-    #firstSupp <- supplyList[[2]][1]
-    #firstDem <- demandList[[2]][1]
+    firstSupp <- supplyList[[2]][1]
+    firstDem <- demandList[[2]][1]
 
     # Plot the intervals for different colors
     for( i in 1:numIntervals){
@@ -128,11 +219,11 @@ plot1DTransport <- function(transportMap,supplyList, demandList, X){
         subK <- transportMap * colSuppInter
 
         # Adding the color intervals
-        lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "h", col = colors[i])
-        lines(demandList[[2]], subK %*% demandList[[3]], type = "h", col = colors[i])
+        #lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "h", col = colors[i])
+        #lines(demandList[[2]], subK %*% demandList[[3]], type = "h", col = colors[i])
 
-        #polygon(c(firstSup´p,supplyList[[2]]),c(0,t(subK) %*% supplyList[[3]]), col = colors[i])
-        #polygon(c(firstDem,demandList[[2]]), c(0,subK %*% demandList[[3]]), col = colors[i])
+        polygon(c(firstSupp,supplyList[[2]]),c(0,t(subK) %*% supplyList[[3]]), col = colors[i])
+        polygon(c(firstDem,demandList[[2]]), c(0,subK %*% demandList[[3]]), col = colors[i])
 
         lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "l", col = "black")
         lines(demandList[[2]], subK %*% demandList[[3]], type = "l", col = "black")
@@ -381,10 +472,10 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
                pch = 19 )
 
         points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "green")
+               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "chartreuse3")
 
         points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "blue")
+               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "dodgerblue3")
 
 
     }

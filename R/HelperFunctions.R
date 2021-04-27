@@ -1,3 +1,39 @@
+#' Coordinates by distance matrix
+#'
+#' Calculating the coordinates of the supply and demand points using
+#' the eigenvalue decomposition of the distance matrix.
+#'
+#' @param c A numeric distance matrix.
+#' @return The coordinates based on the distance matrix.
+#' @export
+#'
+positionsByEigenvalue <- function(c){
+        dimC <- dim(c)[1]
+        m <- matrix(rep(0, length(c)), dimC)
+        for (i in 1:dimC){
+                for (j in 1:dimC){
+                        m[i,j] = (c[1,j]^2+c[i,1]^2-c[i,j]^2) / 2
+                }
+        }
+        eig <- eigen(m)
+        values <- eig$values
+        values[abs(values) < 0.00001] <- 0
+        coordinates <- eig$vectors %*% diag(sqrt(eig$values))
+        coordinates[abs(coordinates) < 0.00001] <- 0
+
+
+        usedDimensions <- c()
+
+        for(i in 1:dimC){
+                if(any(coordinates[,i] != 0)){
+                        usedDimensions <- append(usedDimensions, i)
+                }
+        }
+
+        return(coordinates[,usedDimensions])
+}
+
+
 
 #' Wasserstein-Fisher-Rao Cost Matrix
 #'
