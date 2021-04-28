@@ -125,7 +125,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
-        "file_last_write": 1619316772.0,
+        "file_last_write": 1619563754.0,
         "definitions": [
             {
                 "usr": "c:@S@node",
@@ -296,6 +296,15 @@
                 "name": "treegkr_dfs(Tree &, std::vector<double> &, Rcpp::NumericVector &, Rcpp::NumericVector &, std::vector<TH> &, int, int)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
                 "line": 349,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@printTree#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "printTree(np)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
+                "line": 492,
                 "column": 6
             },
             {

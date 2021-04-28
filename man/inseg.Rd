@@ -2,7 +2,7 @@
 % Please edit documentation in R/HelperFunctions.R
 \name{inseg}
 \alias{inseg}
-\title{Interval check}
+\title{Value in interval}
 \usage{
 inseg(x, s1, s2)
 }
@@ -17,5 +17,5 @@ inseg(x, s1, s2)
 1 if x is in [s1,s2] and 0 if it is not.
 }
 \description{
-This checks if a value is in a given interval
+This checks if the value is in a given interval
 }

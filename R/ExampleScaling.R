@@ -74,6 +74,48 @@ ExampleScaling <- function(){
     plotUOTP(res$transportPlan)
 }
 
+#' The Scaling Algorithm Example
+#'
+#' The examples given in the [paper]
+#'
+#' @export
+#'
+ExampleScaling2 <- function(){
 
 
+    xx <- c(0,0,0,3,3.5,4)
+    xy <- c(0,1,2,1.5,1,0.5)
+
+    dx <-c(1/6,1/6,1/6,1/6,1/6,1/6)
+    dy <- dx
+
+    # supply measure
+    p <- c(2,2,2,0,0,0)
+    q <- c(0,0,0,1,2,3)
+
+    # number of iterations
+    iterMax <- 10000
+
+    # vector of epsilon values
+    epsvec <- seq(-1,-7, length.out = 20)
+    epsvec <- 10^(epsvec)
+
+    #compute quadrature cost matrix
+    C <- createCostMatrix(xx,xy)
+
+    supply <- list("KL", p, dx, 0.5)
+    demand <- list("KL", q, dy, 0.5)
+
+    # compute and plot the transport plan
+    res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
+
+    transportP <- 6*res$transportPlan
+
+    print(transportP)
+
+    plotUOTP(transportP)
+
+    plotTransportByCost(C, transportP, p, q)
+
+}
 

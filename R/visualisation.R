@@ -33,18 +33,9 @@ NULL
 #' @export
 plotTransportByCost <- function(distanceMatrix, transportPlan = NULL, supply = NULL, demand = NULL,  creationDestructionCost = rep(0, length(x))){
 
-    numPoints <- sum(dim(distanceMatrix))
-
-    # expand creation/destruction cost to a vector
-    if(length(creationDestructionCost) == 1){
-
-        creationDestructionCost <- rep(creationDestructionCost, numPoints)
-
-    }
-
-    # calcualte the positions
+    # calculate the positions
     positions <- positionsByEigenvalue(distanceMatrix)
-    print("Positions:")
+    print("Coordinates:")
     print(positions)
 
     # if the positions are in 1 dimension, add a second by using a 0L vector as
@@ -81,7 +72,7 @@ plotTransportByCost <- function(distanceMatrix, transportPlan = NULL, supply = N
 
             for (j in 1:dim){
                 if (transportPlan[[i,j]]>0 && i != j){
-                    curvedarrow(c(x[i],y[i]),c(x[j],y[j]), lwd = transportPlan[[i,j]],
+                    curvedarrow(c(x[i],y[i]),c(x[j],y[j]), lwd = 0.5+transportPlan[[i,j]],
                                          arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
                                          curve = 0.2)
                 }
@@ -102,10 +93,10 @@ plotTransportByCost <- function(distanceMatrix, transportPlan = NULL, supply = N
         points(x[which(supDem == 0 )],y[which(supDem == 0)],  pch = 19 )
 
         points(x[which(supDem > 0 )],y[which(supDem > 0)],
-               pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
+               pch = 19, cex = supDem[which(supDem > 0)],  col = "chartreuse3")
 
         points(x[which(supDem < 0 )],y[which(supDem < 0)],
-               pch = 19, cex = supply[which(supply < 0)],  col = "dodgerblue3")
+               pch = 19, cex = abs(supDem[which(supDem < 0)]),  col = "dodgerblue3")
 
 
     }
@@ -129,16 +120,16 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
 
         image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
               col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
-        att2 <- ((1):(nrow(transportPlan)-1))/(nrow(transportPlan)-1)
-        att2 <- att2[seq(1,length(att2), length.out = 10)]
-        lab2 <- nrow(transportPlan):1
-        lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
-        att1 <- ((1):(ncol(transportPlan)-1))/(ncol(transportPlan)-1)
-        att1 <- att1[seq(1,length(att1), length.out = 10)]
-        lab1 <- 1:ncol(transportPlan)
-        lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
-        Axis(side = 2, at = att2, labels = lab2)
-        Axis(side = 1, at = att1, labels = lab1)
+        # att2 <- ((1):(nrow(transportPlan)-1))/(nrow(transportPlan)-1)
+        # att2 <- att2[seq(1,length(att2), length.out = 10)]
+        # lab2 <- nrow(transportPlan):1
+        # lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
+        # att1 <- ((1):(ncol(transportPlan)-1))/(ncol(transportPlan)-1)
+        # att1 <- att1[seq(1,length(att1), length.out = 10)]
+        # lab1 <- 1:ncol(transportPlan)
+        # lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
+        # Axis(side = 2, at = att2, labels = lab2)
+        # Axis(side = 1, at = att1, labels = lab1)
 
 
     }else{
@@ -380,7 +371,7 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
 
 
     # create an empty plot
-    plot(1, type = "n", xlab = "", ylab = "", xlim = c(-100, 100), ylim = c(maxLayer,0), axes = FALSE)
+    plot(1, type = "n", xlab = "", ylab = "", xlim = c(-110, 110), ylim = c(maxLayer-1,1), axes = FALSE)
 
 
 
@@ -391,6 +382,28 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
                  coordinates[coordinates$node == treeDF[i,]$child,]$x,
                  coordinates[coordinates$node == treeDF[i,]$child,]$layer)
     }
+
+    # If the supply and demand are not given, plot all nodes in black.
+    if(is.null(supply) | is.null(demand)){
+        points(coordinates$x, coordinates$layer,pch = 19 )
+
+        # Otherwise plot supply nodes in green and demand nodes in blue.
+        # The radius of the node indicates the amount of supply / demand: The bigger the node
+        # the more mass is supplied or demanded.
+        # Nodes without supply or demand are plotted in black.
+    }else{
+        points(coordinates[coordinates$supply  == 0, ]$x, coordinates[coordinates$supply  == 0, ]$layer,
+               pch = 19 )
+
+        points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "chartreuse3")
+
+        points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "dodgerblue3")
+
+
+    }
+
 
 
 
@@ -459,26 +472,6 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
         }
     }
 
-    # If the supply and demand are not given, plot all nodes in black.
-    if(is.null(supply) | is.null(demand)){
-        points(coordinates$x, coordinates$layer,pch = 19 )
-
-    # Otherwise plot supply nodes in green and demand nodes in blue.
-    # The radius of the node indicates the amount of supply / demand: The bigger the node
-    # the more mass is supplied or demanded.
-    # Nodes without supply or demand are plotted in black.
-    }else{
-        points(coordinates[coordinates$supply  == 0, ]$x, coordinates[coordinates$supply  == 0, ]$layer,
-               pch = 19 )
-
-        points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "chartreuse3")
-
-        points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "dodgerblue3")
-
-
-    }
 
     # Adding the keys to the plot.
     text(coordinates$x, coordinates$layer, labels = coordinates$node, pos = 4)

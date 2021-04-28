@@ -489,27 +489,27 @@ void treegkr_dfs(Tree &T, std::vector<double> &a, Rcpp::NumericVector &creation,
 
 // A function to print the segment tree structure to the console
 // Used for Debugging.
-// void printTree(np t){
-//
-//     if(t->chl != &dummy){
-//         Rcpp::Rcout << "left \n";
-//         printTree(t->chl);
-//     }
-//
-//     if(t->len > 0){
-//         Rcpp::Rcout << "value: " << t->val << "  length: " << t->len <<
-//             "  key :" << 1+t->key << "  add :" << t->add << "  size :" << t->size <<
-//                 "  nb :" << t->nb  << "\n";
-//     }
-//     if( t->chr != &dummy){
-//         Rcpp::Rcout << "right \n";
-//         printTree(t->chr);
-//     }
-//
-//     Rcpp::Rcout << "up \n";
-//
-//
-// }
+void printTree(np t){
+
+    if(t->chl != &dummy){
+        Rcpp::Rcout << "left \n";
+        printTree(t->chl);
+    }
+
+    if(t->len > 0){
+        Rcpp::Rcout << "value: " << t->val << "  length: " << t->len <<
+            "  key :" << 1+t->key << "  add :" << t->add << "  size :" << t->size <<
+                "  nb :" << t->nb  << "\n";
+    }
+    if( t->chr != &dummy){
+        Rcpp::Rcout << "right \n";
+        printTree(t->chr);
+    }
+
+    Rcpp::Rcout << "up \n";
+
+
+}
 
 
 
@@ -571,6 +571,13 @@ Rcpp::List treegkr_Rcpp (Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::Nu
     Rcpp::NumericVector import (n);
 
 
+    keysLeft = {0};
+    lengthLeft = {0};
+    keysRight = {0};
+    lengthRight = {0};
+
+
+
     // creating tree structure
     Tree T(n);
     Rcpp::NumericVector currentEdge;
@@ -601,6 +608,7 @@ Rcpp::List treegkr_Rcpp (Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::Nu
     // but splits any segment that crosses x = 0. Therefore, one element in the
     // segment tree ends at x = 0.
     dp[0].root = find(dp[0].root, -pos, 0);
+
     Rcpp::NumericVector finalKeys;
     Rcpp::NumericVector finalLengths;
 

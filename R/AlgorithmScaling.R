@@ -49,7 +49,7 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
 
     transportPlan <- res$TransportMap
 
-    transport <- list(cost = res$cost, transportPlan = transportPlan)
+    transport <- list(transportPlan = transportPlan)
     return(transport)
 
 }

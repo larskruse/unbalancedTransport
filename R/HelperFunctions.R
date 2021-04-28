@@ -1,3 +1,4 @@
+
 #' Coordinates by distance matrix
 #'
 #' Calculating the coordinates of the supply and demand points using
@@ -18,14 +19,19 @@ positionsByEigenvalue <- function(c){
         eig <- eigen(m)
         values <- eig$values
         values[abs(values) < 0.00001] <- 0
-        coordinates <- eig$vectors %*% diag(sqrt(eig$values))
-        coordinates[abs(coordinates) < 0.00001] <- 0
 
+        sqrtValues <- sqrt(values)
+
+        sqrtValues[values < 0.00001] <- 0
+
+
+        coordinates <- eig$vectors %*% diag(sqrtValues)
+        coordinates[abs(coordinates) < 0.00001] <- 0
 
         usedDimensions <- c()
 
         for(i in 1:dimC){
-                if(any(coordinates[,i] != 0)){
+                if(!is.null(dim(coordinates)) & (any(coordinates[,i] != 0))){
                         usedDimensions <- append(usedDimensions, i)
                 }
         }
@@ -82,9 +88,9 @@ quadCost <- function(X,Y){
 
 
 
-#' Interval check
+#' Value in interval
 #'
-#' This checks if a value is in a given interval
+#' This checks if the value is in a given interval
 #'
 #' @param x A numeric value.
 #' @param s1 The left boundary of a 1D interval.
@@ -131,5 +137,25 @@ fq <- function(y){
         return(r)
 
 }
+
+#' Distance matrix
+#'
+#' Calculating the distance matrix for point clouds in 2D.
+#'
+#' @param x The first coordinates.
+#' @param y The second coordinates.
+#' @return The distance matrix.
+#' @export
+createCostMatrix <- function(x,y,method = "euclidean"){
+        costM <-matrix(rep(0, length(x)*length(x)), nrow = length(x))
+        for (i in 1:length(x)){
+                for (j in 1:length(x)){
+                        costM[i,j] <- stats::dist(rbind(c(x[i],y[i]), c(x[j] ,y[j])), method = method)
+                }
+        }
+        return(costM)
+}
+
+
 
 
