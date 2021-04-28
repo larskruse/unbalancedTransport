@@ -4,6 +4,10 @@
 #'
 #' @export
 ExampleMonge <- function(){
+
+    print("This function uses the example distributions used in the scaling paper and the quadratic cost matrix.")
+
+
     # number of supply and demand points
     I <- 300
     J <- 300
@@ -35,14 +39,21 @@ ExampleMonge <- function(){
     C <-  quadCost(X,Y)
     checkMongeProperty(C)
 
+    print("The cost for mass creation and destruction is set to 1.1")
+
     # compute and plot the transport plan
-    res <- mongeTransport(C, p, q, 1.1, 1.1)
+    res <- mongeAlgorithm(C, p, q, 1.1, 1.1)
     plot1DTransport(res$transportPlan, supplyList, demandList, X)
     plotUOTP(res$transportPlan, res$import, res$export)
 
+
+    print("The cost for mass creation and destruction is set to 0.2")
+
     # compute and plot the transport plan
-    res <- mongeTransport(C, p, q, 0.2, 0.2)
+    res <- mongeAlgorithm(C, p, q, 0.1, 0.1)
     plot1DTransport(res$transportPlan, supplyList, demandList, X)
     plotUOTP(res$transportPlan, res$import, res$export)
+
+
 
 }

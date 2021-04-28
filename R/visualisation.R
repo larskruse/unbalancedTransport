@@ -120,16 +120,6 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
 
         image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
               col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
-        # att2 <- ((1):(nrow(transportPlan)-1))/(nrow(transportPlan)-1)
-        # att2 <- att2[seq(1,length(att2), length.out = 10)]
-        # lab2 <- nrow(transportPlan):1
-        # lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
-        # att1 <- ((1):(ncol(transportPlan)-1))/(ncol(transportPlan)-1)
-        # att1 <- att1[seq(1,length(att1), length.out = 10)]
-        # lab1 <- 1:ncol(transportPlan)
-        # lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
-        # Axis(side = 2, at = att2, labels = lab2)
-        # Axis(side = 1, at = att1, labels = lab1)
 
 
     }else{

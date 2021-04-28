@@ -58,8 +58,8 @@ checkMongeProperty <- function(mat){
 
                 print("Matrix does not fulfill the Monge property")
                 print("Failed at:")
-                cat("\n i Coordiante: " + i)
-                cat("\n j Coordiante: " + j )
+                cat("\n i Coordiante: ", i)
+                cat("\n j Coordiante: ", j )
                 return(0)
 
             }
@@ -128,13 +128,13 @@ pathToPlan <- function(iList, jList, wList, dimX, dimY){
 #' destructCost <- runif(1,0,0.3)
 #'
 #' # calculating the optimal transport cost and plan
-#' res <- mongeTransport(mongeMatrix, supply, demand, createCost, destructCost)
+#' res <- mongeAlgorithm(mongeMatrix, supply, demand, createCost, destructCost)
 #'
 #' # plotting the transport plan
 #' plotUOTP(res$transportPlan, res$import, res$export)
 #'
 
-mongeTransport <- function(costMatrix, supply, demand, constructionCost, destructionCost){
+mongeAlgorithm <- function(costMatrix, supply, demand, constructionCost, destructionCost){
 
     # computing the optimal transport cost, path and import / export vectors
     transportResult <- Monge_Rcpp(costMatrix, supply, demand, constructionCost, destructionCost)

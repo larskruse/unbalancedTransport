@@ -14,6 +14,7 @@ ExampleTree1 <- function(){
     constructionCost <- rep(2,13)
     destructionCost <- rep(1,13)
 
+
     cat("Mass creation cost: ", constructionCost, "\n")
     cat("Mass destruction cost: ", destructionCost, "\n")
 
@@ -22,6 +23,8 @@ ExampleTree1 <- function(){
 
     cat("Supply: ", supply, "\n")
     cat("Demand: ", demand, "\n")
+
+    print("All edge weights are 1.")
 
 
     transport <- treeAlgorithm(tree, supply, demand , constructionCost,
@@ -56,6 +59,8 @@ ExampleTree2 <- function(){
 
     cat("Supply: ", supply, "\n")
     cat("Demand: ", demand, "\n")
+
+    print("The edge weight from 1 to 8 is 10. Every other edge weight is 1.")
 
 
     transport <- treeAlgorithm(tree, supply, demand , constructionCost,
