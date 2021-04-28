@@ -144,6 +144,8 @@ fq <- function(y){
 #'
 #' @param x The first coordinates.
 #' @param y The second coordinates.
+#' @param method Determines which distance function to use for the computation. The default value is "euclidean" but every
+#' method given for stats::dist can be used.
 #' @return The distance matrix.
 #' @export
 createCostMatrix <- function(x,y,method = "euclidean"){

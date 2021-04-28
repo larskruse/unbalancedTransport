@@ -10,6 +10,9 @@ createCostMatrix(x, y, method = "euclidean")
 \item{x}{The first coordinates.}
 
 \item{y}{The second coordinates.}
+
+\item{method}{Determines which distance function to use for the computation. The default value is "euclidean" but every
+method given for stats::dist can be used.}
 }
 \value{
 The distance matrix.
