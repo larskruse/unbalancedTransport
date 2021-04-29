@@ -7,7 +7,7 @@
 mongeAlgorithm(costMatrix, supply, demand, constructionCost, destructionCost)
 }
 \arguments{
-\item{costMatrix}{A numeric matrix fulfilling the Monge property}
+\item{costMatrix}{A numeric Monge matrix.}
 
 \item{supply}{A numeric supply vector}
 

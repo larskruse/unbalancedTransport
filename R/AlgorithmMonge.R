@@ -107,7 +107,7 @@ pathToPlan <- function(iList, jList, wList, dimX, dimY){
 #' unbalanced optimal transport problem. The cost matrix has to fulfill the Monge
 #' property.
 #'
-#' @param costMatrix A numeric matrix fulfilling the Monge property
+#' @param costMatrix A numeric Monge matrix.
 #' @param supply A numeric supply vector
 #' @param demand A numeric demand vector
 #' @param constructionCost A numeric construction cost value
