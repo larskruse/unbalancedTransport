@@ -125,7 +125,7 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
     }else{
 
         # Distance between import/export vectors and transport plan
-        emptyColRow <- max(1, max(nrow(transportPlan), ncol(transportPlan))/20)
+        emptyColRow <- max(1, ceiling(max(nrow(transportPlan), ncol(transportPlan))/20))
 
         leftCol <- export
         leftCol[(length(leftCol)+1):(length(leftCol)+1+emptyColRow)] <- NaN
