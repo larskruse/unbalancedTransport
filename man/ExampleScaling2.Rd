@@ -7,5 +7,5 @@
 ExampleScaling2()
 }
 \description{
-The examples given in the [paper]
+Another scaling algorithm example
 }

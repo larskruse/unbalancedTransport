@@ -104,7 +104,7 @@ ExampleScaling <- function(){
 
 #' The Scaling Algorithm Example
 #'
-#' The examples given in the [paper]
+#' Another scaling algorithm example
 #'
 #' @export
 #'
@@ -114,7 +114,7 @@ ExampleScaling2 <- function(){
     xx <- c(0,0,0,3,3.5,4)
     xy <- c(0,1,2,1.7,1,0.2)
 
-    dx <-c(1/6,1/6,1/6,1/6,1/6,1/6)
+    dx <- rep(1/6,6)
     dy <- dx
 
     # supply measure
@@ -147,7 +147,10 @@ ExampleScaling2 <- function(){
     # compute and plot the transport plan
     res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
 
-    transportP <- 6*res$transportPlan
+
+    transportP <- res$transportPlan
+
+    transportP <- transportP*6
 
     plotUOTP(transportP)
 
