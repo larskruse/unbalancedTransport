@@ -1,7 +1,7 @@
 
 #' The log-domain stabilized Scaling Algorithm
 #'
-#' @param costMatrix A numeric matrix.
+#' @param costMatrix A numeric matrix. tt
 #' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
 #'  a numeric supply vector, the reference measure as numeric vector and the
 #'  value for the lambda parameter.

@@ -157,4 +157,3 @@ ExampleScaling2 <- function(){
     plotTransportByCost(C, transportP, p, q)
 
 }
-
