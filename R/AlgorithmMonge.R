@@ -13,7 +13,7 @@
 #' @param dimy number of rows
 #'
 #' @return A Monge matrix of size dimx times dimy.
-#' @export
+#' @noRd
 #'
 genMongeMat <- function(dimx, dimy){
     a <- round(runif(dimx, min = 0, max = 1),3)
@@ -46,7 +46,7 @@ genMongeMat <- function(dimx, dimy){
 #' @param mat A numeric matrix.
 #'
 #' @return '0' if the matrix does not fulfill the Monge property, '1' if it does
-#' @export
+#' @noRd
 #'
 checkMongeProperty <- function(mat){
     dim <- dim(mat)
@@ -85,7 +85,8 @@ checkMongeProperty <- function(mat){
 #' @param dimY The number of columns in the transport matrix
 #'
 #' @return A dimX times dimY transport matrix
-#' @export
+#'
+#' @noRd
 #'
 pathToPlan <- function(iList, jList, wList, dimX, dimY){
     plan <- matrix(0L, nrow = dimX, ncol = dimY)

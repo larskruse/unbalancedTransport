@@ -6,7 +6,8 @@
 #'
 #' @param c A numeric distance matrix.
 #' @return The coordinates based on the distance matrix.
-#' @export
+#'
+#' @NoRd
 #'
 positionsByEigenvalue <- function(c){
         dimC <- dim(c)[1]
@@ -72,7 +73,7 @@ wfrCost <- function(X,Y){
 #' @param X A numeric vector.
 #' @param Y A numeric vector.
 #' @return The quadratic cost matrix.
-#' @export
+#' @NoRd
 #'
 quadCost <- function(X,Y){
         C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
@@ -96,7 +97,7 @@ quadCost <- function(X,Y){
 #' @param s1 The left boundary of a 1D interval.
 #' @param s2 The right boundary of a 1D interval.
 #' @return 1 if x is in [s1,s2] and 0 if it is not.
-#' @export
+#' @NoRd
 #'
 inseg <- function(x,s1,s2){
         if(s1 <= x & x <= s2){
