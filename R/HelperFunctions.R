@@ -8,7 +8,7 @@
 #' @return The coordinates based on the distance matrix.
 #'
 #' @NoRd
-#'
+
 positionsByEigenvalue <- function(c){
         dimC <- dim(c)[1]
         m <- matrix(rep(0, length(c)), dimC)
@@ -74,7 +74,7 @@ wfrCost <- function(X,Y){
 #' @param Y A numeric vector.
 #' @return The quadratic cost matrix.
 #' @NoRd
-#'
+
 quadCost <- function(X,Y){
         C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
 
@@ -113,7 +113,7 @@ inseg <- function(x,s1,s2){
 #'
 #' @param x A numeric value.
 #' @return The function value r = p(x).
-#' @export
+#' @noRd
 #'
 fp <- function(x){
         r <- 2*inseg(x,0.0,0.2)
@@ -129,7 +129,7 @@ fp <- function(x){
 #'
 #' @param y A numeric value.
 #' @return The function value r = ´q(y).
-#' @export
+#' @noRd
 #'
 fq <- function(y){
         r <- 10*(y-0.2)*inseg(y,0.2,0.4)
@@ -149,7 +149,7 @@ fq <- function(y){
 #' method given for stats::dist can be used.
 #' @return The distance matrix.
 #' @export
-createCostMatrix <- function(x,y,method = "euclidean"){
+costMatrixAlt <- function(x,y,method = "euclidean"){
         costM <-matrix(rep(0, length(x)*length(x)), nrow = length(x))
         for (i in 1:length(x)){
                 for (j in 1:length(x)){
@@ -158,6 +158,69 @@ createCostMatrix <- function(x,y,method = "euclidean"){
         }
         return(costM)
 }
+
+
+#' @title Cost Matrix
+#'
+#' @description Calculates the cost matrix between points.
+#'
+#' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
+#' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
+#' @param method Determines which distance function to use for the computation.  Currently implemented are:
+#' 1. Euclidean distance:
+#' 2. Wassserstein Fisher Rao distance:
+#' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
+#' points in y
+#' @export
+costMatrix <- function(x, y, method = "euclidean", p = 1){
+
+        if(ncol(x) != ncol(y)){
+                print("Unequal dimensions.")
+        }
+
+        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
+
+        if(method == "euclidean"){
+
+                for (i in 1:nrow(x)){
+
+                        cat("Iteration: ", i, "\n")
+
+
+                        a <- t(t(y) - x[i,])
+                        b <- a^2
+                        c <- rowSums(b)
+                        d <- sqrt(c)
+                        print(x[i,])
+                        print(a)
+                        print(b)
+                        print(c)
+                        print(d)
+
+                        cMatrix[i,] <- sqrt(rowSums((t(t(y) - x[i,]))^2))^p
+                }
+
+
+        }else if(method == "WFR"){
+
+
+        }else{
+                print("Please specify a method.")
+        }
+
+        return(cMatrix)
+
+}
+# costMatrix(x,y)
+#
+#
+# x <- matrix(c(1,1,1,0,1,2), ncol = 2)
+# x
+# y <- matrix(c(3,2,3,0,1,2), ncol = 2)
+# y
+#
+# plot(x, xlim = c(1,3))
+# points(y)
 
 
 
