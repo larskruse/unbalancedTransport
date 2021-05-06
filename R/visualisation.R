@@ -170,15 +170,18 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
 #' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
 #'  a numeric demand vector, the reference measure as numeric vector and the
 #'  value for the lambda parameter.
-#' @param X Discretization underlying the supply and demand mearsures.
 #'
 #'
 #' @export
-plot1DTransport <- function(transportMap,supplyList, demandList, X){
+plot1DTransport <- function(transportMap,supplyList, demandList){
 
     # Number of color intervals
     numIntervals <- 50
 
+    X <- supplyList[[2]]
+
+    x1Measure <- rep(1, length(supplyList[[1]]))
+    y1Measure <- rep(1, length(demandList[[1]]))
 
     colors <- rainbow(numIntervals, s = 1, v = 1, start = 0, end = max(1, numIntervals - 1)/numIntervals, alpha = 1, rev = FALSE)
 
@@ -200,19 +203,19 @@ plot1DTransport <- function(transportMap,supplyList, demandList, X){
         subK <- transportMap * colSuppInter
 
         # Adding the color intervals
-        #lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "h", col = colors[i])
-        #lines(demandList[[2]], subK %*% demandList[[3]], type = "h", col = colors[i])
+        #lines(supplyList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
+        #lines(demandList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
 
-        polygon(c(firstSupp,supplyList[[2]]),c(0,t(subK) %*% supplyList[[3]]), col = colors[i])
-        polygon(c(firstDem,demandList[[2]]), c(0,subK %*% demandList[[3]]), col = colors[i])
+        polygon(c(firstSupp,supplyList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
+        polygon(c(firstDem,demandList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
 
-        lines(supplyList[[2]], t(subK) %*% supplyList[[3]], type = "l", col = "black")
-        lines(demandList[[2]], subK %*% demandList[[3]], type = "l", col = "black")
+        lines(supplyList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
+        lines(demandList[[2]], subK %*% y1Measure, type = "l", col = "black")
 
     }
 
-    lines(supplyList[[2]], t(transportMap) %*% supplyList[[3]], type = "l", col = "red")
-    lines(demandList[[2]], transportMap %*% demandList[[3]], type = "l", col = "blue")
+    lines(supplyList[[2]], t(transportMap) %*% x1Measure, type = "l", col = "red")
+    lines(demandList[[2]], transportMap %*% y1Measure, type = "l", col = "blue")
 
     lines(supplyList[[2]], rep(0, length(supplyList[[2]])), type = "l", col = "black")
 

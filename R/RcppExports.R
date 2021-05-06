@@ -48,8 +48,6 @@ proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
 #' @param costMatrix A numeric matrix.
 #' @param supply A numeric vector
 #' @param demand A numeric vector
-#' @param dx Reference measure underlying the supply distribution
-#' @param dy Reference measure underlying the demand distribution
 #' @param lambdaSupply Parameter for the supply proxdiv function
 #' @param lambdaDemand Parameter for the demand proxdiv function
 #' @param DivSupply Parameter indicating the divergence function to use for the supply proxdiv function
@@ -62,9 +60,9 @@ proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
 #' @param betaDemand numeric value
 #'
 #' @return The optimal transport plan
-#'
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, dx, dy, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec) {
-    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, dx, dy, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec)
+#' @export
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec) {
+    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec)
 }
 
 treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {

@@ -58,8 +58,6 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
   }else if(DivFun == 2){
     return ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
   }else{
-
-    // test this
     return((beta*div0(p,s)).array().min(alpha*div0(p,s).array().max((-u.array()/eps).array().exp())));
   }
 
@@ -100,8 +98,6 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 //' @param costMatrix A numeric matrix.
 //' @param supply A numeric vector
 //' @param demand A numeric vector
-//' @param dx Reference measure underlying the supply distribution
-//' @param dy Reference measure underlying the demand distribution
 //' @param lambdaSupply Parameter for the supply proxdiv function
 //' @param lambdaDemand Parameter for the demand proxdiv function
 //' @param DivSupply Parameter indicating the divergence function to use for the supply proxdiv function
@@ -114,20 +110,19 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 //' @param betaDemand numeric value
 //'
 //' @return The optimal transport plan
-//'
+//' @export
 // [[Rcpp::export]]
 
 Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::Map<Eigen::VectorXd> supply,
-                                  Eigen::Map<Eigen::VectorXd> demand, Eigen::Map<Eigen::VectorXd> dx,
-                                  Eigen::Map<Eigen::VectorXd> dy, double lambdaSupply, double alphaSupply,
+                                  Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec){
   // number of absorptions
   int numAbs = 0;
 
   // number of points in the reference measures
-  int Nx = dx.size();
-  int Ny = dy.size();
+  int Nx = supply.size();
+  int Ny = demand.size();
 
   // initializing vectors
   Eigen::VectorXd a = Eigen::VectorXd::Ones(Nx);
@@ -156,13 +151,11 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
 
 
     // calculate scaling iterates
-    a = b.array() * dy.array();
-    a = Kernel * a;
+    a = Kernel * b;
     a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply, alphaSupply, betaSupply);
 
 
-    b = a.array() * dx.array();
-    b = Kernel.transpose() * b;
+    b = Kernel.transpose() * a;
     b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand, alphaDemand, betaDemand);
 
 

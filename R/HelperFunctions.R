@@ -72,6 +72,7 @@ wfrCost <- function(X,Y){
 #' @param X A numeric vector.
 #' @param Y A numeric vector.
 #' @return The quadratic cost matrix.
+#' @export
 
 quadCost <- function(X,Y){
         C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
@@ -110,7 +111,7 @@ inseg <- function(x,s1,s2){
 #'
 #' @param x A numeric value.
 #' @return The function value r = p(x).
-#' @noRd
+#' @export
 #'
 fp <- function(x){
         r <- 2*inseg(x,0.0,0.2)
@@ -126,7 +127,7 @@ fp <- function(x){
 #'
 #' @param y A numeric value.
 #' @return The function value r = ´q(y).
-#' @noRd
+#' @export
 #'
 fq <- function(y){
         r <- 10*(y-0.2)*inseg(y,0.2,0.4)

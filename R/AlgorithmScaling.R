@@ -22,7 +22,6 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
         Div1 <- 1
     }else if(supplyList[[1]] == "TV"){
         Div1 <- 2
-
     }else if(supplyList[[1]] == "RG"){
         Div1 <- 3
     }else{
@@ -42,36 +41,40 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
     supply <- supplyList[[2]]
     demand <- demandList[[2]]
 
-    supplyRefMeasure <- supplyList[[3]]
-    demandRefMeasure <- demandList[[3]]
 
-    if(Div1 == 3){
-        supplyReg <- supplyList[[4]]
+    if(Div1 != 3){
+        supplyReg <- supplyList[[3]]
         supplyAlpha <- 0
         supplyBeta <- 0
 
     }else{
         supplyReg <- 0
-        supplyAlpha <- supplyList[[4]]
-        supplyBeta <- supplyList[[5]]
+        supplyAlpha <- supplyList[[3]]
+        supplyBeta <- supplyList[[4]]
     }
 
 
-    if(Div2 == 3){
-        demandReg <- demandList[[4]]
+    if(Div2 != 3){
+        demandReg <- demandList[[3]]
         demandAlpha <- 0
         demandBeta <- 0
 
     }else{
         demandReg <- 0
-        demandAlpha <- demandList[[4]]
-        demandBeta <- demandList[[5]]
+        demandAlpha <- demandList[[3]]
+        demandBeta <- demandList[[4]]
     }
 
-    res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyRefMeasure,
-                                demandRefMeasure, supplyReg, supplyAlpha, supplyBeta,
-                                demandReg, demandAlpha, demandBeta, Div1,
-                                Div2, maxIteration, epsVector)
+    print(supplyReg)
+    print(demandReg)
+    print(Div1)
+    print(Div2)
+    res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
+                                  supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
+                                  Div2, maxIteration, epsVector)
+
+    print(res$TransportMap[1:10,1:10])
+
 
     transportPlan <- res$TransportMap
 

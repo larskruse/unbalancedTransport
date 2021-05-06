@@ -43,7 +43,7 @@ ExampleMonge <- function(){
 
     # compute and plot the transport plan
     res <- mongeAlgorithm(C, p, q, 1.1, 1.1)
-    plot1DTransport(res$transportPlan, supplyList, demandList, X)
+    plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan, res$import, res$export)
 
 
@@ -51,7 +51,7 @@ ExampleMonge <- function(){
 
     # compute and plot the transport plan
     res <- mongeAlgorithm(C, p, q, 0.1, 0.1)
-    plot1DTransport(res$transportPlan, supplyList, demandList, X)
+    plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan, res$import, res$export)
 
 

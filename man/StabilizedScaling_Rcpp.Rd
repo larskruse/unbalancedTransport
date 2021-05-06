@@ -8,8 +8,6 @@ StabilizedScaling_Rcpp(
   costMatrix,
   supply,
   demand,
-  dx,
-  dy,
   lambdaSupply,
   alphaSupply,
   betaSupply,
@@ -28,10 +26,6 @@ StabilizedScaling_Rcpp(
 \item{supply}{A numeric vector}
 
 \item{demand}{A numeric vector}
-
-\item{dx}{Reference measure underlying the supply distribution}
-
-\item{dy}{Reference measure underlying the demand distribution}
 
 \item{lambdaSupply}{Parameter for the supply proxdiv function}
 
