@@ -11,7 +11,11 @@ StabilizedScaling_Rcpp(
   dx,
   dy,
   lambdaSupply,
+  alphaSupply,
+  betaSupply,
   lambdaDemand,
+  alphaDemand,
+  betaDemand,
   DivSupply,
   DivDemand,
   iterMax,
@@ -31,7 +35,15 @@ StabilizedScaling_Rcpp(
 
 \item{lambdaSupply}{Parameter for the supply proxdiv function}
 
+\item{alphaSupply}{numeric Value}
+
+\item{betaSupply}{numeric value}
+
 \item{lambdaDemand}{Parameter for the demand proxdiv function}
+
+\item{alphaDemand}{numeric Value}
+
+\item{betaDemand}{numeric value}
 
 \item{DivSupply}{Parameter indicating the divergence function to use for the supply proxdiv function}
 

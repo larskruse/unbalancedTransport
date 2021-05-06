@@ -22,6 +22,9 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
         Div1 <- 1
     }else if(supplyList[[1]] == "TV"){
         Div1 <- 2
+
+    }else if(supplyList[[1]] == "RG"){
+        Div1 <- 3
     }else{
         stop("Please use 'KL' or 'TV' as divergence Function parameter for supplyList")
     }
@@ -30,6 +33,8 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
         Div2 <- 1
     }else if(demandList[[1]] == "TV"){
         Div2 <- 2
+    }else if(demandList[[1]] == "RG"){
+        Div2 <- 3
     }else{
         stop("Please use 'KL' or 'TV' as divergence Function parameter for demandList")
     }
@@ -40,11 +45,32 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
     supplyRefMeasure <- supplyList[[3]]
     demandRefMeasure <- demandList[[3]]
 
-    supplyReg <- supplyList[[4]]
-    demandReg <- demandList[[4]]
+    if(Div1 == 3){
+        supplyReg <- supplyList[[4]]
+        supplyAlpha <- 0
+        supplyBeta <- 0
+
+    }else{
+        supplyReg <- 0
+        supplyAlpha <- supplyList[[4]]
+        supplyBeta <- supplyList[[5]]
+    }
+
+
+    if(Div2 == 3){
+        demandReg <- demandList[[4]]
+        demandAlpha <- 0
+        demandBeta <- 0
+
+    }else{
+        demandReg <- 0
+        demandAlpha <- demandList[[4]]
+        demandBeta <- demandList[[5]]
+    }
 
     res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyRefMeasure,
-                                demandRefMeasure, supplyReg, demandReg, Div1,
+                                demandRefMeasure, supplyReg, supplyAlpha, supplyBeta,
+                                demandReg, demandAlpha, demandBeta, Div1,
                                 Div2, maxIteration, epsVector)
 
     transportPlan <- res$TransportMap

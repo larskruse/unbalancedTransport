@@ -32,10 +32,12 @@ Monge_Rcpp <- function(costMatrix, supply, demand, constructionCost, destruction
 #' @param DivFun A numeric value indicating the function to be used.'1' gives
 #'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 #'   for the total variation.
+#' @param alpha num value
+#' @param beta num value
 #' @return A vector holding the proxdiv evaluation
 #' @export
-proxdiv <- function(lambda, p, s, u, eps, DivFun) {
-    .Call(`_unbalancedTransport_proxdiv`, lambda, p, s, u, eps, DivFun)
+proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
+    .Call(`_unbalancedTransport_proxdiv`, lambda, p, s, u, eps, DivFun, alpha, beta)
 }
 
 #' The stabilized Scaling Algorithm
@@ -54,11 +56,15 @@ proxdiv <- function(lambda, p, s, u, eps, DivFun) {
 #' @param DivDemand Parameter indicating the divergence function to use for the demand proxdiv function
 #' @param iterMax Maximum number of iterations
 #' @param epsvec A numeric vector of decreasing epsilon values.
+#' @param alphaSupply numeric Value
+#' @param betaSupply numeric value
+#' @param alphaDemand numeric Value
+#' @param betaDemand numeric value
 #'
 #' @return The optimal transport plan
 #'
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, dx, dy, lambdaSupply, lambdaDemand, DivSupply, DivDemand, iterMax, epsvec) {
-    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, dx, dy, lambdaSupply, lambdaDemand, DivSupply, DivDemand, iterMax, epsvec)
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, dx, dy, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec) {
+    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, dx, dy, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec)
 }
 
 treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {

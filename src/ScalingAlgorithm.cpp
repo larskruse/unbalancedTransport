@@ -42,10 +42,12 @@ Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
 //' @param DivFun A numeric value indicating the function to be used.'1' gives
 //'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 //'   for the total variation.
+//' @param alpha num value
+//' @param beta num value
 //' @return A vector holding the proxdiv evaluation
 //' @export
 //[[Rcpp::export]]
-Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun){
+Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
   if (DivFun == 1){
     Eigen::VectorXd temp = s.array()*exp(u.array()/lambda);
     Eigen::VectorXd temp1 = div0(p,temp);
@@ -53,8 +55,12 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
 
     return temp2;
 
-  }else{ //} if (DivFun == 2){
+  }else if(DivFun == 2){
     return ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
+  }else{
+
+    // test this
+    return((beta*div0(p,s)).array().min(alpha*div0(p,s).array().max((-u.array()/eps).array().exp())));
   }
 
 }
@@ -102,6 +108,10 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 //' @param DivDemand Parameter indicating the divergence function to use for the demand proxdiv function
 //' @param iterMax Maximum number of iterations
 //' @param epsvec A numeric vector of decreasing epsilon values.
+//' @param alphaSupply numeric Value
+//' @param betaSupply numeric value
+//' @param alphaDemand numeric Value
+//' @param betaDemand numeric value
 //'
 //' @return The optimal transport plan
 //'
@@ -109,7 +119,8 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 
 Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::Map<Eigen::VectorXd> supply,
                                   Eigen::Map<Eigen::VectorXd> demand, Eigen::Map<Eigen::VectorXd> dx,
-                                  Eigen::Map<Eigen::VectorXd> dy, double lambdaSupply, double lambdaDemand,
+                                  Eigen::Map<Eigen::VectorXd> dy, double lambdaSupply, double alphaSupply,
+                                  double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec){
   // number of absorptions
   int numAbs = 0;
@@ -147,12 +158,12 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     // calculate scaling iterates
     a = b.array() * dy.array();
     a = Kernel * a;
-    a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply);
+    a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply, alphaSupply, betaSupply);
 
 
     b = a.array() * dx.array();
     b = Kernel.transpose() * b;
-    b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand);
+    b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand, alphaDemand, betaDemand);
 
 
     //Stabilizing step and changing epsilon
