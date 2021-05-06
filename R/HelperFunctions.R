@@ -7,7 +7,6 @@
 #' @param c A numeric distance matrix.
 #' @return The coordinates based on the distance matrix.
 #'
-#' @NoRd
 
 positionsByEigenvalue <- function(c){
         dimC <- dim(c)[1]
@@ -73,7 +72,6 @@ wfrCost <- function(X,Y){
 #' @param X A numeric vector.
 #' @param Y A numeric vector.
 #' @return The quadratic cost matrix.
-#' @NoRd
 
 quadCost <- function(X,Y){
         C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
@@ -97,7 +95,6 @@ quadCost <- function(X,Y){
 #' @param s1 The left boundary of a 1D interval.
 #' @param s2 The right boundary of a 1D interval.
 #' @return 1 if x is in [s1,s2] and 0 if it is not.
-#' @NoRd
 #'
 inseg <- function(x,s1,s2){
         if(s1 <= x & x <= s2){
@@ -149,7 +146,7 @@ fq <- function(y){
 #' method given for stats::dist can be used.
 #' @return The distance matrix.
 #' @export
-costMatrixAlt <- function(x,y,method = "euclidean"){
+createCostMatrix <- function(x,y,method = "euclidean"){
         costM <-matrix(rep(0, length(x)*length(x)), nrow = length(x))
         for (i in 1:length(x)){
                 for (j in 1:length(x)){
@@ -160,58 +157,65 @@ costMatrixAlt <- function(x,y,method = "euclidean"){
 }
 
 
-#' @title Cost Matrix
+#' #' @title Cost Matrix
+#' #'
+#' #' @description Calculates the cost matrix between points.
+#' #'
+#' #' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
+#' #' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
+#' #' @param method Determines which distance function to use for the computation.  Currently implemented are:
+#' #' 1. Euclidean
+#' #' 2. Minkowski
+#' #' 3. Maximum
+#' #' @param exp exponent to apply to the distance
+#' #' @param wfr computing the wasserstein fisher rao distance
+#' #' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
+#' #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
+#' #' points in y
+#' #' @export
+#' costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
 #'
-#' @description Calculates the cost matrix between points.
 #'
-#' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
-#' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
-#' @param method Determines which distance function to use for the computation.  Currently implemented are:
-#' 1. Euclidean distance:
-#' 2. Wassserstein Fisher Rao distance:
-#' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
-#' points in y
-#' @export
-costMatrix <- function(x, y, method = "euclidean", p = 1){
-
-        if(ncol(x) != ncol(y)){
-                print("Unequal dimensions.")
-        }
-
-        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
-
-        if(method == "euclidean"){
-
-                for (i in 1:nrow(x)){
-
-                        cat("Iteration: ", i, "\n")
-
-
-                        a <- t(t(y) - x[i,])
-                        b <- a^2
-                        c <- rowSums(b)
-                        d <- sqrt(c)
-                        print(x[i,])
-                        print(a)
-                        print(b)
-                        print(c)
-                        print(d)
-
-                        cMatrix[i,] <- sqrt(rowSums((t(t(y) - x[i,]))^2))^p
-                }
-
-
-        }else if(method == "WFR"){
-
-
-        }else{
-                print("Please specify a method.")
-        }
-
-        return(cMatrix)
-
-}
-# costMatrix(x,y)
+#'         if(ncol(x) != ncol(y)){
+#'                 print("Unequal dimensions.")
+#'         }
+#'
+#'         if (method == "euclidean"){
+#'                 method <- "minkowski"
+#'                 p <- 2
+#'         }
+#'
+#'         cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
+#'
+#'         if(method == "minkowski"){
+#'
+#'                 for (i in 1:nrow(x)){
+#'
+#'                         cMatrix[i,] <- ((rowSums((t(t(y) - x[i,]))^p))^(1/p))^exp
+#'                 }
+#'
+#'         }else if(method == "maximum"){
+#'
+#'                 for(i in 1:nrow(x)){
+#'
+#'                         cMatrix[i,] <- max(t(t(y) - x[i,]))^exp
+#'
+#'                 }
+#'
+#'         }else{
+#'                 print("Please specify a method.")
+#'         }
+#'
+#'
+#'         if(wfr){
+#'
+#'                 cMatrix <- -2*log(cos(min(cMatrix, pi/2)))
+#'         }
+#'
+#'         return(cMatrix)
+#'
+#' }
+#' costMatrix(x, y, method = "maximum")
 #
 #
 # x <- matrix(c(1,1,1,0,1,2), ncol = 2)

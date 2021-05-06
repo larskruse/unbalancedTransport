@@ -83,23 +83,23 @@ ExampleScaling <- function(){
     plotUOTP(res$transportPlan)
 
 
-    cat("Number of iterations: ", iterMax, "\n")
-
-    cat("Epsilon values: ", epsvec, "\n")
-
-    cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.")
-
-    cat("The WFR distance matrix is used.")
-
-    #compute Wasserstein-Fisher-Rao cost matrix
-    C <- wfrCost(X,Y)
-    # use Kulback-Leibner divergence with lambda = 0.5 for supply and demand
-    supply <- list("KL", p, dx, 0.5)
-    demand <- list("KL", q, dy, 0.5)
-    # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, 20000, epsvec)
-    plot1DTransport(res$transportPlan, supplyList, demandList, X)
-    plotUOTP(res$transportPlan)
+    # cat("Number of iterations: ", iterMax, "\n")
+    #
+    # cat("Epsilon values: ", epsvec, "\n")
+    #
+    # cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.")
+    #
+    # cat("The WFR distance matrix is used.")
+    #
+    # #compute Wasserstein-Fisher-Rao cost matrix
+    # C <- wfrCost(X,Y)
+    # # use Kulback-Leibner divergence with lambda = 0.5 for supply and demand
+    # supply <- list("KL", p, dx, 0.5)
+    # demand <- list("KL", q, dy, 0.5)
+    # # compute and plot the transport plan
+    # res <- scalingAlgorithm(C, supply, demand, 20000, epsvec)
+    # plot1DTransport(res$transportPlan, supplyList, demandList, X)
+    # plotUOTP(res$transportPlan)
 }
 
 #' The Scaling Algorithm Example

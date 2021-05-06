@@ -13,7 +13,7 @@
 #' @param dimy number of rows
 #'
 #' @return A Monge matrix of size dimx times dimy.
-#' @noRd
+#' @export
 #'
 genMongeMat <- function(dimx, dimy){
     a <- round(runif(dimx, min = 0, max = 1),3)

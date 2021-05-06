@@ -231,6 +231,8 @@ plot1DTransport <- function(transportMap,supplyList, demandList, X){
 #'
 #' @return data.frame with coordinates and information for all tree nodes
 #'
+#' @noRd
+#'
 nextLayer <- function(treeDF, coordinates ,node, layer){
 
     children <- treeDF[treeDF$parent ==node,]$child
@@ -348,10 +350,15 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
     coordinates <- data.frame(c(rootNode, 0, 0, 100,-100,-1))
     colnames(coordinates) <- c("node", "x", "layer", "maxX", "minX", "parent")
 
+
     # compute all coordinates
     coordinates <- nextLayer(treeDF, coordinates, rootNode, -1)
 
     maxLayer <- min(coordinates$layer)
+
+    coordinates$layer <- coordinates$layer * 100/(-maxLayer)
+    maxLayer <- min(coordinates$layer)
+
 
     # add the supply to the coordiantes
     if(!is.null(supply) & !is.null(demand)){
@@ -373,26 +380,6 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
                  coordinates[coordinates$node == treeDF[i,]$child,]$layer)
     }
 
-    # If the supply and demand are not given, plot all nodes in black.
-    if(is.null(supply) | is.null(demand)){
-        points(coordinates$x, coordinates$layer,pch = 19 )
-
-        # Otherwise plot supply nodes in green and demand nodes in blue.
-        # The radius of the node indicates the amount of supply / demand: The bigger the node
-        # the more mass is supplied or demanded.
-        # Nodes without supply or demand are plotted in black.
-    }else{
-        points(coordinates[coordinates$supply  == 0, ]$x, coordinates[coordinates$supply  == 0, ]$layer,
-               pch = 19 )
-
-        points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "chartreuse3")
-
-        points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
-               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "dodgerblue3")
-
-
-    }
 
 
 
@@ -456,11 +443,43 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
             toX <- coordinates[coordinates$node == arrowsDF[i,]$child,]$x
             toY <- coordinates[coordinates$node == arrowsDF[i,]$child,]$layer
 
-            shape::Arrows(fromX, fromY, toX, toY, arr.adj = 1, arr.type = "curved",
-                   lwd = abs(arrowsDF[i,]$tMass), code = 1.5+0.5*sign(arrowsDF[i,]$tMass) )
+            if(arrowsDF[i,]$tMass > 0){
+                curvedarrow(c(fromX, fromY), c(toX, toY), arr.adj = 1, arr.pos = 0.5,arr.type = "triangle", curve = 0.1,
+                            lwd = abs(arrowsDF[i,]$tMass), lcol = "red", arr.col = "red")
+
+            }else{
+
+                curvedarrow(c(toX, toY),c(fromX, fromY), arr.adj = 1, arr.pos = 0.5,arr.type = "triangle", curve = 0.1,
+                            lwd = abs(arrowsDF[i,]$tMass), lcol = "red", arr.col = "red")
+
+            }
+
+
 
         }
     }
+
+
+    # If the supply and demand are not given, plot all nodes in black.
+    if(is.null(supply) | is.null(demand)){
+        points(coordinates$x, coordinates$layer,pch = 19 )
+
+        # Otherwise plot supply nodes in green and demand nodes in blue.
+        # The radius of the node indicates the amount of supply / demand: The bigger the node
+        # the more mass is supplied or demanded.
+        # Nodes without supply or demand are plotted in black.
+    }else{
+        points(coordinates[coordinates$supply  == 0, ]$x, coordinates[coordinates$supply  == 0, ]$layer ) #,  pch = 19 )
+
+        points(coordinates[coordinates$supply  > 0, ]$x, coordinates[coordinates$supply  > 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply > 0, ]$supply),  col = "chartreuse3")
+
+        points(coordinates[coordinates$supply  < 0, ]$x, coordinates[coordinates$supply  < 0, ]$layer,
+               pch = 19, cex = abs(coordinates[coordinates$supply  < 0, ]$supply),  col = "dodgerblue3")
+
+
+    }
+
 
 
     # Adding the keys to the plot.
