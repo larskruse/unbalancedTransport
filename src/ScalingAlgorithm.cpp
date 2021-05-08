@@ -27,6 +27,105 @@ Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
 
 }
 
+//
+//function fdiv(φ,x,p,dx)
+//  if φ[:type] == "OT" || (in(φ[:type],["KL","TV"]) && φ[:param] == Inf)
+//    return sum( axb0(dx,exp(abs(x-p))-1) ) # barrier approx
+//  elseif φ[:type] == "KL"
+//    λ = φ[:param]
+//    return  λ*sum( axb0(dx,axb0(x,log(div0(x,p))) - x + p ))
+//  elseif φ[:type] == "TV"
+//    λ = φ[:param]
+//    return λ*sum( dx.*abs(x-p) )
+//  elseif φ[:type] == "RG"
+//    β1,β2 = φ[:param]
+//    @assert 0 <= β1 <= β2 < Inf
+//    return sum( axb0(dx, exp(max(0,β1*p-x))+ exp(max(0,x-β2*p))-2)) #barrier
+//  else
+//    error("Type of φ not recognized")
+//end
+//end
+
+
+//' Computing the divergence functions values
+//'
+//' @param r input vector
+//' @param s comparision vector
+//' @param DivFun kind of function to use
+//' @param param1 lambda or alpha
+//' @param param2 beta or 0
+//'
+//' @export
+//'
+//[[Rcpp::export]]
+double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, double param1, double param2 = 0){
+  if (DivFun == 1){
+    // return  λ*sum(axb0(x,log(div0(x,p))) - x + p )
+    Eigen::VectorXd temp = (r.array()*(div0(r,s).array().log()) - r.array() + s.array());
+    return(param1 * temp.sum());
+
+   }else if(DivFun == 2){
+     Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
+
+     return(param1 * temp.sum());
+  // }else if(DivFun == 3 && param1 <= param2 && 0 <= param1){
+  //   Eigen::VectorXd temp =  ;
+  //   return(temp.sum())
+  //   //    return sum( exp(max(0,β1*p-x))+ exp(max(0,x-β2*p))-2)
+
+
+  }
+
+  return(0);
+}
+
+
+
+
+// //
+// //function fdivstar(φ,u,p,dx)
+// //  if φ[:type] == "OT" || (in(φ[:type],["KL","TV"]) && φ[:param] == Inf)
+// //    return sum( axb0(p.*dx,u) )
+// //  elseif φ[:type] == "KL"
+// //    λ = φ[:param]
+// //    return λ*sum( axb0(p.*dx,exp(u/λ)-1) )
+// //  elseif φ[:type] == "TV"
+// //    λ = φ[:param]
+// //    return λ*sum( dx.*min(p, max(-p,axb0(p,u/λ))) )
+// //  elseif φ[:type] == "RG"
+// //    β1,β2 = φ[:param]
+// //    @assert 0 <= β1 <= β2 < Inf
+// //    return sum( axb0(dx, max(β1*axb0(p,u), β2*axb0(p,u)) ))
+// //  else
+// //    error("Type of φ not recognized")
+// //  end
+// //end
+//
+// //' Computing the divergence functions values
+// //'
+// //' @param p input vector
+// //' @param u comparision vector
+// //' @param DivFun kind of function to use
+// //' @param param1 lambda or alpha
+// //' @param param2 beta or 0
+// //'
+// //' @export
+// //'
+// //[[Rcpp::export]]
+// Eigen::VectorXd fVectorDivergence (Eigen::VectorXd p, Eigen::VectorXd u, int DivFun, double param1, double param2 = 0){
+//   if (DivFun == 1){
+//     return(param1 * (p.array() * (u.array()/param1).array().exp()-1).sum());
+//
+//   }else if(DivFun == 2){
+//     return(param1*(p.array().min(-p.array().max(p.array()*u.array()/param1)).sum()));
+//
+//   }else if(DivFun == 3 && param1 <= param2 && 0 <= param1){
+//     return(((param1*p.array()*u.array())).max(param2*p.array()*u.array()).sum());
+//
+//   }
+//
+
+
 
 
 //' The proxdiv operator

@@ -58,7 +58,7 @@ ExampleScaling <- function(){
 
 
     # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
+    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
     plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan)
 
@@ -77,7 +77,7 @@ ExampleScaling <- function(){
     demand <- list("TV", q, 0.05)
 
     # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
+    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
     plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan)
 
@@ -96,7 +96,7 @@ ExampleScaling <- function(){
     supply <- list("KL", p, 0.5)
     demand <- list("KL", q, 0.5)
     # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, 20000, epsvec)
+    res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
     plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan)
 
@@ -109,13 +109,9 @@ ExampleScaling <- function(){
 
 
     # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
+    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
     plot1DTransport(res$transportPlan, supplyList, demandList)
     plotUOTP(res$transportPlan)
-
-
-
-
 
 
 }
@@ -163,7 +159,7 @@ ExampleScaling2 <- function(){
     demand <- list("KL", q, dy, 0.5)
 
     # compute and plot the transport plan
-    res <- scalingAlgorithm(C, supply, demand, iterMax, epsvec)
+    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
 
 
     transportP <- res$transportPlan

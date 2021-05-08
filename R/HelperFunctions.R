@@ -158,64 +158,64 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 }
 
 
-#' #' @title Cost Matrix
-#' #'
-#' #' @description Calculates the cost matrix between points.
-#' #'
-#' #' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
-#' #' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
-#' #' @param method Determines which distance function to use for the computation.  Currently implemented are:
-#' #' 1. Euclidean
-#' #' 2. Minkowski
-#' #' 3. Maximum
-#' #' @param exp exponent to apply to the distance
-#' #' @param wfr computing the wasserstein fisher rao distance
-#' #' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
-#' #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
-#' #' points in y
-#' #' @export
-#' costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
+#' Cost Matrix
 #'
+#' @description Calculates the cost matrix between points.
 #'
-#'         if(ncol(x) != ncol(y)){
-#'                 print("Unequal dimensions.")
-#'         }
-#'
-#'         if (method == "euclidean"){
-#'                 method <- "minkowski"
-#'                 p <- 2
-#'         }
-#'
-#'         cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
-#'
-#'         if(method == "minkowski"){
-#'
-#'                 for (i in 1:nrow(x)){
-#'
-#'                         cMatrix[i,] <- ((rowSums((t(t(y) - x[i,]))^p))^(1/p))^exp
-#'                 }
-#'
-#'         }else if(method == "maximum"){
-#'
-#'                 for(i in 1:nrow(x)){
-#'
-#'                         cMatrix[i,] <- max(t(t(y) - x[i,]))^exp
-#'
-#'                 }
-#'
-#'         }else{
-#'                 print("Please specify a method.")
-#'         }
-#'
-#'
-#'         if(wfr){
-#'
-#'                 cMatrix <- -2*log(cos(min(cMatrix, pi/2)))
-#'         }
-#'
-#'         return(cMatrix)
-#'
-#' }
+#' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
+#' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
+#' @param method Determines which distance function to use for the computation.  Currently implemented are:
+#' 1. Euclidean
+#' 2. Minkowski
+#' 3. Maximum
+#' @param exp exponent to apply to the distance
+#' @param wfr computing the wasserstein fisher rao distance
+#' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
+#' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
+#' points in y
+#' @export
+costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
+
+
+        if(ncol(x) != ncol(y)){
+                print("Unequal dimensions.")
+        }
+
+        if (method == "euclidean"){
+                method <- "minkowski"
+                p <- 2
+        }
+
+        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
+
+        if(method == "minkowski"){
+
+                for (i in 1:nrow(x)){
+
+                        cMatrix[i,] <- ((rowSums((t(t(y) - x[i,]))^p))^(1/p))^exp
+                }
+
+        }else if(method == "maximum"){
+
+                for(i in 1:nrow(x)){
+
+                        cMatrix[i,] <- max(t(t(y) - x[i,]))^exp
+
+                }
+
+        }else{
+                print("Please specify a method.")
+        }
+
+
+        if(wfr){
+
+                cMatrix <- -2*log(cos(min(cMatrix, pi/2)))
+        }
+
+        return(cMatrix)
+
+}
 #' costMatrix(x, y, method = "maximum")
 #
 #

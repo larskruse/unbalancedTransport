@@ -19,6 +19,20 @@ Monge_Rcpp <- function(costMatrix, supply, demand, constructionCost, destruction
     .Call(`_unbalancedTransport_Monge_Rcpp`, costMatrix, supply, demand, constructionCost, destructionCost)
 }
 
+#' Computing the divergence functions values
+#'
+#' @param r input vector
+#' @param s comparision vector
+#' @param DivFun kind of function to use
+#' @param param1 lambda or alpha
+#' @param param2 beta or 0
+#'
+#' @export
+#'
+vectorDivergence <- function(r, s, DivFun, param1, param2 = 0) {
+    .Call(`_unbalancedTransport_vectorDivergence`, r, s, DivFun, param1, param2)
+}
+
 #' The proxdiv operator
 #'
 #' The proxdiv operators for different divergences in the form of 'lambda * DivFun(.|p)'

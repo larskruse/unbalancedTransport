@@ -14,7 +14,7 @@
 #'
 #' @export
 #'
-scalingAlgorithm <- function(costMatrix, supplyList, demandList,
+scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
                              maxIteration, epsVector){
 
     # Using either Kullback-Leibler divergence or total variation
@@ -82,4 +82,38 @@ scalingAlgorithm <- function(costMatrix, supplyList, demandList,
     return(transport)
 
 }
+
+
+
+#' The log-domain stabilized Scaling Algorithm
+#'
+#' @param costMatrix A numeric matrix.
+#' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric supply vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric demand vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#' @param maxIteration A numeric value for the maximum number of iterations.
+#' The default value is 20000.
+#' @param epsVector vector of epsilon values to use
+#' @param method distance method
+#' @param exp exponent for distance
+#' @param p p norm value
+#' @param wfr wfr distance?
+#'
+#' @export
+#'
+scalingAlgorithm <- function(supplyList, demandList, maxIteration, epsVector, method = "euclidean", exp = 1, p = 2,  wfr = FALSE){
+
+    costMatrix <- costMatrix(supplyList[[1]], demandList[[1]], method, exp, wfr, p)
+
+    res <- scalingAlgorithmFromCost(costMatrix, supplyList, demandList, maxIteration, epsVector)
+
+
+}
+
+
+
+
 
