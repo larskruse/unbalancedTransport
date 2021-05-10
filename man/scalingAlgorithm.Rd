@@ -36,8 +36,6 @@ The default value is 20000.}
 \item{p}{p norm value}
 
 \item{wfr}{wfr distance?}
-
-\item{costMatrix}{A numeric matrix.}
 }
 \description{
 The log-domain stabilized Scaling Algorithm

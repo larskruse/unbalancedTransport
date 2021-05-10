@@ -36,6 +36,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fVectorDivergence
+double fVectorDivergence(Eigen::VectorXd p, Eigen::VectorXd u, int DivFun, double param1, double param2);
+RcppExport SEXP _unbalancedTransport_fVectorDivergence(SEXP pSEXP, SEXP uSEXP, SEXP DivFunSEXP, SEXP param1SEXP, SEXP param2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type p(pSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type u(uSEXP);
+    Rcpp::traits::input_parameter< int >::type DivFun(DivFunSEXP);
+    Rcpp::traits::input_parameter< double >::type param1(param1SEXP);
+    Rcpp::traits::input_parameter< double >::type param2(param2SEXP);
+    rcpp_result_gen = Rcpp::wrap(fVectorDivergence(p, u, DivFun, param1, param2));
+    return rcpp_result_gen;
+END_RCPP
+}
 // proxdiv
 Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta);
 RcppExport SEXP _unbalancedTransport_proxdiv(SEXP lambdaSEXP, SEXP pSEXP, SEXP sSEXP, SEXP uSEXP, SEXP epsSEXP, SEXP DivFunSEXP, SEXP alphaSEXP, SEXP betaSEXP) {
@@ -112,6 +127,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_unbalancedTransport_Monge_Rcpp", (DL_FUNC) &_unbalancedTransport_Monge_Rcpp, 5},
     {"_unbalancedTransport_vectorDivergence", (DL_FUNC) &_unbalancedTransport_vectorDivergence, 5},
+    {"_unbalancedTransport_fVectorDivergence", (DL_FUNC) &_unbalancedTransport_fVectorDivergence, 5},
     {"_unbalancedTransport_proxdiv", (DL_FUNC) &_unbalancedTransport_proxdiv, 8},
     {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 13},
     {"_unbalancedTransport_treegkr_Rcpp", (DL_FUNC) &_unbalancedTransport_treegkr_Rcpp, 5},

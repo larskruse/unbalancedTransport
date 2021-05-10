@@ -159,7 +159,6 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 
 
 #' Cost Matrix
-#'
 #' @description Calculates the cost matrix between points.
 #'
 #' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.

@@ -128,9 +128,6 @@ ExampleScaling2 <- function(){
     xx <- c(0,0,0,3,3.5,4)
     xy <- c(0,1,2,1.7,1,0.2)
 
-    dx <- rep(1/6,6)
-    dy <- dx
-
     # supply measure
     p <- c(2,2,2,0,0,0)
     q <- c(0,0,0,1,2,3)
@@ -152,22 +149,26 @@ ExampleScaling2 <- function(){
 
     cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.")
 
-    cat("The euclidean distance matrix is used.")
+    cat("The euclidean distance matrix is used. \n")
 
 
-    supply <- list("KL", p, dx, 0.5)
-    demand <- list("KL", q, dy, 0.5)
+    supply <- list("TV", p, 3)
+    demand <- list("TV", q, 3)
+
+
 
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
 
+    print(res)
 
-    transportP <- res$transportPlan
+    transportP <- res$TransportPlan
+    #
 
-    transportP <- transportP*6
+    print(transportP)
 
     plotUOTP(transportP)
-
+    #
     plotTransportByCost(C, transportP, p, q)
 
 }

@@ -73,13 +73,8 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
                                   supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                                   Div2, maxIteration, epsVector)
 
-    print(res$TransportMap[1:10,1:10])
 
-
-    transportPlan <- res$TransportMap
-
-    transport <- list(transportPlan = transportPlan)
-    return(transport)
+    return(res)
 
 }
 
@@ -87,7 +82,6 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
 
 #' The log-domain stabilized Scaling Algorithm
 #'
-#' @param costMatrix A numeric matrix.
 #' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
 #'  a numeric supply vector, the reference measure as numeric vector and the
 #'  value for the lambda parameter.

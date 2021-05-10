@@ -116,7 +116,11 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
 
     # If no import or export vector is given, only the transport plan is plotted
     if(is.null(import) | is.null(export)){
-        transportPlan <- t(transportPlan[nrow(transportPlan):1,])
+
+        print(transportPlan)
+        print(nrow(transportPlan))
+
+        transportPlan <- t(transportPlan[(nrow(transportPlan)):1,])
 
         image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
               col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
