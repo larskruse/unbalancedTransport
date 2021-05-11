@@ -35,13 +35,13 @@ ExampleScaling <- function(){
     epsvec <- seq(-1,-7, length.out = 20)
     epsvec <- 10^(epsvec)
 
-    cat("Number of iterations: ", iterMax, "\n")
-
-    cat("Epsilon values: ", epsvec, "\n")
-
-    cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
-
-    cat("The quadratic cost is used. \n")
+    # cat("Number of iterations: ", iterMax, "\n")
+    #
+    # cat("Epsilon values: ", epsvec, "\n")
+    #
+    # cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
+    #
+    # cat("The quadratic cost is used. \n")
 
 
     # supply/demand with discretization and reference measure
@@ -58,17 +58,20 @@ ExampleScaling <- function(){
 
 
     # compute and plot the transport plan
-    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan)
+    # res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
+    #
+    # print(res$TransportCost)
+    #
+    # plot1DTransport(res$TransportPlan, supplyList, demandList)
+    # plotUOTP(res$TransportPlan)
 
     cat("Number of iterations: ", iterMax, "\n")
 
     cat("Epsilon values: ", epsvec, "\n")
 
-    cat("The TV divergence with parameter 0.05 is used for both supply and demand vectors.")
+    cat("The TV divergence with parameter 0.05 is used for both supply and demand vectors.\n")
 
-    cat("The quadratic cost is used.")
+    cat("The quadratic cost is used.\n")
 
     #compute quadrature cost matrix
     C <-  costMatrix(X, Y, exp = 2)
@@ -76,19 +79,29 @@ ExampleScaling <- function(){
     supply <- list("TV", p, 0.05)
     demand <- list("TV", q, 0.05)
 
+    print(supply[[1]])
+    print(supply[[2]][1:10])
+    print(supply[[3]])
+    print(demand[[1]])
+    print(demand[[2]][1:10])
+    print(demand[[3]])
+
+
+
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan)
+    print(res$TransportCost)
+    plot1DTransport(res$TransportPlan, supplyList, demandList)
+    plotUOTP(res$TransportPlan)
 
 
-    cat("Number of iterations: ", iterMax, "\n")
-
-    cat("Epsilon values: ", epsvec, "\n")
-
-    cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.")
-
-    cat("The WFR distance matrix is used.")
+    # cat("Number of iterations: ", iterMax, "\n")
+    #
+    # cat("Epsilon values: ", epsvec, "\n")
+    #
+    # cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.\n")
+    #
+    # cat("The WFR distance matrix is used.\n")
 
     #compute Wasserstein-Fisher-Rao cost matrix
     C <- wfrCost(X,Y)
@@ -96,9 +109,10 @@ ExampleScaling <- function(){
     supply <- list("KL", p, 0.5)
     demand <- list("KL", q, 0.5)
     # compute and plot the transport plan
-    res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
-    plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan)
+    # res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
+    # print(res$TransportCost)
+    # plot1DTransport(res$TransportPlan, supplyList, demandList)
+    # plotUOTP(res$TransportPlan)
 
 
 
@@ -110,8 +124,9 @@ ExampleScaling <- function(){
 
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan)
+    print(res$TransportCost)
+    plot1DTransport(res$TransportPlan, supplyList, demandList)
+    plotUOTP(res$TransportPlan)
 
 
 }
@@ -159,9 +174,6 @@ ExampleScaling2 <- function(){
 
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-
-    print(res)
-
     transportP <- res$TransportPlan
     #
 

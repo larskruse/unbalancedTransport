@@ -117,8 +117,6 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
     # If no import or export vector is given, only the transport plan is plotted
     if(is.null(import) | is.null(export)){
 
-        print(transportPlan)
-        print(nrow(transportPlan))
 
         transportPlan <- t(transportPlan[(nrow(transportPlan)):1,])
 

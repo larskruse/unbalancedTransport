@@ -96,10 +96,10 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
     temp = (temp.array() - r.array() + s.array());
     return(param1 * temp.sum());
 
-   // }else if(DivFun == 2){
-   //   Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
-   //
-   //   return(param1 * temp.sum());
+   }else if(DivFun == 2){
+     Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
+
+     return(param1 * temp.sum());
    //}else if(DivFun == 3 && param1 <= param2 && 0 <= param1){
      //Eigen::VectorXd temp =    ;
      //return(temp.sum())
@@ -192,7 +192,7 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
   }else if(DivFun == 2){
     return ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
   }else{
-    return((beta*div0(p,s)).array().min(alpha*div0(p,s).array().max((-u.array()/eps).array().exp())));
+    return((beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp())));
   }
 
 }

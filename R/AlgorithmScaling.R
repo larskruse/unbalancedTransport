@@ -65,10 +65,6 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
         demandBeta <- demandList[[4]]
     }
 
-    print(supplyReg)
-    print(demandReg)
-    print(Div1)
-    print(Div2)
     res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                   supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                                   Div2, maxIteration, epsVector)
