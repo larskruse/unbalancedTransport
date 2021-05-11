@@ -36,7 +36,7 @@ ExampleMonge <- function(){
 
 
     #compute quadrature cost matrix and check Monge property
-    C <-  quadCost(X,Y)
+    C <-  costMatrix(X,Y, exp = 2)
     checkMongeProperty(C)
 
     print("The cost for mass creation and destruction is set to 1.1")

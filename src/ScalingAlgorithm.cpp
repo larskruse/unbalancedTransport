@@ -356,10 +356,6 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   }
 
 
-//  Eigen::MatrixXd firstKernel = updateK(Eigen::VectorXd::Zero(Nx),Eigen::VectorXd::Zero(Ny), eps, costMatrix);
-
-  //ϵ*sum( axb0(R,log(div0(R,K))) - R + K )/(I*J)
-
   Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
   Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size());
 

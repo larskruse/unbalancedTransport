@@ -65,27 +65,6 @@ wfrCost <- function(X,Y){
 
 
 
-#' Quadratic Cost Matrix
-#'
-#' Calculating the quadratic cost matrix.
-#'
-#' @param X A numeric vector.
-#' @param Y A numeric vector.
-#' @return The quadratic cost matrix.
-#' @export
-
-quadCost <- function(X,Y){
-        C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
-
-        for(i in 1:length(X)){
-                for(j in 1:length(Y)){
-                        C[i,j] <- abs(X[i]-Y[j])^2
-                }
-        }
-        return(C)
-}
-
-
 
 
 #' Value in interval
@@ -175,6 +154,15 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 #' @export
 costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
 
+        if(is.null(ncol(x))){
+                x <- matrix(x, ncol = 1)
+
+        }
+
+        if(is.null(ncol(y))){
+                y <- matrix(y, ncol = 1)
+
+        }
 
         if(ncol(x) != ncol(y)){
                 print("Unequal dimensions.")
@@ -209,7 +197,7 @@ costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2)
 
         if(wfr){
 
-                cMatrix <- -2*log(cos(min(cMatrix, pi/2)))
+                cMatrix <- -2*log(cospi(pmin(cMatrix/pi, 1/2)))
         }
 
         return(cMatrix)

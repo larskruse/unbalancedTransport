@@ -50,7 +50,7 @@ ExampleScaling <- function(){
 
 
     #compute quadrature cost matrix
-    C <-  quadCost(X,Y)
+    C <-  costMatrix(X,Y, exp = 2)
 
     # use Kulback-Leibner divergence with lambda = 0.5 for supply and demand
     supply <- list("KL", p, 0.5)
@@ -71,7 +71,7 @@ ExampleScaling <- function(){
     cat("The quadratic cost is used.")
 
     #compute quadrature cost matrix
-    C <-  quadCost(X,Y)
+    C <-  costMatrix(X, Y, exp = 2)
     # use Total Variation with lambda = 0.05 for supply and demand
     supply <- list("TV", p, 0.05)
     demand <- list("TV", q, 0.05)
@@ -102,7 +102,7 @@ ExampleScaling <- function(){
 
 
 
-    C <-  quadCost(X,Y)
+    C <-  costMatrix(X, Y, exp = 2)
 
     supply <- list("RG", p, 0.7, 1.2)
     demand <- list("RG", q, 0.7, 1.2)
