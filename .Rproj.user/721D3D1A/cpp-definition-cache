@@ -16,7 +16,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-        "file_last_write": 1620770274.0,
+        "file_last_write": 1621193826.0,
         "definitions": [
             {
                 "usr": "c:@F@div0#I#I#",
@@ -46,21 +46,12 @@
                 "column": 8
             },
             {
-                "usr": "c:@F@fVectorDivergence#I#I#I#d#d#",
-                "kind": 6,
-                "parent_name": "",
-                "name": "fVectorDivergence(Eigen::VectorXd, Eigen::VectorXd, int, double, double)",
-                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 146,
-                "column": 8
-            },
-            {
                 "usr": "c:@F@proxdiv#d#I#I#I#d#I#d#d#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int, double, double)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 184,
+                "line": 194,
                 "column": 17
             },
             {
@@ -69,7 +60,7 @@
                 "parent_name": "",
                 "name": "updateK(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 211,
+                "line": 221,
                 "column": 17
             },
             {
@@ -78,7 +69,7 @@
                 "parent_name": "",
                 "name": "StabilizedScaling_Rcpp(int, int, int, double, double, double, double, double, double, int, int, int, int)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 250,
+                "line": 261,
                 "column": 12
             }
         ]

@@ -33,20 +33,6 @@ vectorDivergence <- function(r, s, DivFun, param1, param2 = 0) {
     .Call(`_unbalancedTransport_vectorDivergence`, r, s, DivFun, param1, param2)
 }
 
-#' Computing the divergence functions values
-#'
-#' @param p input vector
-#' @param u comparision vector
-#' @param DivFun kind of function to use
-#' @param param1 lambda or alpha
-#' @param param2 beta or 0
-#'
-#' @export
-#'
-fVectorDivergence <- function(p, u, DivFun, param1, param2 = 0) {
-    .Call(`_unbalancedTransport_fVectorDivergence`, p, u, DivFun, param1, param2)
-}
-
 #' The proxdiv operator
 #'
 #' The proxdiv operators for different divergences in the form of 'lambda * DivFun(.|p)'
