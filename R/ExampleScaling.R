@@ -60,7 +60,8 @@ ExampleScaling <- function(){
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
 
-    print(res$TransportCost)
+
+    cat("Transport cost: ", res$TransportCost, "\n\n\n")
 
     plot1DTransport(res$TransportPlan, supplyList, demandList)
     plotUOTP(res$TransportPlan)
@@ -82,7 +83,7 @@ ExampleScaling <- function(){
 
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    print(res$TransportCost)
+    cat("Transport cost: ", res$TransportCost, "\n\n\n")
     plot1DTransport(res$TransportPlan, supplyList, demandList)
     plotUOTP(res$TransportPlan)
 
@@ -102,7 +103,7 @@ ExampleScaling <- function(){
     demand <- list("KL", q, 0.5)
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
-    print(res$TransportCost)
+    cat("Transport cost: ", res$TransportCost, "\n\n\n")
     plot1DTransport(res$TransportPlan, supplyList, demandList)
     plotUOTP(res$TransportPlan)
 
@@ -121,7 +122,7 @@ ExampleScaling <- function(){
 
     #compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    print(res$TransportCost)
+    cat("Transport cost: ", res$TransportCost, "\n\n\n")
     plot1DTransport(res$TransportPlan, supplyList, demandList)
     plotUOTP(res$TransportPlan)
 
@@ -165,8 +166,8 @@ ExampleScaling2 <- function(){
     cat("The euclidean distance matrix is used. \n")
 
 
-    supply <- list("RG", p, 0, 20)
-    demand <- list("RG", q, 0, 20)
+    supply <- list("RG", p, 0.1, 20)
+    demand <- list("RG", q, 0.1, 20)
 
 
 
