@@ -16,7 +16,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-        "file_last_write": 1619784556.0,
+        "file_last_write": 1621193826.0,
         "definitions": [
             {
                 "usr": "c:@F@div0#I#I#",
@@ -28,12 +28,30 @@
                 "column": 17
             },
             {
-                "usr": "c:@F@proxdiv#d#I#I#I#d#I#",
+                "usr": "c:@F@axb0#I#I#",
                 "kind": 6,
                 "parent_name": "",
-                "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int)",
+                "name": "axb0(Eigen::VectorXd, Eigen::VectorXd)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 48,
+                "line": 36,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@vectorDivergence#I#I#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "vectorDivergence(Eigen::VectorXd, Eigen::VectorXd, int, double, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 88,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@proxdiv#d#I#I#I#d#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int, double, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
+                "line": 194,
                 "column": 17
             },
             {
@@ -42,16 +60,16 @@
                 "parent_name": "",
                 "name": "updateK(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 73,
+                "line": 221,
                 "column": 17
             },
             {
-                "usr": "c:@F@StabilizedScaling_Rcpp#I#I#I#I#I#d#d#I#I#I#I#",
+                "usr": "c:@F@StabilizedScaling_Rcpp#I#I#I#d#d#d#d#d#d#I#I#I#I#",
                 "kind": 6,
                 "parent_name": "",
-                "name": "StabilizedScaling_Rcpp(int, int, int, int, int, double, double, int, int, int, int)",
+                "name": "StabilizedScaling_Rcpp(int, int, int, double, double, double, double, double, double, int, int, int, int)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 110,
+                "line": 261,
                 "column": 12
             }
         ]

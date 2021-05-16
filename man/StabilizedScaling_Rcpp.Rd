@@ -8,10 +8,12 @@ StabilizedScaling_Rcpp(
   costMatrix,
   supply,
   demand,
-  dx,
-  dy,
   lambdaSupply,
+  alphaSupply,
+  betaSupply,
   lambdaDemand,
+  alphaDemand,
+  betaDemand,
   DivSupply,
   DivDemand,
   iterMax,
@@ -25,13 +27,17 @@ StabilizedScaling_Rcpp(
 
 \item{demand}{A numeric vector}
 
-\item{dx}{Reference measure underlying the supply distribution}
-
-\item{dy}{Reference measure underlying the demand distribution}
-
 \item{lambdaSupply}{Parameter for the supply proxdiv function}
 
+\item{alphaSupply}{numeric Value}
+
+\item{betaSupply}{numeric value}
+
 \item{lambdaDemand}{Parameter for the demand proxdiv function}
+
+\item{alphaDemand}{numeric Value}
+
+\item{betaDemand}{numeric value}
 
 \item{DivSupply}{Parameter indicating the divergence function to use for the supply proxdiv function}
 

@@ -64,28 +64,6 @@ wfrCost <- function(X,Y){
 
 
 
-#' Quadratic Cost Matrix
-#'
-#' Calculating the quadratic cost matrix.
-#'
-#' @param X A numeric vector.
-#' @param Y A numeric vector.
-#' @return The quadratic cost matrix.
-#'
-quadCost <- function(X,Y){
-        C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
-
-        for(i in 1:length(X)){
-                for(j in 1:length(Y)){
-                        C[i,j] <- abs(X[i]-Y[j])^2
-                }
-        }
-        return(C)
-}
-
-
-
-
 #' Value in interval
 #'
 #' This checks if the value is in a given interval
@@ -153,6 +131,84 @@ createCostMatrix <- function(x,y,method = "euclidean"){
         }
         return(costM)
 }
+
+
+#' Cost Matrix
+#' @description Calculates the cost matrix between points.
+#'
+#' @param x A numeric matrix. Each row corresponds to the coordinates of one point in the first point cloud.
+#' @param y A numeric matrix. Each row corresponds to the coordinates of one point in the second point cloud
+#' @param method Determines which distance function to use for the computation.  Currently implemented are:
+#' 1. Euclidean
+#' 2. Minkowski
+#' 3. Maximum
+#' @param exp exponent to apply to the distance
+#' @param wfr computing the wasserstein fisher rao distance
+#' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
+#' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
+#' points in y
+#' @export
+costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
+
+        if(is.null(ncol(x))){
+                x <- matrix(x, ncol = 1)
+
+        }
+
+        if(is.null(ncol(y))){
+                y <- matrix(y, ncol = 1)
+
+        }
+
+        if(ncol(x) != ncol(y)){
+                print("Unequal dimensions.")
+        }
+
+        if (method == "euclidean"){
+                method <- "minkowski"
+                p <- 2
+        }
+
+        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
+
+        if(method == "minkowski"){
+
+                for (i in 1:nrow(x)){
+
+                        cMatrix[i,] <- ((rowSums((t(t(y) - x[i,]))^p))^(1/p))^exp
+                }
+
+        }else if(method == "maximum"){
+
+                for(i in 1:nrow(x)){
+
+                        cMatrix[i,] <- max(t(t(y) - x[i,]))^exp
+
+                }
+
+        }else{
+                print("Please specify a method.")
+        }
+
+
+        if(wfr){
+
+                cMatrix <- -2*log(cospi(pmin(cMatrix/pi, 1/2)))
+        }
+
+        return(cMatrix)
+
+}
+#' costMatrix(x, y, method = "maximum")
+#
+#
+# x <- matrix(c(1,1,1,0,1,2), ncol = 2)
+# x
+# y <- matrix(c(3,2,3,0,1,2), ncol = 2)
+# y
+#
+# plot(x, xlim = c(1,3))
+# points(y)
 
 
 

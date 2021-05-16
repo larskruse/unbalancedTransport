@@ -4,7 +4,7 @@
 \alias{proxdiv}
 \title{The proxdiv operator}
 \usage{
-proxdiv(lambda, p, s, u, eps, DivFun)
+proxdiv(lambda, p, s, u, eps, DivFun, alpha, beta)
 }
 \arguments{
 \item{lambda}{Regularization parameter}
@@ -20,6 +20,10 @@ proxdiv(lambda, p, s, u, eps, DivFun)
 \item{DivFun}{A numeric value indicating the function to be used.'1' gives
 the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 for the total variation.}
+
+\item{alpha}{num value}
+
+\item{beta}{num value}
 }
 \value{
 A vector holding the proxdiv evaluation

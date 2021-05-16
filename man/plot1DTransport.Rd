@@ -4,7 +4,7 @@
 \alias{plot1DTransport}
 \title{Plotting dense 1D transport}
 \usage{
-plot1DTransport(transportMap, supplyList, demandList, X)
+plot1DTransport(transportMap, supplyList, demandList)
 }
 \arguments{
 \item{transportMap}{A numeric matrix.}
@@ -16,8 +16,6 @@ value for the lambda parameter.}
 \item{demandList}{A demand list containing the divergence to use (either "KL" or "TV"),
 a numeric demand vector, the reference measure as numeric vector and the
 value for the lambda parameter.}
-
-\item{X}{Discretization underlying the supply and demand mearsures.}
 }
 \description{
 Plotting dense 1D transport
