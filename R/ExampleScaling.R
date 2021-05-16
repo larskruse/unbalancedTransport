@@ -35,13 +35,13 @@ ExampleScaling <- function(){
     epsvec <- seq(-1,-7, length.out = 20)
     epsvec <- 10^(epsvec)
 
-    # cat("Number of iterations: ", iterMax, "\n")
-    #
-    # cat("Epsilon values: ", epsvec, "\n")
-    #
-    # cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
-    #
-    # cat("The quadratic cost is used. \n")
+    cat("Number of iterations: ", iterMax, "\n")
+
+    cat("Epsilon values: ", epsvec, "\n")
+
+    cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
+
+    cat("The quadratic cost is used. \n")
 
 
     # supply/demand with discretization and reference measure
@@ -58,12 +58,12 @@ ExampleScaling <- function(){
 
 
     # compute and plot the transport plan
-    # res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
-    #
-    # print(res$TransportCost)
-    #
-    # plot1DTransport(res$TransportPlan, supplyList, demandList)
-    # plotUOTP(res$TransportPlan)
+    res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
+
+    print(res$TransportCost)
+
+    plot1DTransport(res$TransportPlan, supplyList, demandList)
+    plotUOTP(res$TransportPlan)
 
     cat("Number of iterations: ", iterMax, "\n")
 
@@ -79,14 +79,6 @@ ExampleScaling <- function(){
     supply <- list("TV", p, 0.05)
     demand <- list("TV", q, 0.05)
 
-    print(supply[[1]])
-    print(supply[[2]][1:10])
-    print(supply[[3]])
-    print(demand[[1]])
-    print(demand[[2]][1:10])
-    print(demand[[3]])
-
-
 
     # compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
@@ -95,13 +87,13 @@ ExampleScaling <- function(){
     plotUOTP(res$TransportPlan)
 
 
-    # cat("Number of iterations: ", iterMax, "\n")
-    #
-    # cat("Epsilon values: ", epsvec, "\n")
-    #
-    # cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.\n")
-    #
-    # cat("The WFR distance matrix is used.\n")
+    cat("Number of iterations: ", iterMax, "\n")
+
+    cat("Epsilon values: ", epsvec, "\n")
+
+    cat("The KL divergence with parameter 0.5 is used for both supply and demand vectors.\n")
+
+    cat("The WFR distance matrix is used.\n")
 
     #compute Wasserstein-Fisher-Rao cost matrix
     C <- wfrCost(X,Y)
@@ -109,11 +101,16 @@ ExampleScaling <- function(){
     supply <- list("KL", p, 0.5)
     demand <- list("KL", q, 0.5)
     # compute and plot the transport plan
-    # res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
-    # print(res$TransportCost)
-    # plot1DTransport(res$TransportPlan, supplyList, demandList)
-    # plotUOTP(res$TransportPlan)
+    res <- scalingAlgorithmFromCost(C, supply, demand, 20000, epsvec)
+    print(res$TransportCost)
+    plot1DTransport(res$TransportPlan, supplyList, demandList)
+    plotUOTP(res$TransportPlan)
 
+    cat("Number of iterations: ", iterMax, "\n")
+
+    cat("Epsilon values: ", epsvec, "\n")
+
+    cat("The RG divergence with parameters 0.7 and 1.2 is used for both supply and demand vectors.\n")
 
 
     C <-  costMatrix(X, Y, exp = 2)
@@ -122,7 +119,7 @@ ExampleScaling <- function(){
     demand <- list("RG", q, 0.7, 1.2)
 
 
-    # compute and plot the transport plan
+    #compute and plot the transport plan
     res <- scalingAlgorithmFromCost(C, supply, demand, iterMax, epsvec)
     print(res$TransportCost)
     plot1DTransport(res$TransportPlan, supplyList, demandList)
@@ -153,6 +150,7 @@ ExampleScaling2 <- function(){
     # vector of epsilon values
     epsvec <- seq(-1,-7, length.out = 20)
     epsvec <- 10^(epsvec)
+    #epsvec <- c(2)
 
     #compute quadrature cost matrix
     C <- createCostMatrix(xx,xy)
@@ -167,8 +165,8 @@ ExampleScaling2 <- function(){
     cat("The euclidean distance matrix is used. \n")
 
 
-    supply <- list("TV", p, 3)
-    demand <- list("TV", q, 3)
+    supply <- list("RG", p, 0, 20)
+    demand <- list("RG", q, 0, 20)
 
 
 
@@ -177,7 +175,7 @@ ExampleScaling2 <- function(){
     transportP <- res$TransportPlan
     #
 
-    print(transportP)
+    print(res)
 
     plotUOTP(transportP)
     #

@@ -51,6 +51,12 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
         supplyReg <- 0
         supplyAlpha <- supplyList[[3]]
         supplyBeta <- supplyList[[4]]
+
+        if(supplyAlpha < 0 || supplyBeta < supplyAlpha){
+
+            stop("0 <= Alpha <= Beta")
+
+        }
     }
 
 
@@ -63,6 +69,11 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
         demandReg <- 0
         demandAlpha <- demandList[[3]]
         demandBeta <- demandList[[4]]
+        if(demandAlpha < 0 || demandBeta < demandAlpha){
+
+            stop("0 <= Alpha <= Beta")
+
+        }
     }
 
     res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
