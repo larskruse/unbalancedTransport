@@ -187,8 +187,10 @@ plot1DTransport <- function(transportMap,supplyList, demandList){
 
     colors <- rainbow(numIntervals, s = 1, v = 1, start = 0, end = max(1, numIntervals - 1)/numIntervals, alpha = 1, rev = FALSE)
 
+    ymax <- max(supplyList[[1]], demandList[[1]], t(transportMap) %*% x1Measure, transportMap %*% y1Measure)
+
     # Plotting the supply and demand measures
-    plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", xlab = "Position", ylab = "Mass")
+    plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", ylim= c(0, ymax), xlab = "Position", ylab = "Mass")
     lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
 
     firstSupp <- supplyList[[2]][1]
