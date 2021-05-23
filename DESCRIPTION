@@ -22,3 +22,5 @@ Imports:
     shape,
     diagram,
     transport
+Depends:
+    logSumExp

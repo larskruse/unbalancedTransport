@@ -16,7 +16,7 @@ ExampleScaling <- function(){
     # Discretization of [0,1]
     X <- seq(0,1,length.out = I)
     Y <- seq(0,1,length.out = J)
-
+    
 
     # supply measure
     p <- sapply(X, fp)

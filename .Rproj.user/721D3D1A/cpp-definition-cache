@@ -1,5 +1,65 @@
 [
     {
+        "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+        "file_last_write": 1621803554.0,
+        "definitions": [
+            {
+                "usr": "c:@F@LSE#&I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "LSE(Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 30,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@lambertInit#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "lambertInit(Rcpp::NumericVector)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 48,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@lambertWFunctionLog#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "lambertWFunctionLog(Rcpp::NumericVector)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 77,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@inital#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "inital(Rcpp::NumericVector)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 104,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@aprox#d#&I#d#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "aprox(double, Rcpp::NumericVector &, double, int, double, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 143,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@Sinkhorn_Rcpp#I#I#I#d#d#d#d#d#d#I#I#I#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "Sinkhorn_Rcpp(Rcpp::NumericMatrix, Rcpp::NumericVector, Rcpp::NumericVector, double, double, double, double, double, double, int, int, int, double)",
+                "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/AlgorithmSinkhorn.cpp",
+                "line": 206,
+                "column": 12
+            }
+        ]
+    },
+    {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/MongeAlgorithm.cpp",
         "file_last_write": 1619316897.0,
         "definitions": [
@@ -16,7 +76,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-        "file_last_write": 1621193826.0,
+        "file_last_write": 1621794640.0,
         "definitions": [
             {
                 "usr": "c:@F@div0#I#I#",
@@ -143,7 +203,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
-        "file_last_write": 1619563754.0,
+        "file_last_write": 1621346630.0,
         "definitions": [
             {
                 "usr": "c:@S@node",
@@ -347,7 +407,7 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.cpp",
-        "file_last_write": 1619310733.0,
+        "file_last_write": 1621274779.0,
         "definitions": [
             {
                 "usr": "c:@F@Nw_Corner_Rule#I#I#I#&I#S0_#S0_#",
@@ -380,12 +440,12 @@
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilMonge.h",
-        "file_last_write": 1619310714.0,
+        "file_last_write": 1621274782.0,
         "definitions": []
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/utilTree.cpp",
-        "file_last_write": 1619310717.0,
+        "file_last_write": 1621274775.0,
         "definitions": [
             {
                 "usr": "c:@S@Tree",
