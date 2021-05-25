@@ -17,7 +17,8 @@ Sinkhorn_Rcpp(
   DivSupply,
   DivDemand,
   iterMax,
-  eps
+  eps,
+  tol
 )
 }
 \arguments{

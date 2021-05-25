@@ -95,11 +95,11 @@ sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
     supply <- supplyList[[2]]
     demand <- demandList[[2]]
     
-    
+    tol = 1e-8
 
     res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                    supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-                                   Div2, maxIteration, eps)
+                                   Div2, maxIteration, eps, tol)
     
     
     

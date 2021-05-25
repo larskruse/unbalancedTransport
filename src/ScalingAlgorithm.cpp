@@ -2,6 +2,8 @@
 #include <chrono>
 #include <RcppEigen.h>
 
+#include "gperftools/profiler.h"
+
 
 // Elementwise division of two vectors with 'x/0 = 0'
 //
@@ -276,8 +278,12 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // stabilization vectors
   Eigen::VectorXd u = Eigen::VectorXd::Zero(Nx);
   Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
+  
+  Eigen::VectorXd u_prev;
 
 
+  double tol = 10e-8;
+  
   // main loop iteration counter
   int i = 1;
 
@@ -294,8 +300,11 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // since u and v are 0, the updateK function returns the Gibbs kernel
   Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
   Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
-
+  ProfilerStart("scaling.log");
+  
   while(i < iterMax){
+      
+      u_prev = u;
 
 
     // calculate scaling iterates
@@ -322,27 +331,27 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
       }
       
       
-      pCost = 0;
-
-
-      if(DivSupply != 3){
-        pCost += vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply);
-      }else{
-        pCost += vectorDivergence(Kernel.rowwise().sum(), supply, DivSupply, alphaSupply, betaSupply);
-      }
-      if(DivDemand != 3){
-        pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand);
-      }else{
-        pCost += vectorDivergence(Kernel.colwise().sum().transpose() , demand, DivDemand, alphaDemand, betaDemand);
-      }
-
-
-      Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
-      Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size()); 
-
-      pCost += vectorDivergence(vecKernel, vecFirstKernel, 1,eps);
-      
-      Rcpp::Rcout << "cost: " << pCost << "\n\n";
+      // pCost = 0;
+      // 
+      // 
+      // if(DivSupply != 3){
+      //   pCost += vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply);
+      // }else{
+      //   pCost += vectorDivergence(Kernel.rowwise().sum(), supply, DivSupply, alphaSupply, betaSupply);
+      // }
+      // if(DivDemand != 3){
+      //   pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand);
+      // }else{
+      //   pCost += vectorDivergence(Kernel.colwise().sum().transpose() , demand, DivDemand, alphaDemand, betaDemand);
+      // }
+      // 
+      // 
+      // Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
+      // Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size()); 
+      // 
+      // pCost += vectorDivergence(vecKernel, vecFirstKernel, 1,eps);
+      // 
+      // Rcpp::Rcout << "cost: " << pCost << "\n\n";
       
       
 
@@ -355,6 +364,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
 
 
 
+
       // updating epsilon
       if((static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size())){
         epsind = epsind + 1;
@@ -362,6 +372,14 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
       }
       // update Kernel according to u and v
       Kernel = updateK(u, v, eps, costMatrix);
+      
+      if(((u.array()-u_prev.array()).array().abs().maxCoeff()) < tol){
+          Rcpp::Rcout << "converged at: " << i << " \n";
+
+          break;
+      }
+      
+      
       //reset a and b
       a = Eigen::VectorXd::Ones(Nx);
       b = Eigen::VectorXd::Ones(Ny);
@@ -372,7 +390,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     i = i + 1;
 
   }
-
+  ProfilerStop();
   Rcpp::Rcout << 100 << "% done. \n";
 
 

@@ -2,6 +2,9 @@
 #include <chrono>
 #include <Rcpp.h>
 
+#include "gperftools/profiler.h"
+
+
 // //' The Log-Sum-Exp reduction of the vector u
 // //'
 // //'
@@ -10,33 +13,15 @@
 // //' @export
 // //[[Rcpp::export]]
 // double LSE(Rcpp::NumericVector& u){
-//     
+// 
 //         double maxU = Rcpp::max(u);
-//     
+// 
 //         double res = Rcpp::sum(Rcpp::exp(u-maxU));
 //         return(std::log(res)+maxU);
 //         //double res = std::log(Rcpp::sum(Rcpp::exp(u)));
 //         //return(res);
-//         
+// 
 // }
-
-//' The Log-Sum-Exp reduction of the vector u
-//'
-//'
-//' @param u a numeric vector
-//' @return log(sum_{i=1, N}(exp(u_i)))
-//' @export
-//[[Rcpp::export]]
-double LSE(Rcpp::NumericVector& u){
-
-        double maxU = Rcpp::max(u);
-
-        double res = Rcpp::sum(Rcpp::exp(u-maxU));
-        return(std::log(res)+maxU);
-        //double res = std::log(Rcpp::sum(Rcpp::exp(u)));
-        //return(res);
-
-}
 
 
 
@@ -45,7 +30,7 @@ double LSE(Rcpp::NumericVector& u){
 //' @return initial value 
 //' @export
 //[[Rcpp::export]]
-Rcpp::NumericVector lambertInit(Rcpp::NumericVector x){
+Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
     Rcpp::NumericVector temp;
     Rcpp::NumericVector z(x.length());
     z[x>1] = x[x>1];
@@ -74,7 +59,7 @@ Rcpp::NumericVector lambertInit(Rcpp::NumericVector x){
 //' @return the function value
 //' @export
 //[[Rcpp::export]]
-Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector x){
+Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
     
     
     Rcpp::NumericVector z = lambertInit(x);
@@ -101,7 +86,7 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector x){
 //' @return the function value
 //' @export
 //[[Rcpp::export]]
-Rcpp::NumericVector inital(Rcpp::NumericVector x){
+Rcpp::NumericVector inital(Rcpp::NumericVector& x){
     
     
     Rcpp::NumericVector z = lambertInit(x);
@@ -180,6 +165,103 @@ Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps, int
 }
 
 
+Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, int Nx, int Ny){
+    
+    Rcpp::NumericVector res(Nx);
+    
+    for(size_t i = 0; i < Nx; i++){
+        for(size_t j = 0; j < Ny; j++){
+       
+            res(i) = res(i) + vec(j)*mat(i,j);
+            
+        }    
+        
+    }
+    
+    return(res);
+    
+}
+
+
+
+
+
+
+//' Inital values
+//'
+//' The aprix operators for different divergences in the form of 'lambda * DivFun(.|p)'
+//' Implemented are the operators for the Kullback-Leibler divergence and total variation.
+//'
+//' @param lambda Regularization parameter
+//' @param p A numeric vector
+//' @param eps The epsilon value
+//' @param DivFun A numeric value indicating the function to be used.'1' gives
+//'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
+//'   for the total variation.
+//' @param param1 num value
+//' @param param2 num value
+//' @return A vector holding the proxdiv evaluation
+//' @export
+//[[Rcpp::export]]
+Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& distribution, 
+                                 Rcpp::NumericVector& secDistribution, int DivFun, double param1, double param2, int Nx, int Ny, double eps){
+    
+    
+    Rcpp::NumericVector temp(Nx);
+
+    double val;
+    
+    //KL
+    if (DivFun == 1){
+        
+        // val = Rcpp::sum(distribution);
+        
+        temp.fill(-lambda*std::log(Rcpp::sum(distribution)));
+
+        return temp;
+        
+        
+    //TV
+    }else if(DivFun == 2){
+        
+        if(std::log(Rcpp::sum(distribution)) < 0){
+            temp.fill(lambda);
+        }else if(std::log(Rcpp::sum(distribution)) > 0){
+            temp.fill(-lambda);
+        }else{
+            
+            temp = matMul(costMatrix, secDistribution, Nx, Ny);
+ 
+            temp = temp + 0.5*distribution*temp;
+            
+            temp = aprox(lambda, temp, eps, DivFun, param1, param2);
+            
+        }
+        
+        return(temp);
+        
+    //Range
+    }else if(DivFun == 3){
+        return(temp);
+        
+        
+    //Power
+    }else if(DivFun == 4){
+        temp.fill(lambda*(1-param1)*(std::pow(Rcpp::sum(distribution),(1/(param1-1)))-1));
+        
+        return(temp);
+    }else{
+        return(temp);
+    }
+    
+    
+    
+}
+
+
+
+
+
 //' The stabilized Scaling Algorithm
 //'
 //' C++ implementation of the log-domain stabilized Version of the Scaling
@@ -203,10 +285,10 @@ Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps, int
 //' @export
 // [[Rcpp::export]]
 
-Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector supply,
-                                  Rcpp::NumericVector demand, double lambdaSupply, double param1Supply,
+Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply,
+                                  Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply,
                                   double param2Supply, double lambdaDemand, double param1Demand, double param2Demand,
-                                  int DivSupply, int DivDemand, int iterMax, double eps){
+                                  int DivSupply, int DivDemand, int iterMax, double eps, double tol){
    
     // number of points in the reference measures
     int Nx = supply.length();
@@ -216,10 +298,11 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector sup
     Rcpp::NumericVector logDem = Rcpp::log(demand);
 
     // initializing vectors
-    Rcpp::NumericVector f(Nx);
-    Rcpp::NumericVector g(Ny);
+    Rcpp::NumericVector f = init_vectors(lambdaSupply, costMatrix, supply, demand, DivSupply, param1Supply, param2Supply, Nx, Ny, eps);
+    Rcpp::NumericVector g = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
     
     
+    Rcpp::NumericVector f_prev;
     //Rcpp::NumericVector temp;
     Rcpp::NumericMatrix temp(Nx,Ny);
     
@@ -229,56 +312,66 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector sup
     
     Rcpp::NumericMatrix transportPlan(Nx,Ny);
 
+    
+    ProfilerStart("sink.log");
+    
+    
+    
     for(size_t k=0; k < iterMax; k++){
+        
+        f_prev = Rcpp::clone(f);
         //Rcpp::Rcout << "k:" <<k << "\n";
 
         for(int j = 0; j < Ny; j++){
-
-            //temp(j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
+            
+            //temp = logSup + (f-costMatrix(Rcpp::_,j))/eps;
             temp(Rcpp::_,j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
             //g(j) = -eps*LSE(temp);
         }
         
         
         
-        //Rcpp::Rcout << temp << "\n";
+        // Rcpp::Rcout << temp << "\n";
         
         g = lse(temp);
         
-        //Rcpp::Rcout << g << "\n";
+        // Rcpp::Rcout << g << "\n";
         
         g = -eps*g;
         
-        //Rcpp::Rcout << g << "\n";
+        // Rcpp::Rcout << g << "\n";
         
-        // temp = Rcpp::transpose(costMatrix)-f;
-        // temp = -temp;
-        // temp = temp/eps;
-        // temp = temp + logSup;
-        // 
-        // g = -eps*LSEMat(temp);
-        
-
         g = aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
         
-        //Rcpp::Rcout << g(1) << "\n";
+        // Rcpp::Rcout << g << "\n";
         
+        
+        // Rcpp::Rcout << "f: " << "\n";
         for(int i = 0; i < Nx; i++){
-            //temp(i) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
+            //temp = logDem+(g-costMatrix(i,Rcpp::_))/eps;
             temp(Rcpp::_,i) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
             //f(i) = -eps*LSE(temp);
         }
         
-        //Rcpp::Rcout << temp << "\n";
+        // Rcpp::Rcout << temp << "\n";
         
         f = lse(temp);
-        //Rcpp::Rcout << f << "\n";
+        // Rcpp::Rcout << f << "\n";
         
         f = -eps*f;
-        //Rcpp::Rcout << f << "\n";
+        // Rcpp::Rcout << f << "\n";
         f = aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
-        //Rcpp::Rcout << f << "\n";
+        // Rcpp::Rcout << f << "\n";
+        
+        
+        if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){
+            Rcpp::Rcout << "converged at: " << k << " \n";
+
+            break;
+        }
+        
     }
+    ProfilerStop();
     
     for(int i = 0; i < Nx; i++){
         for(int j = 0; j < Ny ; j++){
