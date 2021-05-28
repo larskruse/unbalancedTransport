@@ -323,45 +323,22 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         //Rcpp::Rcout << "k:" <<k << "\n";
 
         for(int j = 0; j < Ny; j++){
-            
-            //temp = logSup + (f-costMatrix(Rcpp::_,j))/eps;
             temp(Rcpp::_,j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
-            //g(j) = -eps*LSE(temp);
         }
         
-        
-        
-        // Rcpp::Rcout << temp << "\n";
         
         g = lse(temp);
-        
-        // Rcpp::Rcout << g << "\n";
-        
         g = -eps*g;
-        
-        // Rcpp::Rcout << g << "\n";
-        
         g = aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
         
-        // Rcpp::Rcout << g << "\n";
-        
-        
-        // Rcpp::Rcout << "f: " << "\n";
         for(int i = 0; i < Nx; i++){
-            //temp = logDem+(g-costMatrix(i,Rcpp::_))/eps;
             temp(Rcpp::_,i) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
-            //f(i) = -eps*LSE(temp);
         }
         
-        // Rcpp::Rcout << temp << "\n";
-        
         f = lse(temp);
-        // Rcpp::Rcout << f << "\n";
-        
         f = -eps*f;
-        // Rcpp::Rcout << f << "\n";
         f = aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
-        // Rcpp::Rcout << f << "\n";
+    
         
         
         if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){

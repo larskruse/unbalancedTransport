@@ -16,7 +16,7 @@
 #' @export
 #'
 sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
-                                     maxIteration, eps){
+                                     maxIteration, eps, tol = 1e-8){
     
     supplyReg <- 0
     demandReg <- 0
@@ -95,7 +95,6 @@ sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
     supply <- supplyList[[2]]
     demand <- demandList[[2]]
     
-    tol = 1e-8
 
     res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                    supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
@@ -144,7 +143,7 @@ sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
 #'
 sinkhornAlgorithm <- function(supplyList, demandList, maxIteration, eps, method = "euclidean", exp = 1, p = 2,  wfr = FALSE){
     
-    costMatrix <- costMatrix(supplyList[[1]], demandList[[1]], method, exp, wfr, p)
+    costMatrix <- costMatrix(supplyList[[length(supplyList)]], demandList[[length(demandList)]], method, exp, wfr, p)
     
     res <- scalingAlgorithmFromCost(costMatrix, supplyList, demandList, maxIteration, eps)
     
