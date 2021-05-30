@@ -20,6 +20,12 @@ init_vectors(
 \arguments{
 \item{lambda}{Regularization parameter}
 
+\item{costMatrix}{A numeric matrix}
+
+\item{distribution}{A numeric vector}
+
+\item{secDistribution}{A numeric vector}
+
 \item{DivFun}{A numeric value indicating the function to be used.'1' gives
 the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 for the total variation.}
@@ -28,9 +34,11 @@ for the total variation.}
 
 \item{param2}{num value}
 
-\item{eps}{The epsilon value}
+\item{Nx}{num value}
 
-\item{p}{A numeric vector}
+\item{Ny}{num value}
+
+\item{eps}{eps value}
 }
 \value{
 A vector holding the proxdiv evaluation

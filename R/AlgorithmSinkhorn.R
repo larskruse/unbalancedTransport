@@ -12,6 +12,7 @@
 #' @param maxIteration A numeric value for the maximum number of iterations.
 #' The default value is 20000.
 #' @param eps vector of epsilon values to use
+#' @param tol tolerance for break
 #'
 #' @export
 #'
@@ -95,6 +96,12 @@ sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
     supply <- supplyList[[2]]
     demand <- demandList[[2]]
     
+    
+    print(supplyAlpha)
+    print(demandAlpha)
+
+
+
 
     res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                    supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
@@ -103,7 +110,7 @@ sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
     
     
     
-    TransportPlan <- res$TransportPlan*supply %*% t(demand)
+    TransportPlan <- res$TransportPlan*(supply %*% t(demand))
     
     returnList <- list("TransportPlan" = TransportPlan, "dual_f" = res$dual_f, "dual_g" =  res$dual_g)
     

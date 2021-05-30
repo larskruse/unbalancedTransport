@@ -47,6 +47,8 @@ Sinkhorn_Rcpp(
 \item{iterMax}{Maximum number of iterations}
 
 \item{eps}{A numeric vector of decreasing epsilon values.}
+
+\item{tol}{numeric value}
 }
 \value{
 The optimal transport plan

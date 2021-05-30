@@ -50,13 +50,17 @@ aprox <- function(lambda, p, eps, DivFun, param1, param2) {
 #' Implemented are the operators for the Kullback-Leibler divergence and total variation.
 #'
 #' @param lambda Regularization parameter
-#' @param p A numeric vector
-#' @param eps The epsilon value
+#' @param costMatrix A numeric matrix
+#' @param distribution A numeric vector
+#' @param secDistribution A numeric vector
 #' @param DivFun A numeric value indicating the function to be used.'1' gives
 #'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 #'   for the total variation.
 #' @param param1 num value
 #' @param param2 num value
+#' @param Nx num value
+#' @param Ny num value
+#' @param eps eps value
 #' @return A vector holding the proxdiv evaluation
 #' @export
 init_vectors <- function(lambda, costMatrix, distribution, secDistribution, DivFun, param1, param2, Nx, Ny, eps) {
@@ -81,6 +85,7 @@ init_vectors <- function(lambda, costMatrix, distribution, secDistribution, DivF
 #' @param param2Supply numeric value
 #' @param param1Demand numeric Value
 #' @param param2Demand numeric value
+#' @param tol numeric value
 #'
 #' @return The optimal transport plan
 #' @export

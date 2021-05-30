@@ -9,7 +9,8 @@ sinkhornAlgorithmFromCost(
   supplyList,
   demandList,
   maxIteration,
-  eps
+  eps,
+  tol = 1e-08
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ value for the lambda parameter.}
 The default value is 20000.}
 
 \item{eps}{vector of epsilon values to use}
+
+\item{tol}{tolerance for break}
 }
 \description{
 The Sinkhorn Algorihm for unbalanced optimal transport

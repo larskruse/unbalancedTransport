@@ -23,15 +23,22 @@ legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
 }
 
 
-grad_legrende <- function(lambda, x, DivFun, param1 = 0){
+grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
     if(DivFun == "KL"){
         
         return(exp(x/(lambda)))
         
-    }else{
+    }else if(DivFun == "Power"){
         
         return((1-(x/(lambda * (1-param1))))**(param1-1))
+        
+    }else if(DivFun == "RG"){
+        return(pmax(-param1*sign(x), param1 * sign(x)))
+        
+    }else if(DivFun == "TV"){
+        return(rep(1, length(x)))
+        
         
     }
     
@@ -62,16 +69,19 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
     lenSup <- length(supplyList)
     lenDem <- length(demandList)
     
+    X <- supplyList[[lenSup]]
+    Y <- demandList[[lenDem]]
+    
     if(is.null(Cxy)){
-        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, wfr, p)
+        Cxy <- costMatrix(X, Y , method, exp, wfr, p)
     }
     
     if(is.null(Cxx)){
-        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, wfr, p)
+        Cxx <- costMatrix(X, X, method, exp, wfr, p)
     }
     
     if(is.null(Cyy)){
-        Cyy <- costMatrix(demandList[[lendem]], supplyList[[lendem]], method, exp, wfr, p)
+        Cyy <- costMatrix(Y, Y , method, exp, wfr, p)
     }
     
     
@@ -82,12 +92,9 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
         
     }
     
-    res_xy = sinkhornAlgorithmFromCost(Cxy, supplyList, demandList,
-                                       iterMax, eps, tol)
-    res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList,
-                                      iterMax, eps, tol)
-    res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList,
-                                      iterMax, eps, tol)
+    res_xy = sinkhornAlgorithmFromCost(Cxy, supplyList, demandList, iterMax, eps, tol)
+    res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList, iterMax, eps, tol)
+    res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList, iterMax, eps, tol)
     
     f_xy = res_xy$dual_f
     g_xy = res_xy$dual_g
@@ -101,12 +108,19 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
     
     if(supplyList[[1]] == "TV"){
         
+        print("TV")
+        
         func = sum(supplyList[[2]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)) + sum(demandList[[2]] * (g_xy - 0.5*g_y1 -0.5*g_y2))
         
-        supxdem = supplyList[[2]] %*% demandList[[2]]
-        supxsup = supplyList[[2]] %*% supplyList[[2]] 
-        demxdem = demandList[[2]] %*% demandList[[2]]
+        supxdem = supplyList[[2]] %*% t(demandList[[2]])
+        supxsup = supplyList[[2]] %*% t(supplyList[[2]])
+        demxdem = demandList[[2]] %*% t(demandList[[2]])
         
+        print(1-exp(expC(f_xy,g_xy,Cxy)/eps))
+        
+        print(supxdem)
+        print(supxsup)
+        print(demxdem)
 
         func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
                 - 0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) 
@@ -120,36 +134,55 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
         param1 <- supplyList[[3]]
         param2 <- supplyList[[4]]
         
-        -legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
-        
 
         func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)
                     - 0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2))
                     - 0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2))))
-                + sum(demadnList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
+                + sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
                     - 0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2))
                     - 0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2))))
                     
                     
         
-        supxdem = supplyList[[2]] %*% demandList[[2]]
-        supxsup = supplyList[[2]] %*% supplyList[[2]] 
-        demxdem = demandList[[2]] %*% demandList[[2]]
+        supxdem = supplyList[[2]] %*% t(demandList[[2]])
+        supxsup = supplyList[[2]] %*% t(supplyList[[2]])
+        demxdem = demandList[[2]] %*% t(demandList[[2]])
         
         
-        func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
-        - 0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) 
-        - 0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
+        func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
+            0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
+            0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
         
         return(func)
 
         
     }else{
         
-        outf_xy <- -legendre_entropy(-f_xy) - 0.5*eps*grad_legrende(-f_xy)
-        outf_xx <- -legendre_entropy(-f_x1) - 0.5*eps*grad_legrende(-f_x)
-        outg_xy <- -legendre_entropy(-g_xy) - 0.5*eps*grad_legrende(-g_xy)
-        outg_yy <- -legendre_entropy(-g_y1) - 0.5*eps*grad_legrende(-g_y)
+        param1 <- 0
+        
+        if(supplyList[[1]] == "Berg"){
+            supplyList[[1]] <- "Power"
+            demandList[[1]] <- "Power"
+            
+            param1 <- 0
+            
+            
+        }else if(supplyList[[1]] == "Hellinger"){
+            supplyList[[1]] <- "Power"
+            demandList[[1]] <- "Power"
+            
+            param1 <- -1
+            
+        }else if(supplyList[[1]] == "Power"){
+            
+            param1 <- supplyList[[4]]
+        }
+        
+        
+        outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[1]], param1)
+        outf_xx <- -legendre_entropy(supplyList[[3]], -f_x1, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_x1, supplyList[[1]], param1)
+        outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1)
+        outg_yy <- -legendre_entropy(supplyList[[3]], -g_y1, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_y1, supplyList[[1]], param1)
         
         out <- sum(supplyList[[2]]*(outf_xx-outf_xy)) + sum(demandList[[2]] * (outg_yy - outg_xy))
         
@@ -166,7 +199,7 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
 
 
 regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
-                            Cxy = NULL, Cxx = NULL, Cyy = NULL){
+                            Cxy = NULL){
     
     lenSup <- length(supplyList)
     lenDem <- length(demandList)
@@ -174,6 +207,8 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
     if(is.null(Cxy)){
         Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, wfr, p)
     }
+    
+    print(Cxy[1:10, 1:10])
 
     if(supplyList[[1]] != demandList[[1]]){
         
@@ -187,13 +222,14 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
     f_xy = res_xy$dual_f
     g_xy = res_xy$dual_g
     
-   
+    print(f_xy)
+    print(g_xy)
     
     if(supplyList[[1]] == "TV"){
 
         func = sum(supplyList[[2]], f_xy) + sum(demandList[[2]], g_xy)
         
-        expFun <- supplyList[[2]] %*% demandList[[2]] * (1-exp(expC(f_xy,g_xy,Cxy)/eps))
+        expFun <- supplyList[[2]] %*% t(demandList[[2]]) * (1-exp(expC(f_xy,g_xy,Cxy)/eps))
         
         func = func + sum(eps * expFun)
         return(func)
@@ -205,9 +241,7 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
         param1 <- supplyList[[3]]
         param2 <- supplyList[[4]]
         
-        supxdem <- supplyList[[2]] %*% demandList[[2]]
-        
-        -legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)     
+        supxdem <- supplyList[[2]] %*% t(demandList[[2]])
         
 
         func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)))
@@ -221,15 +255,27 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
     
     }else{
         
-        if(supplyList[[1]] == "Power"){
+        param1 <- 0
+        
+        if(supplyList[[1]] == "Berg"){
+            supplyList[[1]] <- "Power"
+            demandList[[1]] <- "Power"
             
-            param1 = supplyList[[4]]
+            param1 <- 0
             
-        }else{
-            param1 = 0
+            
+        }else if(supplyList[[1]] == "Hellinger"){
+            supplyList[[1]] <- "Power"
+            demandList[[1]] <- "Power"
+            
+            param1 <- -1
+            
+        }else if(supplyList[[1]] == "Power"){
+            
+            param1 <- supplyList[[4]]
         }
         
-    
+
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[1]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1)
         
@@ -245,106 +291,81 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
 
 
 
-# hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
-#                                 Cxy = NULL, Cxx = NULL, Cyy = NULL){
-#     
-#     lenSup <- length(supplyList)
-#     lenDem <- length(demandList)
-#     
-#     if(is.null(Cxy)){
-#         Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, wfr, p)
-#     }
-#     
-#     if(is.null(Cxx)){
-#         Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, wfr, p)
-#     }
-#     
-#     if(is.null(Cyy)){
-#         Cyy <- costMatrix(demandList[[lendem]], supplyList[[lendem]], method, exp, wfr, p)
-#     }
-#     
-#     
-#     
-#     if(supplyList[[1]] != demandList[[1]]){
-#         
-#         print("Please chose the same entropy for supply and demand.")
-#         
-#     }
-#     
-#     res_xy = sinkhornAlgorithmFromCost(Cxy, supplyList, demandList,
-#                                        iterMax, eps, tol)
-#     res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList,
-#                                       iterMax, eps, tol)
-#     res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList,
-#                                       iterMax, eps, tol)
-#     
-#     f_xy = res_xy$dual_f
-#     g_xy = res_xy$dual_g
-#     
-#     f_x1 = res_x$dual_f
-#     f_x2 = res_x$dual_g
-#     
-#     g_y1 = res_y$dual_f
-#     g_y2 = res_y$dual_g
-#     
-#     
-#     if(supplyList[[1]] == "TV"){
-#         
-#         func = sum(supplyList[[2]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)) + sum(demandList[[2]] * (g_xy - 0.5*g_y1 -0.5*g_y2))
-#         
-#         supxdem = supplyList[[2]] %*% demandList[[2]]
-#         supxsup = supplyList[[2]] %*% supplyList[[2]] 
-#         demxdem = demandList[[2]] %*% demandList[[2]]
-#         
-#         
-#         func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
-#         - 0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) 
-#         - 0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
-#         
-#         return(func)
-#         
-#         
-#     }else if(supplyList[[1]] == "RG" ){
-#         
-#         param1 <- supplyList[[3]]
-#         param2 <- supplyList[[4]]
-#         
-#         -legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
-#         
-#         
-#         func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)
-#                                       - 0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2))
-#                                       - 0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2))))
-#         + sum(demadnList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
-#                                  - 0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2))
-#                                  - 0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2))))
-#         
-#         
-#         
-#         supxdem = supplyList[[2]] %*% demandList[[2]]
-#         supxsup = supplyList[[2]] %*% supplyList[[2]] 
-#         demxdem = demandList[[2]] %*% demandList[[2]]
-#         
-#         
-#         func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
-#         - 0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) 
-#         - 0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
-#         
-#         return(func)
-#         
-#         
-#     }else{
-#         
-#         outf_xy <- -legendre_entropy(-f_xy) - 0.5*eps*grad_legrende(-f_xy)
-#         outf_xx <- -legendre_entropy(-f_x1) - 0.5*eps*grad_legrende(-f_x)
-#         outg_xy <- -legendre_entropy(-g_xy) - 0.5*eps*grad_legrende(-g_xy)
-#         outg_yy <- -legendre_entropy(-g_y1) - 0.5*eps*grad_legrende(-g_y)
-#         
-#         out <- sum(supplyList[[2]]*(outf_xx-outf_xy)) + sum(demandList[[2]] * (outg_yy - outg_xy))
-#         
-#         return(out)
-#     }
-#     
-#     
-#     
-# }
+hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+                                Cxx = NULL, Cyy = NULL){
+
+    lenSup <- length(supplyList)
+    lenDem <- length(demandList)
+
+
+
+    if(is.null(Cxx)){
+        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, wfr, p)
+    }
+
+    if(is.null(Cyy)){
+        Cyy <- costMatrix(demandList[[lenDem]], supplyList[[lenDem]], method, exp, wfr, p)
+    }
+
+
+
+    if(supplyList[[1]] != demandList[[1]]){
+
+        print("Please chose the same entropy for supply and demand.")
+
+    }
+
+    
+    param1 <- 0
+    param2 <- 0
+    
+    
+
+    res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList, iterMax, eps, tol)
+    res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList, iterMax, eps, tol)
+
+
+    f_xx = res_x$dual_f
+    g_xy = res_x$dual_g
+
+    f_xy = res_y$dual_f
+    g_yy = res_y$dual_g
+
+
+    
+    if(supplyList[[1]] == "Berg"){
+        supplyList[[1]] <- "Power"
+        demandList[[1]] <- "Power"
+        
+        param1 <- 0
+        
+        
+    }else if(supplyList[[1]] == "Hellinger"){
+        supplyList[[1]] <- "Power"
+        demandList[[1]] <- "Power"
+        
+        param1 <- -1
+        
+    }else if(supplyList[[1]] == "Power"){
+        
+        param1 <- supplyList[[4]]
+        
+    }else if(supplyList[[1]] == "RG"){
+        
+        param1 <- supplyList[[3]]
+        param2 <- supplyList[[4]]
+        
+    }
+    
+    
+    
+    res <- sum(supplyList[[2]] * (legendre_entropy(supplyList[[3]], -f_xx, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_xx, supplyList[[1]], param1, param2)  
+                                  - legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_xy,supplyList[[1]], param1, param2) )) +
+        sum(demandList[[2]] *(legendre_entropy(supplyList[[3]], -g_yy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_yy,supplyList[[1]], param1, param2)  
+                              - legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2)))
+    
+    return(res)
+
+
+
+}

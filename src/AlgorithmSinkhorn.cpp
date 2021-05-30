@@ -42,8 +42,7 @@ Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
     temp = Rcpp::exp(x[x <= 1 & x>=-2]);
 
     temp = temp*(3+6*temp+temp*temp)/(3+9*temp+5*temp*temp);
-    Rcpp::Rcout << "temp: " << temp << "\n";
-    
+
     z[x<=1 & x>= -2] = temp;
     
     z[z == 0] = 1e-6;
@@ -193,13 +192,17 @@ Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, i
 //' Implemented are the operators for the Kullback-Leibler divergence and total variation.
 //'
 //' @param lambda Regularization parameter
-//' @param p A numeric vector
-//' @param eps The epsilon value
+//' @param costMatrix A numeric matrix
+//' @param distribution A numeric vector
+//' @param secDistribution A numeric vector
 //' @param DivFun A numeric value indicating the function to be used.'1' gives
 //'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
 //'   for the total variation.
 //' @param param1 num value
 //' @param param2 num value
+//' @param Nx num value
+//' @param Ny num value
+//' @param eps eps value
 //' @return A vector holding the proxdiv evaluation
 //' @export
 //[[Rcpp::export]]
@@ -280,6 +283,7 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix, 
 //' @param param2Supply numeric value
 //' @param param1Demand numeric Value
 //' @param param2Demand numeric value
+//' @param tol numeric value
 //'
 //' @return The optimal transport plan
 //' @export
@@ -313,7 +317,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     Rcpp::NumericMatrix transportPlan(Nx,Ny);
 
     
-    ProfilerStart("sink.log");
+    // ProfilerStart("sink.log");
     
     
     
@@ -348,7 +352,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         }
         
     }
-    ProfilerStop();
+    // ProfilerStop();
     
     for(int i = 0; i < Nx; i++){
         for(int j = 0; j < Ny ; j++){
