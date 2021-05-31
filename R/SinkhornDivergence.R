@@ -1,13 +1,26 @@
+
+
+#' @title legendre Entropy
+#' @param lambda num value
+#' @param x num value
+#' @param DivFun div fun value
+#' @param param1 num val
+#' @param param2 num val
+#'
+#' @export
+#'
 legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
     if(DivFun == "KL"){
         
-        return(lambda*exp(x/lambda) - 1)
+        return(lambda*(exp(x/lambda) - 1))
         
     }else if(DivFun == "Power"){
+        print("le power")
+        print(x)
         
         if(param1 == 0){
-            return( -lambda *(1-log(x/lambda)))
+            return( -lambda *log(1-(x/lambda)))
         }else{
             return(lambda*(1- 1/param1) * ((1+x/(lambda *(param1 - 1)))**param1 - 1) )
         }
@@ -22,7 +35,15 @@ legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
 }
 
-
+#' @title legendre grad
+#' @param lambda num value
+#' @param x num value
+#' @param DivFun div fun value
+#' @param param1 num val
+#' @param param2 num val
+#'
+#' @export
+#'
 grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
     if(DivFun == "KL"){
@@ -44,7 +65,13 @@ grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
 }
 
-
+#' @title exp exponent
+#' @param f num vec
+#' @param g num  vec 
+#' @param C cost mat
+#'
+#' @export
+#'
 expC <- function(f, g, C){
     
     res = matrix(0, length(f), length(g))
@@ -62,8 +89,23 @@ expC <- function(f, g, C){
     
 }
 
-
-sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+#' @title Sink div
+#' @param supplyList sup list
+#' @param demandList dem list
+#' @param eps num val
+#' @param iterMax num val
+#' @param tol num val
+#' @param method cost method
+#' @param exp cost exponent
+#' @param p cost parameter
+#' @param wfr wfr param
+#' @param Cxy cost matrix
+#' @param Cxx cost matrix
+#' @param Cyy cost matrix
+#'
+#' @export
+#'
+sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-10, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
 
     lenSup <- length(supplyList)
@@ -84,7 +126,9 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
         Cyy <- costMatrix(Y, Y , method, exp, wfr, p)
     }
     
-    
+    print(Cxy)
+    print(Cxx)
+    print(Cyy)
     
     if(supplyList[[1]] != demandList[[1]]){
         
@@ -106,25 +150,51 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
     g_y2 = res_y$dual_g
     
     
+    print("f_xy ...")
+    print(f_xy)
+    print(g_xy)
+    print(f_x1)
+    print(f_x2)
+    print(g_y1)
+    print(g_y2)
+    
+    cat("\n\n")
+    
     if(supplyList[[1]] == "TV"){
         
         print("TV")
         
+        
+        print("func")
+        print(sum(supplyList[[2]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)))
+        print(sum(demandList[[2]] * (g_xy - 0.5*g_y1 -0.5*g_y2)))
+        
+        
+        
         func = sum(supplyList[[2]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)) + sum(demandList[[2]] * (g_xy - 0.5*g_y1 -0.5*g_y2))
+        
+        print(func)
         
         supxdem = supplyList[[2]] %*% t(demandList[[2]])
         supxsup = supplyList[[2]] %*% t(supplyList[[2]])
         demxdem = demandList[[2]] %*% t(demandList[[2]])
         
-        print(1-exp(expC(f_xy,g_xy,Cxy)/eps))
-        
-        print(supxdem)
-        print(supxsup)
-        print(demxdem)
 
-        func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
-                - 0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) 
-                - 0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
+        func = func + sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
+            0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
+            0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
+        
+        print((1-exp(expC(f_xy,g_xy,Cxy)/eps)))
+        
+        print(sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        print(0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
+        print(0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
+        print(eps * sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        print(0.5*eps*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
+        print(0.5*eps*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
+        
+        
+        print(func)
         
         return(func)
         
@@ -134,25 +204,57 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
         param1 <- supplyList[[3]]
         param2 <- supplyList[[4]]
         
-
-        func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)
-                    - 0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2))
-                    - 0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2))))
-                + sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
-                    - 0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2))
-                    - 0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2))))
-                    
-                    
+        
+        print("outs")
+        print(-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2))
+        print(0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2)))
+        print(0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2)))
+        print(-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2))
+        print(0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2)))
+        print(0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2)))
+        
+        
         
         supxdem = supplyList[[2]] %*% t(demandList[[2]])
         supxsup = supplyList[[2]] %*% t(supplyList[[2]])
         demxdem = demandList[[2]] %*% t(demandList[[2]])
         
         
-        func = func + sum(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
-            0.5*sum(supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
-            0.5*sum(demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
+        print("exps")
         
+        print(supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))
+        
+        
+        print("funcs")
+        func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)-
+                                          0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2))-
+                                          0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2)))) +
+                                        sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2) -
+                                            0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2)) -
+                                            0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2))))
+                  
+        print(sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)
+                                     - 0.5 * (-legendre_entropy(0, -f_x1, supplyList[[1]], param1, param2))
+                                     - 0.5 * (-legendre_entropy(0, -f_x2, supplyList[[1]], param1, param2)))))
+        
+        print(sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)
+                                     - 0.5 * (-legendre_entropy(0, -g_y1, supplyList[[1]], param1, param2))
+                                     - 0.5 * (-legendre_entropy(0, -g_y2, supplyList[[1]], param1, param2)))))
+          
+        print(func)
+        
+       
+    
+        
+        print(sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        print(0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
+        print(0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
+        
+        func = func + sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
+            0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
+            0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps)))
+        
+        print(func)
         return(func)
 
         
@@ -179,12 +281,26 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
         }
         
         
+        
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[1]], param1)
         outf_xx <- -legendre_entropy(supplyList[[3]], -f_x1, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_x1, supplyList[[1]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1)
         outg_yy <- -legendre_entropy(supplyList[[3]], -g_y1, supplyList[[1]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_y1, supplyList[[1]], param1)
         
-        out <- sum(supplyList[[2]]*(outf_xx-outf_xy)) + sum(demandList[[2]] * (outg_yy - outg_xy))
+        print("outs")
+        print(outf_xy)
+        print(outf_xx)
+        print(outf_xy-outf_xx)
+        print(sum(supplyList[[2]]*(outf_xy-outf_xx)))
+        
+        
+        print(outg_xy)
+        print(outg_yy)
+        print(outg_xy-outg_yy)
+        print(sum(demandList[[2]]*(outg_xy-outg_yy)))
+        
+        
+        out <- sum(supplyList[[2]]*(outf_xy-outf_xx)) + sum(demandList[[2]] * (outg_xy - outg_yy))
         
         return(out)
     }
@@ -197,7 +313,20 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol 
 
 
 
-
+#' @title regularized output
+#' @param supplyList sup list
+#' @param demandList dem list
+#' @param eps num val
+#' @param iterMax num val
+#' @param tol num val
+#' @param method cost method
+#' @param exp cost exponent
+#' @param p cost parameter
+#' @param wfr wfr param
+#' @param Cxy cost matrix
+#' 
+#' @export
+#'
 regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL){
     
@@ -222,14 +351,30 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
     f_xy = res_xy$dual_f
     g_xy = res_xy$dual_g
     
+    
+    print("solved")
+    print("f_x, g_y: ")
     print(f_xy)
     print(g_xy)
     
     if(supplyList[[1]] == "TV"){
-
-        func = sum(supplyList[[2]], f_xy) + sum(demandList[[2]], g_xy)
         
+        print("funcs")
+        print(sum(supplyList[[2]] * f_xy))
+        print( sum(demandList[[2]] * g_xy))
+        
+
+        func = sum(supplyList[[2]] * f_xy) + sum(demandList[[2]] * g_xy)
+        
+        print(func)
+        
+      
         expFun <- supplyList[[2]] %*% t(demandList[[2]]) * (1-exp(expC(f_xy,g_xy,Cxy)/eps))
+        
+        
+        print((1-exp(expC(f_xy,g_xy,Cxy)/eps)))
+        print(sum(eps * expFun))
+        
         
         func = func + sum(eps * expFun)
         return(func)
@@ -243,11 +388,21 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
         
         supxdem <- supplyList[[2]] %*% t(demandList[[2]])
         
-
-        func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)))
-                   + sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)))
-
+        print("funcs")
+        print(sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2))))
+        
+        print( sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2))))
+        
+        
+        func = sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[1]], param1, param2)))+ 
+            sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[1]], param1, param2)))
+        print(func)
+        
+        print(sum(eps * (supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps)))))
+        
         func = func + sum(eps * (supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        
+        print(func)
         
         return(func)
         
@@ -279,7 +434,23 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[1]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1)
         
-        res = sum(supplyList[[2]] * outf_xy) + sum(demandList[[2]] * outg_xy) + eps*(sum(supplyList[[2]]) + sum(demandList[[2]]))
+        print("pre outs")
+        print(legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, 0))
+        print(grad_legrende(supplyList[[3]], -f_xy, supplyList[[1]], param1))
+        
+        print(legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, 0))
+        print(grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1))
+        
+        print("outs")
+        print(outf_xy)
+        print(outg_xy)
+
+        print("funcs")
+        print(sum(supplyList[[2]] * outf_xy))
+        print(sum(supplyList[[2]] * outf_xy)+ sum(demandList[[2]] * outg_xy))
+        print(sum(supplyList[[2]] * outf_xy)+ sum(demandList[[2]] * outg_xy)+ eps*(sum(supplyList[[2]]) * sum(demandList[[2]])))
+        print(eps*(sum(supplyList[[2]]) + sum(demandList[[2]])))
+        res = sum(supplyList[[2]] * outf_xy) + sum(demandList[[2]] * outg_xy) + eps*(sum(supplyList[[2]]) * sum(demandList[[2]]))
         
         return(res)
         
@@ -290,7 +461,21 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
 
 
 
-
+#' @title hausdorff div
+#' @param supplyList sup list
+#' @param demandList dem list
+#' @param eps num val
+#' @param iterMax num val
+#' @param tol num val
+#' @param method cost method
+#' @param exp cost exponent
+#' @param p cost parameter
+#' @param wfr wfr param
+#' @param Cxx cost matrix
+#' @param Cyy cost matrix
+#' 
+#' @export
+#'
 hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                                 Cxx = NULL, Cyy = NULL){
 
@@ -365,7 +550,4 @@ hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol
                               - legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2)))
     
     return(res)
-
-
-
 }

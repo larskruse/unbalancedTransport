@@ -62,6 +62,9 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
     
     
     Rcpp::NumericVector z = lambertInit(x);
+    
+    Rcpp::Rcout << "init z: " << z << "\n";
+    
     Rcpp::NumericVector c;
     Rcpp::NumericVector b;
     
@@ -74,6 +77,8 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
         b = -1/(z*(1+z));
         z = Rcpp::pmax(z-c/(1-0.5*c*b),eps);
     }
+    
+    Rcpp::Rcout << "end z: " << z << "\n";
     
     return(z);
 }
@@ -148,12 +153,21 @@ Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps, int
     // Power
     }else if(DivFun == 4){
         
-        temp = p/(eps*(1-param1)) + lambda/eps + std::log(lambda/eps);
         
-        temp = (1-param1)*(lambda-lambertWFunctionLog(temp));
         
-        // temp = lambda/eps*Rcpp::exp((lambda+(p/2))/eps);
-        // temp = 2*eps*lambertWFunction(temp) - 2*lambda;
+        temp = p/(eps*(1-param1));
+        Rcpp::Rcout << "temp : " << temp << "\n";
+        temp = temp + lambda/eps;
+        Rcpp::Rcout << temp << "\n";
+        temp = temp + std::log(lambda/eps);
+        Rcpp::Rcout << temp << "\n";
+        
+        Rcpp::Rcout << "param1 : " << param1 << "\n";
+        Rcpp::Rcout << "eps : " << eps << "\n";
+        
+        temp = (1-param1)*(lambda-eps*lambertWFunctionLog(temp));
+        
+        
         return(-temp);
     }else{
         return(p);
@@ -306,6 +320,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     Rcpp::NumericVector g = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
     
     
+    Rcpp::Rcout << "init: \n" << "f: " << f << "\n" << "g: " << g << "\n\n";
+    
     Rcpp::NumericVector f_prev;
     //Rcpp::NumericVector temp;
     Rcpp::NumericMatrix temp(Nx,Ny);
@@ -326,6 +342,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         f_prev = Rcpp::clone(f);
         //Rcpp::Rcout << "k:" <<k << "\n";
 
+       // Rcpp::Rcout << "f: " << f << "\n";
+        
         for(int j = 0; j < Ny; j++){
             temp(Rcpp::_,j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
         }
@@ -333,7 +351,13 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         
         g = lse(temp);
         g = -eps*g;
+        
+        Rcpp::Rcout << "g_j\n";
+        Rcpp::Rcout << g << "\n";
+        
         g = aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
+        Rcpp::Rcout << g << "\n";
+        
         
         for(int i = 0; i < Nx; i++){
             temp(Rcpp::_,i) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
@@ -341,15 +365,19 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         
         f = lse(temp);
         f = -eps*f;
+        
+        Rcpp::Rcout << "f_i\n";
+        Rcpp::Rcout << f << "\n";
+        
         f = aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
-    
+        Rcpp::Rcout << f << "\n\n";
         
         
-        if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){
-            Rcpp::Rcout << "converged at: " << k << " \n";
-
-            break;
-        }
+        // if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){
+        //     Rcpp::Rcout << "converged at: " << k << " \n";
+        // 
+        //     break;
+        // }
         
     }
     // ProfilerStop();
