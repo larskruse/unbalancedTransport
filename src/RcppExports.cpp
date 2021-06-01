@@ -99,6 +99,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// Hausdorff_Vec_Rcpp
+Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& distribution, Rcpp::NumericVector& f, double lambda, double param1, double param2, int Div, double eps);
+RcppExport SEXP _unbalancedTransport_Hausdorff_Vec_Rcpp(SEXP costMatrixSEXP, SEXP distributionSEXP, SEXP fSEXP, SEXP lambdaSEXP, SEXP param1SEXP, SEXP param2SEXP, SEXP DivSEXP, SEXP epsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type costMatrix(costMatrixSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type distribution(distributionSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type f(fSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type param1(param1SEXP);
+    Rcpp::traits::input_parameter< double >::type param2(param2SEXP);
+    Rcpp::traits::input_parameter< int >::type Div(DivSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    rcpp_result_gen = Rcpp::wrap(Hausdorff_Vec_Rcpp(costMatrix, distribution, f, lambda, param1, param2, Div, eps));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Monge_Rcpp
 Rcpp::List Monge_Rcpp(Rcpp::NumericMatrix& costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double& constructionCost, double& destructionCost);
 RcppExport SEXP _unbalancedTransport_Monge_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP constructionCostSEXP, SEXP destructionCostSEXP) {
@@ -148,8 +166,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // StabilizedScaling_Rcpp
-Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix, Eigen::Map<Eigen::VectorXd> supply, Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply, double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand, int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec);
-RcppExport SEXP _unbalancedTransport_StabilizedScaling_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP alphaSupplySEXP, SEXP betaSupplySEXP, SEXP lambdaDemandSEXP, SEXP alphaDemandSEXP, SEXP betaDemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP) {
+Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix, Eigen::Map<Eigen::VectorXd> supply, Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply, double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand, int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec, double tol);
+RcppExport SEXP _unbalancedTransport_StabilizedScaling_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP alphaSupplySEXP, SEXP betaSupplySEXP, SEXP lambdaDemandSEXP, SEXP alphaDemandSEXP, SEXP betaDemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -166,7 +184,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type DivDemand(DivDemandSEXP);
     Rcpp::traits::input_parameter< int >::type iterMax(iterMaxSEXP);
     Rcpp::traits::input_parameter< Eigen::Map<Eigen::VectorXd> >::type epsvec(epsvecSEXP);
-    rcpp_result_gen = Rcpp::wrap(StabilizedScaling_Rcpp(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec));
+    Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(StabilizedScaling_Rcpp(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -209,10 +228,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_unbalancedTransport_aprox", (DL_FUNC) &_unbalancedTransport_aprox, 6},
     {"_unbalancedTransport_init_vectors", (DL_FUNC) &_unbalancedTransport_init_vectors, 10},
     {"_unbalancedTransport_Sinkhorn_Rcpp", (DL_FUNC) &_unbalancedTransport_Sinkhorn_Rcpp, 14},
+    {"_unbalancedTransport_Hausdorff_Vec_Rcpp", (DL_FUNC) &_unbalancedTransport_Hausdorff_Vec_Rcpp, 8},
     {"_unbalancedTransport_Monge_Rcpp", (DL_FUNC) &_unbalancedTransport_Monge_Rcpp, 5},
     {"_unbalancedTransport_vectorDivergence", (DL_FUNC) &_unbalancedTransport_vectorDivergence, 5},
     {"_unbalancedTransport_proxdiv", (DL_FUNC) &_unbalancedTransport_proxdiv, 8},
-    {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 13},
+    {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 14},
     {"_unbalancedTransport_treegkr_Rcpp", (DL_FUNC) &_unbalancedTransport_treegkr_Rcpp, 5},
     {"_unbalancedTransport_Nw_Corner_Rule", (DL_FUNC) &_unbalancedTransport_Nw_Corner_Rule, 6},
     {NULL, NULL, 0}
