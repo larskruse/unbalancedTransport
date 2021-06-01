@@ -5,7 +5,7 @@
 struct Tree{
 
     // Every node in the tree is assigned a vector. These vectors hold pairs of values.
-    // The first value is the key of another node it is connected to with an edge.
+    // The first value is the key of node it is connected to with an edge.
     // The second value is the weight of that edge.
     std::vector<std::vector<std::pair<int, double>>> G;
     // the number of nodes in the tree

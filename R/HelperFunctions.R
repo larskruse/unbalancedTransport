@@ -6,7 +6,8 @@
 #'
 #' @param c A numeric distance matrix.
 #' @return The coordinates based on the distance matrix.
-#'
+#' @noRd
+
 positionsByEigenvalue <- function(c){
         dimC <- dim(c)[1]
         m <- matrix(rep(0, length(c)), dimC)
@@ -48,7 +49,7 @@ positionsByEigenvalue <- function(c){
 #' @param X A numeric vector.
 #' @param Y A numeric vector.
 #' @return The WFR cost matrix.
-#' @export
+#' @noRd
 #'
 wfrCost <- function(X,Y){
         C <- matrix(rep(0, length(X)*length(Y)), nrow = length(X))
@@ -72,6 +73,8 @@ wfrCost <- function(X,Y){
 #' @param s1 The left boundary of a 1D interval.
 #' @param s2 The right boundary of a 1D interval.
 #' @return 1 if x is in [s1,s2] and 0 if it is not.
+#' @noRd
+
 inseg <- function(x,s1,s2){
         if(s1 <= x & x <= s2){
                 return(1)
@@ -86,8 +89,8 @@ inseg <- function(x,s1,s2){
 #'
 #' @param x A numeric value.
 #' @return The function value r = p(x).
-#' @export
-#'
+#' @noRd
+#' 
 fp <- function(x){
         r <- 2*inseg(x,0.0,0.2)
         r <- r + 40*(x-0.9)*inseg(x,0.9,0.95)
@@ -102,7 +105,7 @@ fp <- function(x){
 #'
 #' @param y A numeric value.
 #' @return The function value r = ´q(y).
-#' @export
+#' @noRd
 #'
 fq <- function(y){
         r <- 10*(y-0.2)*inseg(y,0.2,0.4)
@@ -121,7 +124,7 @@ fq <- function(y){
 #' @param method Determines which distance function to use for the computation. The default value is "euclidean" but every
 #' method given for stats::dist can be used.
 #' @return The distance matrix.
-#' @export
+#' @noRd
 createCostMatrix <- function(x,y,method = "euclidean"){
         costM <-matrix(rep(0, length(x)*length(x)), nrow = length(x))
         for (i in 1:length(x)){
@@ -147,7 +150,7 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 #' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
 #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
 #' points in y
-#' @export
+#' @noRd
 costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
 
         if(is.null(ncol(x))){
@@ -199,17 +202,4 @@ costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2)
         return(cMatrix)
 
 }
-#' costMatrix(x, y, method = "maximum")
-#
-#
-# x <- matrix(c(1,1,1,0,1,2), ncol = 2)
-# x
-# y <- matrix(c(3,2,3,0,1,2), ncol = 2)
-# y
-#
-# plot(x, xlim = c(1,3))
-# points(y)
-
-
-
 

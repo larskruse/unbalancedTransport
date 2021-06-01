@@ -1,26 +1,3 @@
-#' @importFrom grDevices hcl.colors rainbow
-#' @importFrom graphics Axis image lines plot polygon points segments text
-#' @importFrom diagram curvedarrow
-#'
-## usethis namespace: start
-#' @useDynLib unbalancedTransport, .registration = TRUE
-## usethis namespace: end
-NULL
-#'
-#'
-#'
-## usethis namespace: start
-#' @importFrom Rcpp sourceCpp
-## usethis namespace: end
-NULL
-
-
-## usethis namespace: start
-#' @import RcppEigen
-## usethis namespace: end
-NULL
-
-
 #' Plotting transport between points given by a distance matrix
 #'
 #' @param distanceMatrix A numeric distance matrix.
@@ -278,7 +255,7 @@ nextLayer <- function(treeDF, coordinates ,node, layer){
 #' @param treeDF tree in data.frame format
 #'
 #' @return A list of nodes from 'from' to 'to'
-#'
+#' @noRd
 findPath <- function(from, to, treeDF){
 
     # if the node has children, check if one of them is the wanted node
@@ -492,5 +469,25 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
     # Adding the keys to the plot.
     text(coordinates$x, coordinates$layer, labels = coordinates$node, pos = 4)
 
+}
+
+
+
+
+
+#' Plotting dense 1D transport
+#'
+#' @param transportMap A numeric matrix.
+#' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric supply vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
+#'  a numeric demand vector, the reference measure as numeric vector and the
+#'  value for the lambda parameter.
+#'
+#'
+#' @export
+plot2DTransport <- function(transportMap,supplyList, demandList){
+    
 }
 

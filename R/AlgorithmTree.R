@@ -1,8 +1,3 @@
-#' @importFrom transport transport
-
-
-
-
 #' @title Tree Cost Matrix
 #'
 #' Calculating the cost matrix for a given tree.
@@ -11,7 +6,7 @@
 #' containing the parent node, the child node and the edge weight.
 #'
 #' @return The cost matrix for the given tree.
-#'
+#' @noRd
 getCostMatrix <- function(tree){
     treeDF <- as.data.frame(do.call(rbind, tree[-1]))
     colnames(treeDF) <- c("parent", "child", "weight")

@@ -2,7 +2,7 @@
 #'
 #' The examples given in the [paper]
 #'
-#' @export
+#' @noRd
 #'
 ExampleScaling <- function(){
 
@@ -16,7 +16,7 @@ ExampleScaling <- function(){
     # Discretization of [0,1]
     X <- seq(0,1,length.out = I)
     Y <- seq(0,1,length.out = J)
-
+    
 
     # supply measure
     p <- sapply(X, fp)
@@ -133,8 +133,7 @@ ExampleScaling <- function(){
 #'
 #' Another scaling algorithm example
 #'
-#' @export
-#'
+#' @noRd
 ExampleScaling2 <- function(){
 
 

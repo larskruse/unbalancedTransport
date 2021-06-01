@@ -11,11 +11,12 @@
 #' @param maxIteration A numeric value for the maximum number of iterations.
 #' The default value is 20000.
 #' @param epsVector vector of epsilon values to use
+#' @param tol num value
 #'
 #' @export
 #'
 scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
-                             maxIteration, epsVector){
+                             maxIteration, epsVector, tol = 1e-10){
 
     # Using either Kullback-Leibler divergence or total variation
     if(supplyList[[1]] == "KL"){
@@ -78,7 +79,7 @@ scalingAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
 
     res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                   supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-                                  Div2, maxIteration, epsVector)
+                                  Div2, maxIteration, epsVector, tol)
 
 
     return(res)

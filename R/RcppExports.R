@@ -14,10 +14,26 @@
 #' @param destructionCost The cost of destructing mass at any point.
 #' @return It returns a list of the transport cost, three numeric vectors that indicate the optimal transport path, and two vectors that indicate
 #'     where mass is created and where it is destructed.
-#' @export
+#' @noRd
 Monge_Rcpp <- function(costMatrix, supply, demand, constructionCost, destructionCost) {
     .Call(`_unbalancedTransport_Monge_Rcpp`, costMatrix, supply, demand, constructionCost, destructionCost)
 }
+
+#' Elementwise division of two vectors with 'x/0 = 0'
+#'
+#' @param a The dividend vector
+#' @param b The divisor vector
+#' @return solution of elementwise division of a and b
+#' @noRd
+NULL
+
+#' Elementwise multiplication of two vectors with 'x/0 = 0'
+#'
+#' @param a The dividend vector
+#' @param b The divisor vector
+#' @return solution of elementwise division of a and b
+#' @noRd
+NULL
 
 #' Computing the divergence functions values
 #'
@@ -27,11 +43,8 @@ Monge_Rcpp <- function(costMatrix, supply, demand, constructionCost, destruction
 #' @param param1 lambda or alpha
 #' @param param2 beta or 0
 #'
-#' @export
-#'
-vectorDivergence <- function(r, s, DivFun, param1, param2 = 0) {
-    .Call(`_unbalancedTransport_vectorDivergence`, r, s, DivFun, param1, param2)
-}
+#' @noRd
+NULL
 
 #' The proxdiv operator
 #'
@@ -49,10 +62,21 @@ vectorDivergence <- function(r, s, DivFun, param1, param2 = 0) {
 #' @param alpha num value
 #' @param beta num value
 #' @return A vector holding the proxdiv evaluation
-#' @export
-proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
-    .Call(`_unbalancedTransport_proxdiv`, lambda, p, s, u, eps, DivFun, alpha, beta)
-}
+#' @noRd
+NULL
+
+#' Updating the Kernel
+#'
+#' Calculating and updating the log-domain stabilized kernel. For 0 vectors u and v
+#' it calculates the Gibbs kernel.
+#'
+#' @param u A numeric vector
+#' @param v A numeric vector
+#' @param eps The epsilon value
+#' @param costMatrix A numeric matrix
+#' @return The updated kernel
+#' @noRd
+NULL
 
 #' The stabilized Scaling Algorithm
 #'
@@ -72,32 +96,165 @@ proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
 #' @param betaSupply numeric value
 #' @param alphaDemand numeric Value
 #' @param betaDemand numeric value
+#' @param tol num vale
 #'
 #' @return The optimal transport plan
-#' @export
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec) {
-    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec)
+#' @noRd
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-10) {
+    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
-treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {
-    .Call(`_unbalancedTransport_treegkr_Rcpp`, tree, supply, demand, creation, destruction)
-}
+#' computing the lambert w function
+#' @param x numeric vector
+#' @return the function value
+#' @noRd 
+NULL
 
-#' C++ implantation of the North-West Corner Rule
+#' computing the inital values for f and g
+#' @param x numeric vector
+#' @return the function value
+#' @noRd
+NULL
+
+#' The aprox operator
 #'
-#' This function calculates the optimal transport cost for a balanced optimal
-#' transport problem if its cost matrix fulfills the Monge property. Otherwise,
-#' it calculates a feasible solution for the transport problme.
+#' The aprix operators for different divergences in the form of 'lambda * DivFun(.|p)'
+#' Implemented are the operators for the Kullback-Leibler divergence and total variation.
+#'
+#' @param lambda Regularization parameter
+#' @param p A numeric vector
+#' @param eps The epsilon value
+#' @param DivFun A numeric value indicating the function to be used.'1' gives
+#'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
+#'   for the total variation.
+#' @param param1 num value
+#' @param param2 num value
+#' @return A vector holding the proxdiv evaluation
+#' @noRd
+NULL
+
+#' matrix mulitplication
+#' @param mat num mat
+#' @param vec num vec
+#' @param Nx num val
+#' @param Ny num val
+#' @noRd
+NULL
+
+#' Inital values
+#'
+#' The aprix operators for different divergences in the form of 'lambda * DivFun(.|p)'
+#' Implemented are the operators for the Kullback-Leibler divergence and total variation.
+#'
+#' @param lambda Regularization parameter
+#' @param costMatrix A numeric matrix
+#' @param distribution A numeric vector
+#' @param secDistribution A numeric vector
+#' @param DivFun A numeric value indicating the function to be used.'1' gives
+#'   the proxdiv operator for the Kullback-Leibler divergence and '2' the opterator
+#'   for the total variation.
+#' @param param1 num value
+#' @param param2 num value
+#' @param Nx num value
+#' @param Ny num value
+#' @param eps eps value
+#' @return A vector holding the proxdiv evaluation
+#' @noRd
+NULL
+
+#' init the lambert w function
+#' @param x numeric vector
+#' @return initial value 
+#' @noRd
+lambertInit <- function(x) {
+    .Call(`_unbalancedTransport_lambertInit`, x)
+}
+
+#' The stabilized Scaling Algorithm
+#'
+#' C++ implementation of the log-domain stabilized Version of the Scaling
+#' Algorithm.
 #'
 #' @param costMatrix A numeric matrix.
-#' @param supply A numeric supply vector.
-#' @param demand A numeric demand vector.
-#' @param iList A numeric vector holding the row index of the transport path
-#' @param jList A numeric vector holding the row index of the transport path
-#' @param weightList A numeric vector holding the transport path weights
-#' @return The transport cost.
-#' @export
-Nw_Corner_Rule <- function(costMatrix, supply, demand, iList, jList, weightList) {
-    .Call(`_unbalancedTransport_Nw_Corner_Rule`, costMatrix, supply, demand, iList, jList, weightList)
+#' @param supply A numeric vector
+#' @param demand A numeric vector
+#' @param lambdaSupply Parameter for the supply proxdiv function
+#' @param lambdaDemand Parameter for the demand proxdiv function
+#' @param DivSupply Parameter indicating the divergence function to use for the supply proxdiv function
+#' @param DivDemand Parameter indicating the divergence function to use for the demand proxdiv function
+#' @param iterMax Maximum number of iterations
+#' @param eps A numeric vector of decreasing epsilon values.
+#' @param param1Supply numeric Value
+#' @param param2Supply numeric value
+#' @param param1Demand numeric Value
+#' @param param2Demand numeric value
+#' @param tol numeric value
+#'
+#' @return The optimal transport plan
+#' @noRd
+Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol) {
+    .Call(`_unbalancedTransport_Sinkhorn_Rcpp`, costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol)
+}
+
+#' The symmetric stabilized Scaling Algorithm
+#'
+#' C++ implementation of the log-domain stabilized Version of the Scaling
+#' Algorithm.
+#'
+#' @param costMatrix A numeric matrix.
+#' @param f A numeric vector
+#' @param lambda Parameter for the supply proxdiv function
+#' @param Div Parameter indicating the divergence function to use for the supply proxdiv function
+#' @param eps A numeric vector of decreasing epsilon values.
+#' @param param1 numeric Value
+#' @param param2 numeric value
+#' @param distribution num distrie
+#'
+#' @return The optimal transport plan
+#' @noRd
+Hausdorff_Vec_Rcpp <- function(costMatrix, distribution, f, lambda, param1, param2, Div, eps) {
+    .Call(`_unbalancedTransport_Hausdorff_Vec_Rcpp`, costMatrix, distribution, f, lambda, param1, param2, Div, eps)
+}
+
+#' Updating the segment node values in x < 0
+#'
+#' This function is used to calculate the step from e_{v,x} to t_{p,x} by subtracting
+#' the edge weight from all segment node values in x < 0. If a segment passes through
+#' x = 0, it is split in two parts and a new segment node is inserted in to the tree.
+#'
+#'
+#' @param t A segment node.
+#' @param k A numeric value. Typically, the distance from the leftmost element to 0.
+#' @param c A numeric value. The value that is subtracted from all segment node slopes in x < 0.
+#'      If any segment goes through x = 0, the segment is divided in two parts.
+#' @return The first segment node in x < 0
+#' @noRd
+NULL
+
+#' Calcualting the keys and length of all segments with length > 0 in the subtree
+#'  of t
+#'
+#' @param t A node in a segment tree
+#' @param keys A vector to store the keys
+#' @param length A vector to store the keys
+#' @return by reference: Key and length vectors
+#' @noRd
+NULL
+
+#' The tree metric unbalanced optimal transport algorithm
+#'
+#' This function makes the unbalanced optimal transport algorithm for tree metrics
+#' accessible from R. It calculated the optimal transport cost and the import vector.
+#'
+#' @param tree A tree structure given in list form. Each entry in the list represents
+#'          an edge: (first node, second node, edge weight)
+#' @param supply The supply vector.
+#' @param demand The demand vector.
+#' @param creationCost A numeric vector giving the creation cost at each node.
+#' @param destructionCost A numeric vector giving the destruction cost at each node.
+#' @return A list containing the optimal transport cost and the import vector.
+#' @noRd
+treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {
+    .Call(`_unbalancedTransport_treegkr_Rcpp`, tree, supply, demand, creation, destruction)
 }
 

@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+//#include <bits/stdc++.h>
 
 #include "Rcpp.h"
 #include "utilTree.cpp"
@@ -158,19 +158,19 @@ np re(np t){
 
 
 
-// Updating the segment node values in x < 0
-//
-// This function is used to calculate the step from e_{v,x} to t_{p,x} by subtracting
-// the edge weight from all segment node values in x < 0. If a segment passes through
-// x = 0, it is split in two parts and a new segment node is inserted in to the tree.
-//
-//
-// @param t A segment node.
-// @param k A numeric value. Typically, the distance from the leftmost element to 0.
-// @param c A numeric value. The value that is subtracted from all segment node slopes in x < 0.
-//      If any segment goes through x = 0, the segment is divided in two parts.
-// @return The first segment node in x < 0
-//
+//' Updating the segment node values in x < 0
+//'
+//' This function is used to calculate the step from e_{v,x} to t_{p,x} by subtracting
+//' the edge weight from all segment node values in x < 0. If a segment passes through
+//' x = 0, it is split in two parts and a new segment node is inserted in to the tree.
+//'
+//'
+//' @param t A segment node.
+//' @param k A numeric value. Typically, the distance from the leftmost element to 0.
+//' @param c A numeric value. The value that is subtracted from all segment node slopes in x < 0.
+//'      If any segment goes through x = 0, the segment is divided in two parts.
+//' @return The first segment node in x < 0
+//' @noRd
 np find(np t, double k, double c){
     if(t == &dummy) return t;
 
@@ -515,14 +515,14 @@ void printTree(np t){
 
 
 
-// Calcualting the keys and length of all segments with length > 0 in the subtree
-//  of t
-//
-// @param t A node in a segment tree
-// @param keys A vector to store the keys
-// @param length A vector to store the keys
-// @return by reference: Key and length vectors
-//
+//' Calcualting the keys and length of all segments with length > 0 in the subtree
+//'  of t
+//'
+//' @param t A node in a segment tree
+//' @param keys A vector to store the keys
+//' @param length A vector to store the keys
+//' @return by reference: Key and length vectors
+//' @noRd
 void getKeysLengths(np t, Rcpp::NumericVector &keys, Rcpp::NumericVector &lengths){
 
     if(t->chl != &dummy){
@@ -549,20 +549,20 @@ void getKeysLengths(np t, Rcpp::NumericVector &keys, Rcpp::NumericVector &length
 // creation: cost of creation of mass in the data tree nodes
 // destruction: cost of destruction of mass in the data tree nodes
 
-// The tree metric unbalanced optimal transport algorithm
-//
-// This function makes the unbalanced optimal transport algorithm for tree metrics
-// accessible from R. It calculated the optimal transport cost and the import vector.
-//
-// @param tree A tree structure given in list form. Each entry in the list represents
-//          an edge: (first node, second node, edge weight)
-// @param supply The supply vector.
-// @param demand The demand vector.
-// @param creationCost A numeric vector giving the creation cost at each node.
-// @param destructionCost A numeric vector giving the destruction cost at each node.
-// @return A list containing the optimal transport cost and the import vector.
-// @export
-// [[Rcpp::export]]
+//' The tree metric unbalanced optimal transport algorithm
+//'
+//' This function makes the unbalanced optimal transport algorithm for tree metrics
+//' accessible from R. It calculated the optimal transport cost and the import vector.
+//'
+//' @param tree A tree structure given in list form. Each entry in the list represents
+//'          an edge: (first node, second node, edge weight)
+//' @param supply The supply vector.
+//' @param demand The demand vector.
+//' @param creationCost A numeric vector giving the creation cost at each node.
+//' @param destructionCost A numeric vector giving the destruction cost at each node.
+//' @return A list containing the optimal transport cost and the import vector.
+//' @noRd
+//[[Rcpp::export]]
 Rcpp::List treegkr_Rcpp (Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::NumericVector &demand,
                          Rcpp::NumericVector &creation, Rcpp::NumericVector &destruction){
     // Number of nodes

@@ -1,6 +1,6 @@
 Package: unbalancedTransport
 Type: Package
-Title: Solving unbalanced optimal transport problmes
+Title: Solving unbalanced optimal transport problems
 Version: 0.1.0
 Authors@R: person(given = "Lars",
            family = "Kruse",
@@ -21,4 +21,5 @@ Imports:
     RcppEigen,
     shape,
     diagram,
-    transport
+    transport,
+    logSumExp

@@ -12,6 +12,7 @@
 //' @param ukSW Reference to return the u(k) vector
 //' @param vkSW Reference to return the v(k) vector
 //' @return The vectors u(k) and v(k) for the south-west shifts
+//' @noRd
 //'
 void CalcSWShift(Rcpp::NumericVector costMatrix, Rcpp::NumericVector iList, Rcpp::NumericVector jList, Rcpp::NumericVector &ukSW, Rcpp::NumericVector &vkSW);
 
@@ -26,6 +27,7 @@ void CalcSWShift(Rcpp::NumericVector costMatrix, Rcpp::NumericVector iList, Rcpp
 //' @param ukSW Reference to return the u(k) vector
 //' @param vkSW Reference to return the v(k) vector
 //' @return The vectors u(k) and v(k) for the north-east shifts
+//' @noRd
 //'
 void CalcNOShift(Rcpp::NumericVector costMatrix, Rcpp::NumericVector iList, Rcpp::NumericVector jList, Rcpp::NumericVector &ukNO, Rcpp::NumericVector &vkNO);
 

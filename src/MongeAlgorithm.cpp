@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 
 #include "Rcpp.h"
 #include "getOptimN.h"
@@ -18,9 +17,8 @@
 //' @param destructionCost The cost of destructing mass at any point.
 //' @return It returns a list of the transport cost, three numeric vectors that indicate the optimal transport path, and two vectors that indicate
 //'     where mass is created and where it is destructed.
-//' @export
-// [[Rcpp::export]]
-
+//' @noRd
+//[[Rcpp::export]]
 Rcpp::List Monge_Rcpp(Rcpp::NumericMatrix &costMatrix, Rcpp::NumericVector &supply,
                       Rcpp::NumericVector &demand, double &constructionCost,
                       double &destructionCost){

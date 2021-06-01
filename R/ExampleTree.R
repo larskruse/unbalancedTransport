@@ -2,7 +2,7 @@
 #'
 #' The tree metric transport problem from paper
 #'
-#' @export
+#' @noRd
 ExampleTree1 <- function(){
 
 
@@ -40,7 +40,7 @@ ExampleTree1 <- function(){
 #'
 #'
 #'
-#' @export
+#' @noRd
 ExampleTree2 <- function(){
 
 
