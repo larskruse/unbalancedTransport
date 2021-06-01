@@ -26,20 +26,3 @@ This calculates the optimal transport cost and optimal transport path of an
 unbalanced optimal transport problem. The cost matrix has to fulfill the Monge
 property.
 }
-\examples{
-# generating random data
-mongeMatrix <- genMongeMat(30,30)
-
-supply <- runif(30,0,1)
-demand <- runif(30,0,1)
-
-createCost <- runif(1,0,0.2)
-destructCost <- runif(1,0,0.3)
-
-# calculating the optimal transport cost and plan
-res <- mongeAlgorithm(mongeMatrix, supply, demand, createCost, destructCost)
-
-# plotting the transport plan
-plotUOTP(res$transportPlan, res$import, res$export)
-
-}

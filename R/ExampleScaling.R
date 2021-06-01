@@ -2,7 +2,7 @@
 #'
 #' The examples given in the [paper]
 #'
-#' @export
+#' @noRd
 #'
 ExampleScaling <- function(){
 
@@ -133,8 +133,7 @@ ExampleScaling <- function(){
 #'
 #' Another scaling algorithm example
 #'
-#' @export
-#'
+#' @noRd
 ExampleScaling2 <- function(){
 
 

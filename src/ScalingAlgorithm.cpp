@@ -5,11 +5,12 @@
 #include "gperftools/profiler.h"
 
 
-// Elementwise division of two vectors with 'x/0 = 0'
-//
-// @param a The dividend vector
-// @param b The divisor vector
-// @return solution of elementwise division of a and b
+//' Elementwise division of two vectors with 'x/0 = 0'
+//'
+//' @param a The dividend vector
+//' @param b The divisor vector
+//' @return solution of elementwise division of a and b
+//' @noRd
 
 Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
   // if all values in b are unequal 0, the result is the standard elementwise division
@@ -29,11 +30,12 @@ Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
 
 }
 
-// Elementwise division of two vectors with 'x/0 = 0'
-//
-// @param a The dividend vector
-// @param b The divisor vector
-// @return solution of elementwise division of a and b
+//' Elementwise multiplication of two vectors with 'x/0 = 0'
+//'
+//' @param a The dividend vector
+//' @param b The divisor vector
+//' @return solution of elementwise division of a and b
+//' @noRd
 
 Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
   // if all values in b are unequal 0, the result is the standard elementwise division
@@ -56,26 +58,6 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
 
 
 
-//
-//function fdiv(φ,x,p,dx)
-//  if φ[:type] == "OT" || (in(φ[:type],["KL","TV"]) && φ[:param] == Inf)
-//    return sum( axb0(dx,exp(abs(x-p))-1) ) # barrier approx
-//  elseif φ[:type] == "KL"
-//    λ = φ[:param]
-//    return  λ*sum( axb0(dx,axb0(x,log(div0(x,p))) - x + p ))
-//  elseif φ[:type] == "TV"
-//    λ = φ[:param]
-//    return λ*sum( dx.*abs(x-p) )
-//  elseif φ[:type] == "RG"
-//    β1,β2 = φ[:param]
-//    @assert 0 <= β1 <= β2 < Inf
-//    return sum( axb0(dx, exp(max(0,β1*p-x))+ exp(max(0,x-β2*p))-2)) #barrier
-//  else
-//    error("Type of φ not recognized")
-//end
-//end
-
-
 //' Computing the divergence functions values
 //'
 //' @param r input vector
@@ -84,9 +66,8 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
 //' @param param1 lambda or alpha
 //' @param param2 beta or 0
 //'
-//' @export
-//'
-//[[Rcpp::export]]
+//' @noRd
+
 double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, double param1, double param2 = 0){
   if (DivFun == 1){
     // return  λ*sum(axb0(x,log(div0(x,p))) - x + p )
@@ -123,26 +104,6 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 }
 
 
-
-// //
-// //function fdivstar(φ,u,p,dx)
-// //  if φ[:type] == "OT" || (in(φ[:type],["KL","TV"]) && φ[:param] == Inf)
-// //    return sum( axb0(p.*dx,u) )
-// //  elseif φ[:type] == "KL"
-// //    λ = φ[:param]
-// //    return λ*sum( axb0(p.*dx,exp(u/λ)-1) )
-// //  elseif φ[:type] == "TV"
-// //    λ = φ[:param]
-// //    return λ*sum( dx.*min(p, max(-p,axb0(p,u/λ))) )
-// //  elseif φ[:type] == "RG"
-// //    β1,β2 = φ[:param]
-// //    @assert 0 <= β1 <= β2 < Inf
-// //    return sum( axb0(dx, max(β1*axb0(p,u), β2*axb0(p,u)) ))
-// //  else
-// //    error("Type of φ not recognized")
-// //  end
-// //end
-//
 // //' Computing the divergence functions values
 // //'
 // //' @param p input vector
@@ -191,8 +152,7 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 //' @param alpha num value
 //' @param beta num value
 //' @return A vector holding the proxdiv evaluation
-//' @export
-//[[Rcpp::export]]
+//' @noRd
 Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
   if (DivFun == 1){
     Eigen::VectorXd temp = s.array()*exp(u.array()/lambda);
@@ -209,17 +169,17 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
 
 }
 
-// Updating the Kernel
-//
-// Calculating and updating the log-domain stabilized kernel. For 0 vectors u and v
-// it calculates the Gibbs kernel.
-//
-// @param u A numeric vector
-// @param v A numeric vector
-// @param eps The epsilon value
-// @param costMatrix A numeric matrix
-// @return The updated kernel
-
+//' Updating the Kernel
+//'
+//' Calculating and updating the log-domain stabilized kernel. For 0 vectors u and v
+//' it calculates the Gibbs kernel.
+//'
+//' @param u A numeric vector
+//' @param v A numeric vector
+//' @param eps The epsilon value
+//' @param costMatrix A numeric matrix
+//' @return The updated kernel
+//' @noRd
 Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen::MatrixXd costMatrix){
 
     int Nx = u.size();
@@ -258,9 +218,8 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 //' @param tol num vale
 //'
 //' @return The optimal transport plan
-//' @export
-// [[Rcpp::export]]
-
+//' @noRd
+//[[Rcpp::export]]
 Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::Map<Eigen::VectorXd> supply,
                                   Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
@@ -399,48 +358,3 @@ return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
                           Rcpp::Named("TransportCost") = pCost);
 
 }
-
-// //' Computing the divergence functions values
-// //'
-// //' @param r input vector
-// //' @param s comparision vector
-// //' @param DivFun kind of function to use
-// //' @param param1 lambda or alpha
-// //' @param param2 beta or 0
-// //'
-// //' @export
-// //'
-// //[[Rcpp::export]]
-// Rcpp::List testPrimalDual (Eigen::MatrixXd Kernel, Eigen::MatrixXd originalKernel, int DivSupply,
-//                             int DivDemand, Eigen::VectorXd supply, Eigen::VectorXd demand,
-//                             double lambdaSupply, double lambdaDemand, Eigen::VectorXd u,
-//                             Eigen::VectorXd v, double eps, double param2Supply, double param2Demand){
-//   double pCost = 0;
-//   double dCost = 0;
-//   int Nx = supply.size();
-//   int Ny = demand.size();
-//
-//   if(DivSupply != 3){
-//     pCost += vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply);
-//
-//
-//   }else{
-//     pCost += vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply, param2Supply);
-//   }
-//   if(DivDemand != 3){
-//     pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand);
-//
-//   }else{
-//     pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand, param2Demand);
-//   }
-//
-//
-//   Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
-//   Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size());
-//
-//   pCost += vectorDivergence(vecKernel, vecFirstKernel, 1,eps);
-//
-//   return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
-//                             Rcpp::Named("PrimalCost") = pCost);
-//
-// }

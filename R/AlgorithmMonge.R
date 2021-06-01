@@ -1,9 +1,3 @@
-#' @importFrom stats runif
-
-
-
-
-
 #' @title Monge Matrix Generator
 #'
 #' Generates a Monge matrix of given dimensions.
@@ -13,8 +7,7 @@
 #' @param dimy number of rows
 #'
 #' @return A Monge matrix of size dimx times dimy.
-#' @export
-#'
+#' @noRd
 genMongeMat <- function(dimx, dimy){
     a <- round(runif(dimx, min = 0, max = 1),3)
     b <- round(runif(dimy, min = 0, max = 1),3)
@@ -118,21 +111,7 @@ pathToPlan <- function(iList, jList, wList, dimX, dimY){
 #' and export vector
 #' @export
 #'
-#' @examples
-#' # generating random data
-#' mongeMatrix <- genMongeMat(30,30)
-#'
-#' supply <- runif(30,0,1)
-#' demand <- runif(30,0,1)
-#'
-#' createCost <- runif(1,0,0.2)
-#' destructCost <- runif(1,0,0.3)
-#'
-#' # calculating the optimal transport cost and plan
-#' res <- mongeAlgorithm(mongeMatrix, supply, demand, createCost, destructCost)
-#'
-#' # plotting the transport plan
-#' plotUOTP(res$transportPlan, res$import, res$export)
+#' 
 #'
 
 mongeAlgorithm <- function(costMatrix, supply, demand, constructionCost, destructionCost){

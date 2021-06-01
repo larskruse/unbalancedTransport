@@ -2,34 +2,13 @@
 #include <chrono>
 #include <Rcpp.h>
 
-#include "gperftools/profiler.h"
-
-//using namespace Rcpp;
-
-// //' The Log-Sum-Exp reduction of the vector u
-// //'
-// //'
-// //' @param u a numeric vector
-// //' @return log(sum_{i=1, N}(exp(u_i)))
-// //' @export
-// //[[Rcpp::export]]
-// double LSE(Rcpp::NumericVector& u){
-// 
-//         double maxU = Rcpp::max(u);
-// 
-//         double res = Rcpp::sum(Rcpp::exp(u-maxU));
-//         return(std::log(res)+maxU);
-//         //double res = std::log(Rcpp::sum(Rcpp::exp(u)));
-//         //return(res);
-// 
-// }
 
 
 
 //' init the lambert w function
 //' @param x numeric vector
 //' @return initial value 
-//' @export
+//' @noRd
 //[[Rcpp::export]]
 Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
     Rcpp::NumericVector temp;
@@ -57,8 +36,8 @@ Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
 //' computing the lambert w function
 //' @param x numeric vector
 //' @return the function value
-//' @export
-//[[Rcpp::export]]
+//' @noRd 
+// 
 Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
     
     
@@ -89,8 +68,7 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
 //' computing the inital values for f and g
 //' @param x numeric vector
 //' @return the function value
-//' @export
-//[[Rcpp::export]]
+//' @noRd
 Rcpp::NumericVector inital(Rcpp::NumericVector& x){
     
     
@@ -128,8 +106,7 @@ Rcpp::NumericVector inital(Rcpp::NumericVector& x){
 //' @param param1 num value
 //' @param param2 num value
 //' @return A vector holding the proxdiv evaluation
-//' @export
-//[[Rcpp::export]]
+//' @noRd
 Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps,
                           int DivFun, double param1, double param2){
     Rcpp::NumericVector temp(p.length());
@@ -179,7 +156,12 @@ Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps,
 
 }
 
-
+//' matrix mulitplication
+//' @param mat num mat
+//' @param vec num vec
+//' @param Nx num val
+//' @param Ny num val
+//' @noRd
 Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, int Nx, int Ny){
     
     Rcpp::NumericVector res(Nx);
@@ -220,8 +202,7 @@ Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, i
 //' @param Ny num value
 //' @param eps eps value
 //' @return A vector holding the proxdiv evaluation
-//' @export
-//[[Rcpp::export]]
+//' @noRd
 Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
                                  Rcpp::NumericVector& distribution, 
                                  Rcpp::NumericVector& secDistribution, int DivFun,
@@ -305,9 +286,8 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
 //' @param tol numeric value
 //'
 //' @return The optimal transport plan
-//' @export
-// [[Rcpp::export]]
-
+//' @noRd
+//[[Rcpp::export]]
 Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply,
                                   Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply,
                                   double param2Supply, double lambdaDemand, double param1Demand,
@@ -437,9 +417,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
 //' @param distribution num distrie
 //'
 //' @return The optimal transport plan
-//' @export
-// [[Rcpp::export]]
-
+//' @noRd
+//[[Rcpp::export]]
 Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,Rcpp::NumericVector& distribution, Rcpp::NumericVector& f,
                          double lambda, double param1,
                          double param2, int Div, double eps){

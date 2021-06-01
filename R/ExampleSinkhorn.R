@@ -2,7 +2,7 @@
 #'
 #' The examples given in the [paper]
 #'
-#' @export
+#' @noRd
 #'
 ExampleSink <- function(){
     
@@ -80,7 +80,8 @@ ExampleSink <- function(){
 
 
 
-
+#' example 2
+#' @noRd
 ExampleSink2 <- function(){    
     xx <- c(0,0.1,0.2,3,3.5,4)
     xy <- c(0,1,2,1.7,1,0.2)

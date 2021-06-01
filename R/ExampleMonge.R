@@ -2,7 +2,7 @@
 #'
 #' Using the same values as for the scaling algorithm example given in [paper]
 #'
-#' @export
+#' @noRd
 ExampleMonge <- function(){
 
     print("This function uses the example distributions used in the scaling paper and the quadratic cost matrix.")

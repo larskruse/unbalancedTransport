@@ -6,8 +6,8 @@
 #' @param DivFun div fun value
 #' @param param1 num val
 #' @param param2 num val
-#'
-#' @export
+#' @noRd
+# #' @export
 #'
 legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
@@ -42,8 +42,7 @@ legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
 #' @param param1 num val
 #' @param param2 num val
 #'
-#' @export
-#'
+#' @noRd
 grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
     if(DivFun == "KL"){
@@ -70,8 +69,7 @@ grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
 #' @param g num  vec 
 #' @param C cost mat
 #'
-#' @export
-#'
+#' @noRd
 expC <- function(f, g, C){
     
     res = matrix(0, length(f), length(g))
@@ -104,7 +102,6 @@ expC <- function(f, g, C){
 #' @param Cyy cost matrix
 #'
 #' @export
-#'
 sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
 
@@ -324,9 +321,8 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol
 #' @param p cost parameter
 #' @param wfr wfr param
 #' @param Cxy cost matrix
-#' 
 #' @export
-#'
+#' 
 regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL){
     
@@ -474,7 +470,6 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
 #' #' @param Cxx cost matrix
 #' #' @param Cyy cost matrix
 #' #' @param Cxy cost matrix 
-#' #' 
 #' #' @export
 #' #'
 #' hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
