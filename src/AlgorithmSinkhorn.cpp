@@ -4,6 +4,7 @@
 
 #include "gperftools/profiler.h"
 
+//using namespace Rcpp;
 
 // //' The Log-Sum-Exp reduction of the vector u
 // //'
@@ -129,7 +130,8 @@ Rcpp::NumericVector inital(Rcpp::NumericVector& x){
 //' @return A vector holding the proxdiv evaluation
 //' @export
 //[[Rcpp::export]]
-Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps, int DivFun, double param1, double param2){
+Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps,
+                          int DivFun, double param1, double param2){
     Rcpp::NumericVector temp(p.length());
     
     if (DivFun == 1){
@@ -220,8 +222,11 @@ Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, i
 //' @return A vector holding the proxdiv evaluation
 //' @export
 //[[Rcpp::export]]
-Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& distribution, 
-                                 Rcpp::NumericVector& secDistribution, int DivFun, double param1, double param2, int Nx, int Ny, double eps){
+Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
+                                 Rcpp::NumericVector& distribution, 
+                                 Rcpp::NumericVector& secDistribution, int DivFun,
+                                 double param1, double param2, int Nx, int Ny,
+                                 double eps){
     
     
     Rcpp::NumericVector temp(Nx);
@@ -305,8 +310,12 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix, 
 
 Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply,
                                   Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply,
-                                  double param2Supply, double lambdaDemand, double param1Demand, double param2Demand,
-                                  int DivSupply, int DivDemand, int iterMax, double eps, double tol){
+                                  double param2Supply, double lambdaDemand, double param1Demand,
+                                  double param2Demand,int DivSupply, int DivDemand,
+                                  int iterMax, double eps, double tol ){
+                                  
+                                 
+   
    
     // number of points in the reference measures
     int Nx = supply.length();
@@ -320,7 +329,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     Rcpp::NumericVector g = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
     
     
-    Rcpp::Rcout << "init: \n" << "f: " << f << "\n" << "g: " << g << "\n\n";
+    // Rcpp::Rcout << "init: \n" << "f: " << f << "\n" << "g: " << g << "\n\n";
     
     Rcpp::NumericVector f_prev;
     //Rcpp::NumericVector temp;
@@ -352,11 +361,11 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         g = lse(temp);
         g = -eps*g;
         
-        Rcpp::Rcout << "g_j\n";
-        Rcpp::Rcout << g << "\n";
+        // Rcpp::Rcout << "g_j\n";
+        // Rcpp::Rcout << g << "\n";
         
         g = aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
-        Rcpp::Rcout << g << "\n";
+        // Rcpp::Rcout << g << "\n";
         
         
         for(int i = 0; i < Nx; i++){
@@ -366,21 +375,25 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         f = lse(temp);
         f = -eps*f;
         
-        Rcpp::Rcout << "f_i\n";
-        Rcpp::Rcout << f << "\n";
+        // Rcpp::Rcout << "f_i\n";
+        // Rcpp::Rcout << f << "\n";
         
         f = aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
-        Rcpp::Rcout << f << "\n\n";
+        // Rcpp::Rcout << f << "\n\n";
         
         
-        // if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){
-        //     Rcpp::Rcout << "converged at: " << k << " \n";
-        // 
-        //     break;
-        // }
+        if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol){
+            Rcpp::Rcout << "converged at: " << k << " \n";
+
+            break;
+        }
         
     }
     // ProfilerStop();
+    
+    
+    
+    
     
     for(int i = 0; i < Nx; i++){
         for(int j = 0; j < Ny ; j++){
@@ -396,4 +409,66 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
                               Rcpp::Named("dual_f") = f,
                               Rcpp::Named("dual_g") = g);
 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+//' The symmetric stabilized Scaling Algorithm
+//'
+//' C++ implementation of the log-domain stabilized Version of the Scaling
+//' Algorithm.
+//'
+//' @param costMatrix A numeric matrix.
+//' @param f A numeric vector
+//' @param lambda Parameter for the supply proxdiv function
+//' @param Div Parameter indicating the divergence function to use for the supply proxdiv function
+//' @param eps A numeric vector of decreasing epsilon values.
+//' @param param1 numeric Value
+//' @param param2 numeric value
+//' @param distribution num distrie
+//'
+//' @return The optimal transport plan
+//' @export
+// [[Rcpp::export]]
+
+Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,Rcpp::NumericVector& distribution, Rcpp::NumericVector& f,
+                         double lambda, double param1,
+                         double param2, int Div, double eps){
+    int Nx = costMatrix.nrow();
+    int Ny = costMatrix.ncol();
+    
+    Rcpp::NumericMatrix temp(Nx,Ny);
+    Rcpp::NumericVector g(Ny);
+ 
+    Rcpp::Environment LogSumExp("package:logSumExp");
+    Rcpp::Function lse = LogSumExp["colLogSumExps"]; 
+ 
+    Rcpp::NumericVector logDistribution = Rcpp::log(distribution);
+ 
+    Rcpp::Rcout << "f: " << f << "\n" << "g: " << g << "\n\n";
+    Rcpp::Rcout << "temp: " << temp << "\n\n";
+ 
+    for(int j = 0; j < Ny; j++){
+        temp(Rcpp::_,j) = logDistribution + (f-costMatrix(Rcpp::_,j))/eps;
+    }
+    Rcpp::Rcout << "temp: " << temp << "\n\n";
+    
+ 
+    g = lse(temp);
+    g = -eps*g;
+    
+    
+    g = aprox(lambda, g, eps, Div, param1, param2);
+    
+    return g;
+    
 }
