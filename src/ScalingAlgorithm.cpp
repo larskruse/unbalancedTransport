@@ -255,6 +255,7 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 //' @param betaSupply numeric value
 //' @param alphaDemand numeric Value
 //' @param betaDemand numeric value
+//' @param tol num vale
 //'
 //' @return The optimal transport plan
 //' @export
@@ -263,7 +264,8 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::Map<Eigen::VectorXd> supply,
                                   Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
-                                  int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec){
+                                  int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
+                                  double tol = 1e-10){
   // number of absorptions
   int numAbs = 0;
 
@@ -281,9 +283,6 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   
   Eigen::VectorXd u_prev;
 
-
-  double tol = 10e-8;
-  
   // main loop iteration counter
   int i = 1;
 
@@ -304,7 +303,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   
   while(i < iterMax){
       
-      u_prev = u;
+    u_prev = u;
 
 
     // calculate scaling iterates
@@ -331,27 +330,6 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
       }
       
       
-      // pCost = 0;
-      // 
-      // 
-      // if(DivSupply != 3){
-      //   pCost += vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply);
-      // }else{
-      //   pCost += vectorDivergence(Kernel.rowwise().sum(), supply, DivSupply, alphaSupply, betaSupply);
-      // }
-      // if(DivDemand != 3){
-      //   pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand);
-      // }else{
-      //   pCost += vectorDivergence(Kernel.colwise().sum().transpose() , demand, DivDemand, alphaDemand, betaDemand);
-      // }
-      // 
-      // 
-      // Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
-      // Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size()); 
-      // 
-      // pCost += vectorDivergence(vecKernel, vecFirstKernel, 1,eps);
-      // 
-      // Rcpp::Rcout << "cost: " << pCost << "\n\n";
       
       
 
