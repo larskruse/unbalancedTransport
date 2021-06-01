@@ -105,7 +105,7 @@ expC <- function(f, g, C){
 #'
 #' @export
 #'
-sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-10, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
 
     lenSup <- length(supplyList)
@@ -460,94 +460,133 @@ regularizedf_ot <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e
 
 
 
-
-#' @title hausdorff div
-#' @param supplyList sup list
-#' @param demandList dem list
-#' @param eps num val
-#' @param iterMax num val
-#' @param tol num val
-#' @param method cost method
-#' @param exp cost exponent
-#' @param p cost parameter
-#' @param wfr wfr param
-#' @param Cxx cost matrix
-#' @param Cyy cost matrix
 #' 
-#' @export
-#'
-hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 100, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
-                                Cxx = NULL, Cyy = NULL){
-
-    lenSup <- length(supplyList)
-    lenDem <- length(demandList)
-
-
-
-    if(is.null(Cxx)){
-        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, wfr, p)
-    }
-
-    if(is.null(Cyy)){
-        Cyy <- costMatrix(demandList[[lenDem]], supplyList[[lenDem]], method, exp, wfr, p)
-    }
-
-
-
-    if(supplyList[[1]] != demandList[[1]]){
-
-        print("Please chose the same entropy for supply and demand.")
-
-    }
-
-    
-    param1 <- 0
-    param2 <- 0
-    
-    
-
-    res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList, iterMax, eps, tol)
-    res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList, iterMax, eps, tol)
-
-
-    f_xx = res_x$dual_f
-    g_xy = res_x$dual_g
-
-    f_xy = res_y$dual_f
-    g_yy = res_y$dual_g
-
-
-    
-    if(supplyList[[1]] == "Berg"){
-        supplyList[[1]] <- "Power"
-        demandList[[1]] <- "Power"
-        
-        param1 <- 0
-        
-        
-    }else if(supplyList[[1]] == "Hellinger"){
-        supplyList[[1]] <- "Power"
-        demandList[[1]] <- "Power"
-        
-        param1 <- -1
-        
-    }else if(supplyList[[1]] == "Power"){
-        
-        param1 <- supplyList[[4]]
-        
-    }else if(supplyList[[1]] == "RG"){
-        
-        param1 <- supplyList[[3]]
-        param2 <- supplyList[[4]]
-        
-    }
-    
-    
-    
-    res <- sum(supplyList[[2]] * (legendre_entropy(supplyList[[3]], -f_xx, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_xx, supplyList[[1]], param1, param2)  
-                                  - legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_xy,supplyList[[1]], param1, param2) )) +
-        sum(demandList[[2]] *(legendre_entropy(supplyList[[3]], -g_yy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_yy,supplyList[[1]], param1, param2)  
-                              - legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2)))
-    
-    return(res)
-}
+#' #' @title hausdorff div
+#' #' @param supplyList sup list
+#' #' @param demandList dem list
+#' #' @param eps num val
+#' #' @param iterMax num val
+#' #' @param tol num val
+#' #' @param method cost method
+#' #' @param exp cost exponent
+#' #' @param p cost parameter
+#' #' @param wfr wfr param
+#' #' @param Cxx cost matrix
+#' #' @param Cyy cost matrix
+#' #' @param Cxy cost matrix 
+#' #' 
+#' #' @export
+#' #'
+#' hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+#'                                 Cxy = NULL, Cxx = NULL, Cyy = NULL){
+#' 
+#'     lenSup <- length(supplyList)
+#'     lenDem <- length(demandList)
+#' 
+#'     if(is.null(Cxy)){
+#'         Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, wfr, p)
+#'     }
+#' 
+#'     if(is.null(Cxx)){
+#'         Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, wfr, p)
+#'     }
+#' 
+#'     if(is.null(Cyy)){
+#'         Cyy <- costMatrix(demandList[[lenDem]], demandList[[lenDem]], method, exp, wfr, p)
+#'     }
+#' 
+#' 
+#' 
+#'     if(supplyList[[1]] != demandList[[1]]){
+#' 
+#'         print("Please chose the same entropy for supply and demand.")
+#' 
+#'     }
+#' 
+#'     
+#'     reg <- 0
+#'     param1 <- 0
+#'     param2 <- 0
+#'     
+#'     
+#' 
+#'     
+#'     supply <- supplyList[[2]]
+#'     demand <- demandList[[2]]
+#'     
+#' 
+#'     res_x = sinkhornAlgorithmFromCost(Cxx, supplyList, supplyList, iterMax, eps, tol)
+#'     res_y = sinkhornAlgorithmFromCost(Cyy, demandList, demandList, iterMax, eps, tol)
+#' 
+#'     f_x = res_x$dual_f
+#'     g_y = res_y$dual_g
+#' 
+#'     if(supplyList[[1]] == "KL"){
+#'         div <- 1
+#'         reg <- supplyList[[3]]
+#'         
+#'     }else if(supplyList[[1]] == "TV"){
+#'         div <- 2
+#'         reg <- supplyList[[3]]
+#'     }else if(supplyList[[1]] == "RG"){
+#'         div <- 3
+#'         param1 <- supplyList[[3]]
+#'         param2 <- supplyList[[4]]
+#'         
+#'         if(param1 < 0 || param2 < param1){
+#'             stop("0 <= Alpha <= Beta")
+#'         }
+#'         
+#'     }else if(supplyList[[1]] == "Berg"){
+#'         supplyList[[1]] <- "Power"
+#'         div <- 4
+#'         reg <- supplyList[[3]]
+#'         param1 <- 0
+#'     }else if(supplyList[[1]] == "Hellinger"){
+#'         supplyList[[1]] <- "Power"
+#'         div <- 4
+#'         reg <- supplyList[[3]]
+#'         param1 <- -1
+#'     }else if(supplyList[[1]] == "Power"){
+#'         div <- 4
+#'         reg <- supplyList[[3]]
+#'         param1 <- supplyList[[4]]
+#'     }else{
+#'         stop("Please supply a divergence")
+#'     }
+#'     
+#'     
+#'     g_xy = Hausdorff_Vec_Rcpp(Cxy, supply, f_x, reg, param1, param2, div, eps)
+#'     f_xy = Hausdorff_Vec_Rcpp(t(Cxy), demand, g_y, reg, param1, param2, div, eps)
+#'     
+#'     
+#'     
+#'     print("f_x, g_y, ...")
+#'     print(f_x)
+#'     print(g_y)
+#'     print(g_xy)
+#'     print(f_xy)
+#'     
+#'     
+#'     print("part outs")
+#'     print(legendre_entropy(supplyList[[3]], -f_x, supplyList[[1]], param1, param2))
+#'     print(grad_legrende(supplyList[[3]], -f_x, supplyList[[1]], param1, param2))
+#'     
+#'     print("outs")
+#'     
+#'     print(legendre_entropy(supplyList[[3]], -f_x, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_x, supplyList[[1]], param1, param2))
+#'     print(legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_xy,supplyList[[1]], param1, param2))
+#'     
+#'     print(legendre_entropy(supplyList[[3]], -g_y, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_y,supplyList[[1]], param1, param2))
+#'     print(legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2))
+#' 
+#'     res <- sum(supplyList[[2]] * (legendre_entropy(supplyList[[3]], -f_x, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_x, supplyList[[1]], param1, param2) -
+#'                                       legendre_entropy(supplyList[[3]], -f_xy, supplyList[[1]], param1, param2) - eps * grad_legrende(supplyList[[3]], -f_xy,supplyList[[1]], param1, param2))) +
+#'         sum(demandList[[2]] *(legendre_entropy(supplyList[[3]], -g_y, supplyList[[1]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_y,supplyList[[1]], param1, param2)-
+#'                                   legendre_entropy(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2) - eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[1]], param1, param2)))
+#' 
+#'     
+#'     
+#'     
+#'     return(res)
+#' }
