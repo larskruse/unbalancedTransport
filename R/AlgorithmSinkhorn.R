@@ -17,7 +17,7 @@
 #' @export
 #'
 sinkhornAlgorithmFromCost <- function(costMatrix, supplyList, demandList,
-                                     maxIteration, eps, tol = 1e-10){
+                                     maxIteration, eps, tol = 1e-3){
     
     supplyReg <- 0
     demandReg <- 0
