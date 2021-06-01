@@ -17,7 +17,8 @@ StabilizedScaling_Rcpp(
   DivSupply,
   DivDemand,
   iterMax,
-  epsvec
+  epsvec,
+  tol = 1e-10
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ StabilizedScaling_Rcpp(
 \item{iterMax}{Maximum number of iterations}
 
 \item{epsvec}{A numeric vector of decreasing epsilon values.}
+
+\item{tol}{num vale}
 }
 \value{
 The optimal transport plan

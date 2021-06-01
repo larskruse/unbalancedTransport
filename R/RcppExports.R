@@ -93,6 +93,26 @@ Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply
     .Call(`_unbalancedTransport_Sinkhorn_Rcpp`, costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol)
 }
 
+#' The symmetric stabilized Scaling Algorithm
+#'
+#' C++ implementation of the log-domain stabilized Version of the Scaling
+#' Algorithm.
+#'
+#' @param costMatrix A numeric matrix.
+#' @param f A numeric vector
+#' @param lambda Parameter for the supply proxdiv function
+#' @param Div Parameter indicating the divergence function to use for the supply proxdiv function
+#' @param eps A numeric vector of decreasing epsilon values.
+#' @param param1 numeric Value
+#' @param param2 numeric value
+#' @param distribution num distrie
+#'
+#' @return The optimal transport plan
+#' @export
+Hausdorff_Vec_Rcpp <- function(costMatrix, distribution, f, lambda, param1, param2, Div, eps) {
+    .Call(`_unbalancedTransport_Hausdorff_Vec_Rcpp`, costMatrix, distribution, f, lambda, param1, param2, Div, eps)
+}
+
 #' C++ implementation of the Monge algorithm
 #'
 #' This function calculates the optimal transport cost and transport
@@ -164,11 +184,12 @@ proxdiv <- function(lambda, p, s, u, eps, DivFun, alpha, beta) {
 #' @param betaSupply numeric value
 #' @param alphaDemand numeric Value
 #' @param betaDemand numeric value
+#' @param tol num vale
 #'
 #' @return The optimal transport plan
 #' @export
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec) {
-    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec)
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-10) {
+    .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
 treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {

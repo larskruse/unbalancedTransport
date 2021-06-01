@@ -9,7 +9,8 @@ scalingAlgorithmFromCost(
   supplyList,
   demandList,
   maxIteration,
-  epsVector
+  epsVector,
+  tol = 1e-10
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ value for the lambda parameter.}
 The default value is 20000.}
 
 \item{epsVector}{vector of epsilon values to use}
+
+\item{tol}{num value}
 }
 \description{
 The log-domain stabilized Scaling Algorithm

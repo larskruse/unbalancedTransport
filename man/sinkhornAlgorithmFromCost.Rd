@@ -10,7 +10,7 @@ sinkhornAlgorithmFromCost(
   demandList,
   maxIteration,
   eps,
-  tol = 1e-10
+  tol = 0.001
 )
 }
 \arguments{
