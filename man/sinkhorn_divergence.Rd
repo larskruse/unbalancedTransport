@@ -2,14 +2,26 @@
 % Please edit documentation in R/SinkhornDivergence.R
 \name{sinkhorn_divergence}
 \alias{sinkhorn_divergence}
-\title{Sink div}
+\title{Sinkhorn Divergence
+
+A function to calculate the sinkhorn divergence for regularized unbalanced optimal transport.
+
+For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
+\eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
+\frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
+= OT_eps(a,b) - 0.5 OT_eps(a,a) - 0.5 OT_eps(b,b) + 0.5*eps (m(a) - m(b))²}
+
+with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
+and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
+
+The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.}
 \usage{
 sinkhorn_divergence(
   supplyList,
   demandList,
   eps,
   iterMax = 1000,
-  tol = 0.001,
+  tol = 1e-05,
   method = "euclidean",
   exp = 1,
   p = 2,
@@ -20,30 +32,69 @@ sinkhorn_divergence(
 )
 }
 \arguments{
-\item{supplyList}{sup list}
+\item{supplyList}{A list containing the information about the supply measure, 
+divergence function and parameter. The first element is the supply measure itself,
+the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
+"TV" for total variation and "RG" for range constraint) followed by the parameters 
+needed for the divergence function: 
 
-\item{demandList}{dem list}
+In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+regularization parameter \eqn{\lambda}{lambda} has to be provided.
+
+The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
+regularization parameter \eqn{\lambda}{lambda} has to be provided.
+
+The divergence function associated with the range constraint needs two parameters, that define the upper and 
+lower bound. 
+
+If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
+be omitted if a cost matrix is passed as argument.
+
+
+[REF]}
+
+\item{demandList}{A list containing the information about the demand measure. It has to have the same structure as the supplyList.}
 
 \item{eps}{num val}
 
-\item{iterMax}{num val}
+\item{iterMax}{The maximum number of algorithm iterations}
 
-\item{tol}{num val}
+\item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
+is terminated as it is already converged. The default value is 1e-5.}
 
-\item{method}{cost method}
+\item{method}{(optional) Determines the method that is used to compute the cost matrix.
+\itemize{
+\item "euclidean"
+\item "minkowski"
+\item "maximum" 
+}
+The default value is "euclidean".}
 
-\item{exp}{cost exponent}
+\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
-\item{p}{cost parameter}
+\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
 
-\item{wfr}{wfr param}
+\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
+The default value is "false".}
 
-\item{Cxy}{cost matrix}
+\item{Cxy}{(optional)}
 
-\item{Cxx}{cost matrix}
+\item{Cxx}{(optional)}
 
-\item{Cyy}{cost matrix}
+\item{Cyy}{(optional)}
 }
 \description{
-Sink div
+Sinkhorn Divergence
+
+A function to calculate the sinkhorn divergence for regularized unbalanced optimal transport.
+
+For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
+\eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
+\frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
+= OT_eps(a,b) - 0.5 OT_eps(a,a) - 0.5 OT_eps(b,b) + 0.5*eps (m(a) - m(b))²}
+
+with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
+and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
+
+The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 }

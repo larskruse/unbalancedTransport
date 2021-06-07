@@ -151,7 +151,7 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
 #' points in y
 #' @noRd
-costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2){
+costMatrix <- function(x, y, method = "euclidean", exp = 1,p = 2, wfr = FALSE){
 
         if(is.null(ncol(x))){
                 x <- matrix(x, ncol = 1)
@@ -172,20 +172,20 @@ costMatrix <- function(x, y, method = "euclidean", exp = 1,  wfr = FALSE, p = 2)
                 p <- 2
         }
 
-        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(x))
+        cMatrix <- matrix(rep(0, nrow(x)*nrow(y)), ncol = nrow(y))
 
         if(method == "minkowski"){
 
                 for (i in 1:nrow(x)){
-
-                        cMatrix[i,] <- ((rowSums((t(t(y) - x[i,]))^p))^(1/p))^exp
+                    
+                        cMatrix[i,] <- ((rowSums((abs(t(t(y) - x[i,])))^p))^(1/p))^exp
                 }
 
         }else if(method == "maximum"){
 
                 for(i in 1:nrow(x)){
 
-                        cMatrix[i,] <- max(t(t(y) - x[i,]))^exp
+                        cMatrix[i,] <- max(abs(t(t(y) - x[i,])))^exp
 
                 }
 

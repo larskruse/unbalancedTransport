@@ -22,4 +22,6 @@ Imports:
     shape,
     diagram,
     transport,
-    logSumExp
+    logSumExp,
+    Rdpack
+RdMacros: Rdpack

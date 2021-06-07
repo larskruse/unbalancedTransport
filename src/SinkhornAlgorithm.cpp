@@ -316,7 +316,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     Rcpp::NumericMatrix temp(Nx,Ny);
     
     
-    Rcpp::Environment LogSumExp("package:logSumExp");
+    //Rcpp::Environment LogSumExp("package:logSumExp");
+    Rcpp::Environment LogSumExp = Rcpp::Environment::namespace_env("logSumExp");
     Rcpp::Function lse = LogSumExp["colLogSumExps"]; 
     
     Rcpp::NumericMatrix transportPlan(Nx,Ny);
@@ -380,6 +381,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
             transportPlan(i,j) = exp((f(i) + g(j) - costMatrix(i,j))/eps);
         }
     }
+    
     
 
     // returnING the transport plan

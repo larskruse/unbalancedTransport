@@ -2,23 +2,26 @@
 % Please edit documentation in R/visualisation.R
 \name{plotTree}
 \alias{plotTree}
-\title{Tree plot}
+\title{Plotting transport on trees}
 \usage{
 plotTree(tree, tList = NULL, supply = NULL, demand = NULL)
 }
 \arguments{
-\item{tree}{A tree in list format: The root node followed by multiple vectors of the form
-(parent, child, weight)}
+\item{tree}{A tree structure in list format: The first element is the index of the root node
+followed by multiple vectors defining the edges of the tree. Each of these vectors has to be 
+of the form \eqn{(parent, child, weight)}.}
 
-\item{tList}{The transport list (optional)}
+\item{tList}{(optional) The mass transport as list. Each element is a vector of the form
+\eqn{(source, target, mass)}.}
 
-\item{supply}{A numeric supply vector (optional)}
+\item{supply}{(optional) A non negative numeric vector giving the mass supply at each tree node. The value at 
+position \eqn{i} give the supply at node \eqn{i}.}
 
-\item{demand}{A numeric demand vector (optional)}
+\item{demand}{(optional) A non negative numeric vector giving the mass demand at each tree node. The value at 
+position \eqn{i} give the supply at node \eqn{i}.}
 }
 \description{
-Plotting a tree structure. Supply and demand values as well as the transport plan
-can be plotted in one graph.
+This function visualizes the transport of mass on a tree.
 }
 \examples{
 tree <- list(1, c(1, 2, 1), c(2, 3, 1), c(3, 4, 1), c(3, 5, 1),
@@ -36,6 +39,5 @@ plotTree(tree, supply = supply, demand = demand)
 
 tList = list(c(3,6,1), c(4,8,1))
 plotTree(tree, tList, supply, demand)
-
 
 }

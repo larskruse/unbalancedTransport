@@ -2,27 +2,33 @@
 % Please edit documentation in R/visualisation.R
 \name{plotTransportByCost}
 \alias{plotTransportByCost}
-\title{Plotting transport between points given by a distance matrix}
+\title{Plotting transport between single points.}
 \usage{
 plotTransportByCost(
-  distanceMatrix,
-  transportPlan = NULL,
+  transportPlan,
   supply = NULL,
   demand = NULL,
+  distanceMatrix = NULL,
   creationDestructionCost = rep(0, length(x))
 )
 }
 \arguments{
-\item{distanceMatrix}{A numeric distance matrix.}
+\item{transportPlan}{A non negative numeric matrix that indicates where the mass is
+transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
+supply point \eqn{i} to demand point \eqn{j}.}
 
-\item{transportPlan}{A numeric matrix.}
+\item{supply}{(optional) A non negative numeric vector giving the mass supply at each point. The value at 
+position \eqn{i} give the supply at point \eqn{i}.}
 
-\item{supply}{A numeric vector.}
+\item{demand}{(optional) A non negative numeric vector giving the mass demand at each point. The value at 
+position \eqn{i} give the supply at point \eqn{i}.}
 
-\item{demand}{A numeric vector.}
+\item{distanceMatrix}{(optional) A non negative matrix containing the distances between all points. It is used
+to calcuated the positions of the points if they are not explicitly given.}
 
-\item{creationDestructionCost}{A numeric vector giving the cost for mass creation and destruction.}
+\item{creationDestructionCost}{(optional) A numeric vector giving the cost for mass creation and destruction.}
 }
 \description{
-Plotting transport between points given by a distance matrix
+Visualizing mass transport between point clouds. The coordinates can either be given directly or calculated from a given
+distance matrix.
 }

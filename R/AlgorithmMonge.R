@@ -53,6 +53,7 @@ checkMongeProperty <- function(mat){
                 print("Failed at:")
                 cat("\n i Coordiante: ", i)
                 cat("\n j Coordiante: ", j )
+                stop()
                 return(0)
 
             }
@@ -61,7 +62,7 @@ checkMongeProperty <- function(mat){
 
     }
 
-    print("Matrix fulfills the Monge property")
+    #print("Matrix fulfills the Monge property")
     return(1)
 
 }
@@ -109,9 +110,8 @@ pathToPlan <- function(iList, jList, wList, dimX, dimY){
 #'
 #' @return A list containing the optimal transport cost, plan, import vector
 #' and export vector
-#' @export
 #'
-#' 
+#' @noRd 
 #'
 
 mongeAlgorithm <- function(costMatrix, supply, demand, constructionCost, destructionCost){

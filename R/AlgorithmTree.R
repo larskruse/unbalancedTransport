@@ -67,18 +67,32 @@ getCostMatrix <- function(tree){
 
 
 
-#' Tree Metric Unbalanced Transport
+#' Transport on Trees
+#' 
+#' Solving unbalanced optimal transport problems that use a tree metric as cost function.
+#' 
+#' If the cost matrix is derived from a tree metric, the unbalanced optimal transport problem  \eqn{\min_r <C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
+#' min_r <C,r> + sum_i(p_i (a-sum_j r_ij)) + sum_j(q_j (b-sum_i r_ij))} with supply and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}
+#' , transport plan \eqn{r}, construction and destruction costs \eqn{p} and \eqn{q} and cost matrix \eqn{C} can be solved efficiently in
+#' O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
+#' from R and to be able to compute the transport map. 
 #'
-#' @param tree A tree in list format. The first element holds the index of the
-#' root node. Every other element holds a vector with three values describing an
-#' edge: The parent node, the child node and the edges weight.
-#' @param supply A numeric supply vector
-#' @param demand A numeric demand vector
-#' @param creationCost A creation cost vector
-#' @param destructionCost A destruction cost vector
-#' @param output Either "list", "transportPlan", "cost", or "both".
+#' @param tree A tree in list format. The first element is the index of the
+#' root node. Every other element holds a vector describing the tree's edges: The parent node, the child node and the weight.
+#' @param supply A non negative numeric supply vector. 
+#' @param demand A non negative numeric demand vector
+#' @param creationCost A non negative vector giving the cost to create mass at each node.
+#' @param destructionCost A non negative vector giving the cost to destruct mass at each node.
+#' @param output Determines the format of the output:
+#' \itemize{
+#' \item "transportPlan" give a standard transport plan matrix where the value at \eqn{i,j} gives the amount of mass transproted from 
+#' note \eqn{i} to \eqn{j}.
+#' \item "list" gives a list of vectors. Each vector holds three entries: The first gives the supply node, the second the target node of the transport
+#' and the third the amount of mass transported between those nodes.
+#' \item "cost" gives only the transport cost
+#' }
 #'
-#' @return the transport cost, import and export vector, transport list or plan if specified in 'output'
+#' @return A list containing the transport cost, the mass import and export vectors, and the transport list or plan if specified in 'output'.
 #' @export
 #'
 #' @examples
@@ -121,10 +135,10 @@ getCostMatrix <- function(tree){
 #' plotTree(tree, tList = transport$transportList,
 #'          supply = supply, demand = demand)
 #'
-treeAlgorithm <- function(tree, supply, demand, creationCost, destructionCost, output = "cost"){
+treeAlgorithm <- function(tree, supply, demand, creationCost, destructionCost, output = "transportPlan"){
 
 
-    if(output != "list" & output != "transportPlan"  & output != "both"  & output != "cost"){
+    if(output != "list" & output != "transportPlan"  & output != "cost"){
 
         print("Output set to 'cost'")
         output <- "cost"
@@ -193,22 +207,6 @@ treeAlgorithm <- function(tree, supply, demand, creationCost, destructionCost, o
         }
         result <- list(treegkrOut$cost, tPlan, import, export)
         names(result) <- c("cost", "transportPlan", "import", "export")
-
-    }else if (output == "both"){
-
-        if(length(res$from) > 0){
-
-            tPlan <- matrix(0,length(supply),length(demand))
-            tPlan[cbind(res$from,res$to)] <- res$mass
-
-        }else{
-            tPlan <- matrix(0,length(supply),length(demand))
-
-        }
-
-        result <- list(treegkrOut$cost, tPlan, transportList, import, export)
-        names(result) <- c("cost", "transportPlan", "transportList", "import", "export")
-        return(result)
 
     }else{
         result <- list(treegkrOut$cost, import, export)

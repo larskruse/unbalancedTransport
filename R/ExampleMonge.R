@@ -44,7 +44,7 @@ ExampleMonge <- function(){
     # compute and plot the transport plan
     res <- mongeAlgorithm(C, p, q, 1.1, 1.1)
     plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan, res$import, res$export)
+    gridPlotTransport(res$transportPlan, res$import, res$export)
 
 
     print("The cost for mass creation and destruction is set to 0.2")
@@ -52,7 +52,7 @@ ExampleMonge <- function(){
     # compute and plot the transport plan
     res <- mongeAlgorithm(C, p, q, 0.1, 0.1)
     plot1DTransport(res$transportPlan, supplyList, demandList)
-    plotUOTP(res$transportPlan, res$import, res$export)
+    gridPlotTransport(res$transportPlan, res$import, res$export)
 
 
 
