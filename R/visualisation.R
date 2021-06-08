@@ -231,12 +231,6 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
     # 
     lines(supplyList[[2]], rep(0, length(supplyList[[2]])), type = "l", col = "black")
 
-    print(length(supplyList[[2]]))
-    print(length(t(transportPlan) %*% x1Measure))
-    
-    print(length(demandList[[2]]))
-    print(length(transportPlan %*% y1Measure))
-    
 
 }
 

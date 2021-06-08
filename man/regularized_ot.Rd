@@ -22,7 +22,7 @@ regularized_ot(
   supplyList,
   demandList,
   eps,
-  iterMax = 100,
+  maxIteration = 100,
   tol = 0.001,
   algorithm = "sinkhorn",
   method = "euclidean",
@@ -53,6 +53,10 @@ be omitted if a cost matrix is passed as argument.}
 
 \item{demandList}{A list containing the information about the demand measure. It has to have the same structure as the supplyList.}
 
+\item{eps}{The regularization parameter.}
+
+\item{maxIteration}{The maximum number of iterations.}
+
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-10.}
 
@@ -75,11 +79,6 @@ The default value is "euclidean".}
 The default value is "false".}
 
 \item{Cxy}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
-
-\item{maxIteration}{The maximum number of iterations.}
-
-\item{epsVector}{A vector containing a decreasing sequence of epsilon values. If no epsilon scaling is needed a vector with a single 
-value can be used.}
 }
 \description{
 Regularized transport cost

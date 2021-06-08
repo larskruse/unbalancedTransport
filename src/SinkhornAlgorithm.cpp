@@ -420,6 +420,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
 //'
 //' @return The optimal transport plan
 //' @noRd
+//' @export
 //[[Rcpp::export]]
 Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,Rcpp::NumericVector& distribution, Rcpp::NumericVector& f,
                          double lambda, double param1,
@@ -430,18 +431,19 @@ Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,Rcpp::Nume
     Rcpp::NumericMatrix temp(Nx,Ny);
     Rcpp::NumericVector g(Ny);
  
-    Rcpp::Environment LogSumExp("package:logSumExp");
+    //Rcpp::Environment LogSumExp("package:logSumExp");
+    Rcpp::Environment LogSumExp = Rcpp::Environment::namespace_env("logSumExp");
     Rcpp::Function lse = LogSumExp["colLogSumExps"]; 
  
     Rcpp::NumericVector logDistribution = Rcpp::log(distribution);
  
-    Rcpp::Rcout << "f: " << f << "\n" << "g: " << g << "\n\n";
-    Rcpp::Rcout << "temp: " << temp << "\n\n";
+    //Rcpp::Rcout << "f: " << f << "\n" << "g: " << g << "\n\n";
+    //Rcpp::Rcout << "temp: " << temp << "\n\n";
  
     for(int j = 0; j < Ny; j++){
         temp(Rcpp::_,j) = logDistribution + (f-costMatrix(Rcpp::_,j))/eps;
     }
-    Rcpp::Rcout << "temp: " << temp << "\n\n";
+    //Rcpp::Rcout << "temp: " << temp << "\n\n";
     
  
     g = lse(temp);

@@ -70,12 +70,12 @@
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
 #' @param costMatrix (optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm. 
-#' 
+#' @param duals (optional) Set to TRUE to return the dual potentials
 #'
 #' @export
 #'
 sinkhornAlgorithm <- function(supplyList, demandList, maxIteration, eps, tol = 1e-5, method = "euclidean",
-                                     exp = 1, p = 2,  wfr = FALSE, costMatrix = NULL){
+                                     exp = 1, p = 2,  wfr = FALSE, costMatrix = NULL, duals = FALSE){
     
     if(is.null(costMatrix)){
         
@@ -182,10 +182,24 @@ sinkhornAlgorithm <- function(supplyList, demandList, maxIteration, eps, tol = 1
     
 
     cost = -eps*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
-        sum(supply * legendre_entropy(supplyReg, res$dual_f, Div1, supplyAlpha, supplyBeta))-
-        sum(demand*legendre_entropy(demandReg, res$dual_g, Div2, demandAlpha, demandBeta))
+        sum(supply * legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
+        sum(demand*legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
     
-
+    cost = -eps*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
+        sum(legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
+        sum(legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
+    
+    
+    
+    
+    
+    if(duals){
+        returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost,
+                           "RegCost" = reg_cost, "dual_f" = res$dual_f, "dual_g" = res$dual_g)
+        
+        return(returnList)
+    }
+    
     returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost, "RegCost" = reg_cost)
     
     

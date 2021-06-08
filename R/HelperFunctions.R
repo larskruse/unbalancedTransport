@@ -150,7 +150,8 @@ createCostMatrix <- function(x,y,method = "euclidean"){
 #' @param p parameter for the minkowski metric. standard p = 2 give the minkowski metric.
 #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
 #' points in y
-#' @noRd
+#' @export
+#' 
 costMatrix <- function(x, y, method = "euclidean", exp = 1,p = 2, wfr = FALSE){
 
         if(is.null(ncol(x))){

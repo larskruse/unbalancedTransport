@@ -37,12 +37,12 @@
 #'
 #' @export
 #'
-BalancedExtensionSolver <- function(supplyList, demandList, costMethod, costExp, costP, wfr = FALSE, Monge = FALSE, costMatrix = NULL){
+BalancedExtensionSolver <- function(supplyList, demandList, method, exp, p, wfr = FALSE, Monge = FALSE, costMatrix = NULL){
 
     
     if(is.null(costMatrix)){
     
-        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], costMethod, costExp, wfr, costP)    
+        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], method, exp, wfr, p)    
         
     }
     

@@ -14,7 +14,8 @@ sinkhornAlgorithm(
   exp = 1,
   p = 2,
   wfr = FALSE,
-  costMatrix = NULL
+  costMatrix = NULL,
+  duals = FALSE
 )
 }
 \arguments{
@@ -64,6 +65,8 @@ The default value is "euclidean".}
 The default value is "false".}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
+
+\item{duals}{(optional) Set to TRUE to return the dual potentials}
 }
 \description{
 This functions uses to Sinkhorn algorithm to solve the regularized unbalanced optimal transport problem.

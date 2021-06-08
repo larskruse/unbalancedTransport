@@ -8,8 +8,8 @@ ExampleSink <- function(){
     
 
     # number of supply and demand points
-    I <- 300
-    J <- 300
+    I <- 1000
+    J <- 1000
     
     # Discretization of [0,1]
     X <- seq(0,1,length.out = I)
@@ -26,50 +26,51 @@ ExampleSink <- function(){
     q <- q*sum(p)/sum(q)
     
     # number of iterations
-    iterMax <- 600
+    #iterMax <- 600
     
+    return(list(p,q,X,Y))
     
     # vector of epsilon values
-    epsvec <- 10^(-3)
+   #epsvec <- 10^(-3)
     
-    cat("Number of iterations: ", iterMax, "\n")
-    
-    cat("Epsilon values: ", epsvec, "\n")
-    
-    cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
-    
-    cat("The quadratic cost is used. \n")
-    
-    
-    # supply/demand with discretization and reference measure
-    supplyList <- list(p, X)
-    demandList <- list(q, Y)
-    
-    
-    #compute quadrature cost matrix
-    C <-  costMatrix(X,Y, exp = 2)
-    
-    # use Kulback-Leibner divergence with lambda = 0.5 for supply and demand
-    supply <- list(p, "KL", 1.)
-    demand <- list(q, "KL", 1.)
-    
-    
-    # compute and plot the transport plan
-    
-    start_time <- Sys.time()
-    res <- sinkhornAlgorithm(supply, demand, iterMax, epsvec, costMatrix = C)
-    end_time <- Sys.time()
-    
-    print(end_time - start_time)
-    
-    #cat("Transport cost: ", res$TransportCost, "\n\n\n")
-    
-    print(res$TransportPlan[1:10,1:10])
-    
-    
-    
-    plot1DTransport(res$TransportPlan, supplyList, demandList)
-    gridPlotTransport(res$TransportPlan)
+    # cat("Number of iterations: ", iterMax, "\n")
+    # 
+    # cat("Epsilon values: ", epsvec, "\n")
+    # 
+    # cat("The KL divergence with parameter 0.5 is used for both supply and demand. \n")
+    # 
+    # cat("The quadratic cost is used. \n")
+    # 
+    # 
+    # # supply/demand with discretization and reference measure
+    # supplyList <- list(p, X)
+    # demandList <- list(q, Y)
+    # 
+    # 
+    # #compute quadrature cost matrix
+    # C <-  costMatrix(X,Y, exp = 2)
+    # 
+    # # use Kulback-Leibner divergence with lambda = 0.5 for supply and demand
+    # supply <- list(p, "KL", 1.)
+    # demand <- list(q, "KL", 1.)
+    # 
+    # 
+    # # compute and plot the transport plan
+    # 
+    # start_time <- Sys.time()
+    # res <- sinkhornAlgorithm(supply, demand, iterMax, epsvec, costMatrix = C)
+    # end_time <- Sys.time()
+    # 
+    # print(end_time - start_time)
+    # 
+    # #cat("Transport cost: ", res$TransportCost, "\n\n\n")
+    # 
+    # print(res$TransportPlan[1:10,1:10])
+    # 
+    # 
+    # 
+    # plot1DTransport(res$TransportPlan, supplyList, demandList)
+    # gridPlotTransport(res$TransportPlan)
     
     
 }

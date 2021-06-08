@@ -7,9 +7,9 @@
 BalancedExtensionSolver(
   supplyList,
   demandList,
-  costMethod,
-  costExp,
-  costP,
+  method,
+  exp,
+  p,
   wfr = FALSE,
   Monge = FALSE,
   costMatrix = NULL
@@ -22,13 +22,6 @@ the positions of the supply points. This can either be a vector or a matrix wher
 
 \item{demandList}{A list similar the the supplyList.}
 
-\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
-The default value is "false".}
-
-\item{Monge}{(optional) Set to TRUE to use the Monge algorithm.}
-
-\item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
-
 \item{method}{(optional) Determines the method that is used to compute the cost matrix.
 \itemize{
 \item "euclidean"
@@ -40,6 +33,13 @@ The default value is "euclidean".}
 \item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
 \item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+
+\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
+The default value is "false".}
+
+\item{Monge}{(optional) Set to TRUE to use the Monge algorithm.}
+
+\item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
 }
 \description{
 This function solves unbalanced optimal transport problems by extending them to a balanced problem and applying the revised simplex algorithm.

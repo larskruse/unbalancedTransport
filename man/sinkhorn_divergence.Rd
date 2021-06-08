@@ -20,7 +20,7 @@ sinkhorn_divergence(
   supplyList,
   demandList,
   eps,
-  iterMax = 1000,
+  iterMax = 10000,
   tol = 1e-05,
   method = "euclidean",
   exp = 1,

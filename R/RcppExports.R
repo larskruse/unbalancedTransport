@@ -212,6 +212,7 @@ Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply
 #'
 #' @return The optimal transport plan
 #' @noRd
+#' @export
 Hausdorff_Vec_Rcpp <- function(costMatrix, distribution, f, lambda, param1, param2, Div, eps) {
     .Call(`_unbalancedTransport_Hausdorff_Vec_Rcpp`, costMatrix, distribution, f, lambda, param1, param2, Div, eps)
 }
