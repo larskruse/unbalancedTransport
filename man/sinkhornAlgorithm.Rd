@@ -7,9 +7,9 @@
 sinkhornAlgorithm(
   supplyList,
   demandList,
-  maxIteration,
-  eps,
-  tol = 1e-05,
+  epsVector,
+  maxIteration = 2000,
+  tol = 1e-08,
   method = "euclidean",
   exp = 1,
   p = 2,
@@ -19,35 +19,34 @@ sinkhornAlgorithm(
 )
 }
 \arguments{
-\item{supplyList}{A list containing the information about the supply measure, 
-divergence function and parameter. The first element is the supply measure itself,
+\item{supplyList}{A list containing the information about the supply distribution, 
+divergence function and parameter. The first element is the supply distribution itself,
 the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
 "TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
 needed for the divergence function: 
 
-In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
 regularization parameter \eqn{\lambda}{lambda} has to be provided.
 
-The same structure is used for the TV, Berg and Hellinger divergence. Only the parameter for lambda has to be provided.
-
-The Power divergence also needes the conjugate exponent as additional parameter.
+The "Power" divergence also needs the conjugate exponent as second parameter.
 
 The divergence function associated with the range constraint needs two parameters, that define the upper and 
 lower bound. 
 
 
-
-If the cost matrix is not provided, the support of the supply measure has to be provided as last element in the list. This can
+If the cost matrix is not provided, the support of the supply distribution has to be provided as last element in the list. This can
 be omitted if a cost matrix is passed as argument.}
 
 \item{demandList}{A list containing the information about the demand measure. It has to have the same structure as the supplyList.}
 
+\item{epsVector}{A numeric vector for the regularization parameter. In order to use epsilon scaling, a declining vector of values can be used.}
+
 \item{maxIteration}{(optional) The maximum number of iterations.}
 
-\item{eps}{A positive numeric value for epsilon.}
-
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
-is terminated as it is already converged. The default value is 1e-5.}
+is terminated as it is already converged. The default value is 1e-8.}
 
 \item{method}{(optional) Determines the method that is used to compute the cost matrix.
 \itemize{
@@ -66,13 +65,18 @@ The default value is "false".}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
 
-\item{duals}{(optional) Set to TRUE to return the dual potentials}
+\item{duals}{(optional) Set to TRUE to return the dual potentials as well.}
+}
+\value{
+A list containing the transport plan ("TransportPlan") , the transport cost ("TransportCost"),
+ the maximum change of the dual potential in the last iteration ("converge") and if "duals" is set to TRUE, the dual potentials.
 }
 \description{
-This functions uses to Sinkhorn algorithm to solve the regularized unbalanced optimal transport problem.
+Solving regularized unbalanced optimal transport using the Sinkhorn algorithm.
 }
 \details{
-The algorithm minimizes the regularized unbalanced optimal transport problem given by
+This functions uses to Sinkhorn algorithm to solve the regularized unbalanced optimal transport problem. 
+The algorithm minimizes the optimization problem
 
 \eqn{\min_{r \in \!R^{X \times Y}_+} \cdot F_1(P_X r) + \cdot F_2(P_Y r) + \varepsilon KL(r|K)}{min_r F1(P_X r) +  F_2(P_Y r) + epsilon * KL(r|K)}
 
@@ -93,8 +97,30 @@ The Berg divergence ("Berg") uses the conjugate exponent \eqn{r = -1} and the He
  
 
 Instead of providing a cost matrix to the algorithm, it is possible to provide the support of the supply and demand measures and 
-have the function compute the cost matrix. Four additional parameters can be provided to define the cost matrix to compute. 
+have the function compute the cost matrix automatically.
+
+\insertRef{Sejourne2019}{unbalancedTransport}
+}
+\examples{
+
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+maxIter <- 2000
+eps <- 1e-3
+
+suppList <- list(p, "KL", 0.04, X)
+demList <- list(q, "KL", 0.04, Y)
+res <- sinkhornAlgorithm(suppList, demList, eps, maxIter,  exp = 2)
+plot1DTransport(res$TransportPlan, supply, demand)
+gridPlotTransport(res$TransportPlan)
 
 
-INSERT REF
 }

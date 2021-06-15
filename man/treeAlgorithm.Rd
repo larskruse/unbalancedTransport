@@ -14,8 +14,10 @@ treeAlgorithm(
 )
 }
 \arguments{
-\item{tree}{A tree in list format. The first element is the index of the
-root node. Every other element holds a vector describing the tree's edges: The parent node, the child node and the weight.}
+\item{tree}{A tree structure in list format:
+The first element is the index of the root node.
+The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
+ of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.}
 
 \item{supply}{A non negative numeric supply vector.}
 
@@ -27,25 +29,29 @@ root node. Every other element holds a vector describing the tree's edges: The p
 
 \item{output}{Determines the format of the output:
 \itemize{
-\item "transportPlan" give a standard transport plan matrix where the value at \eqn{i,j} gives the amount of mass transproted from 
+\item "transportPlan" give a standard transport plan matrix where the value at \eqn{i,j} gives the amount of mass transported from 
 note \eqn{i} to \eqn{j}.
 \item "list" gives a list of vectors. Each vector holds three entries: The first gives the supply node, the second the target node of the transport
 and the third the amount of mass transported between those nodes.
-\item "cost" gives only the transport cost
+\item "cost" returns only the transport cost
 }}
 }
 \value{
 A list containing the transport cost, the mass import and export vectors, and the transport list or plan if specified in 'output'.
 }
 \description{
-Solving unbalanced optimal transport problems that use a tree metric as cost function.
+Solving unbalanced optimal transport problems on trees.
 }
 \details{
+This function can be used to solve unbalanced optimal transport problems that use a tree metric as cost function.
 If the cost matrix is derived from a tree metric, the unbalanced optimal transport problem  \eqn{\min_r <C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
 min_r <C,r> + sum_i(p_i (a-sum_j r_ij)) + sum_j(q_j (b-sum_i r_ij))} with supply and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}
 , transport plan \eqn{r}, construction and destruction costs \eqn{p} and \eqn{q} and cost matrix \eqn{C} can be solved efficiently in
 O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
-from R and to be able to compute the transport map.
+from R and to be able to compute the transport map. 
+
+
+\insertRef{Sato2020}{unbalancedTransport}
 }
 \examples{
 

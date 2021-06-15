@@ -7,7 +7,6 @@
 #' @param param1 num val
 #' @param param2 num val
 #' @noRd
-#' @export
 #'
 legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
@@ -16,8 +15,7 @@ legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
         return(lambda*(exp(x/lambda) - 1))
         
     }else if(DivFun == "Power"){
-        print("le power")
-        print(x)
+
         
         if(param1 == 0){
             return( -lambda *log(1-(x/lambda)))
@@ -89,8 +87,10 @@ expC <- function(f, g, C){
 
 #' @title Sinkhorn Divergence
 #' 
-#' A function to calculate the sinkhorn divergence for regularized unbalanced optimal transport.
+#' Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 #' 
+#' 
+#' A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 #' For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
 #' \eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
 #' \frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
@@ -101,30 +101,34 @@ expC <- function(f, g, C){
 #' 
 #' The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 #' 
-#' @param supplyList A list containing the information about the supply measure, 
-#' divergence function and parameter. The first element is the supply measure itself,
+#' \insertRef{Sejourne2019}{unbalancedTransport}
+#' 
+#' 
+#' @param supplyList A list containing the information about the supply distribution, 
+#' divergence function and parameter. The first element is the supply distribution itself,
 #' the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
-#' "TV" for total variation and "RG" for range constraint) followed by the parameters 
+#' "TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
 #' needed for the divergence function: 
 #' 
-#' In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+#' In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+#' TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+#' divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
 #' regularization parameter \eqn{\lambda}{lambda} has to be provided.
 #' 
-#' The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
-#' regularization parameter \eqn{\lambda}{lambda} has to be provided.
+#' The "Power" divergence also needs the conjugate exponent as second parameter.
 #' 
 #' The divergence function associated with the range constraint needs two parameters, that define the upper and 
 #' lower bound. 
 #' 
-#' If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
+#' 
+#' If the cost matrix is not provided, the support of the supply distribution has to be provided as last element in the list. This can
 #' be omitted if a cost matrix is passed as argument.
 #' 
 #' 
-#' [REF]
 #' 
-#' @param demandList A list containing the information about the demand measure. It has to have the same structure as the supplyList.
-#' @param eps num val
-#' @param iterMax The maximum number of algorithm iterations
+#' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
+#' @param eps A numeric value for the regularization parameter.
+#' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 10000.
 #' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 #' is terminated as it is already converged. The default value is 1e-5.
 #' @param method (optional) Determines the method that is used to compute the cost matrix.
@@ -138,9 +142,27 @@ expC <- function(f, g, C){
 #' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
-#' @param Cxy (optional) 
-#' @param Cxx (optional)
-#' @param Cyy (optional)
+#' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
+#' @param Cxx (optional) A cost matrix for transport between the supply and supply distributions.
+#' @param Cyy (optional) A cost matrix for transport between the demand and demand distributions.
+#' @return The Sinkhorn divergence.
+#' @examples 
+#' I <- 1000
+#' J <- 1000
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample
+#' q <- demandExample
+#'
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
+#'
+#' eps <- 1e-3 
+#' supplyList <- list(p, "KL", 0.04, X)
+#' demandList <- list(q, "KL", 0.04, Y)
+#' 
+#' sinkhorn_divergence(supplyList, demandList, eps, exp = 2)
+#' 
 #'
 #' @export
 sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, tol = 1e-5, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
@@ -287,47 +309,47 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
 
 #' @title Regularized transport cost
 #' 
-#' A function to calculate the regularized transport cost using the dual optimal optimal potentials.
+#' Calculating the regularized transport cost.
 #' 
+#' This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 #' The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
 #' <\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}
 #' 
 #' with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b}, optimal dual potentials \eqn{f} and \eqn{g}, 
 #' Legendre transforms of the divergence function \eqn{\phi^*}, cost matrix \eqn{C} and regularization parameter \eqn{\varepsilon}{eps}.
 #' 
-#' The function uses the Sinkhorn algorithm to compute the optimal dual potentials.
 #' 
 #' 
+#' \insertRef{Sejourne2019}{unbalancedTransport}
 #' 
-#' [REF]
-#' 
-#' @param supplyList A list containing the information about the supply measure, 
-#' divergence function and parameter. The first element is the supply measure itself,
+#' @param supplyList A list containing the information about the supply distribution, 
+#' divergence function and parameter. The first element is the supply distribution itself,
 #' the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
-#' "TV" for total variation and "RG" for range constraint) followed by the parameters 
+#' "TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
 #' needed for the divergence function: 
 #' 
-#' In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+#' In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+#' TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+#' divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
 #' regularization parameter \eqn{\lambda}{lambda} has to be provided.
 #' 
-#' The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
-#' regularization parameter \eqn{\lambda}{lambda} has to be provided.
+#' The "Power" divergence also needs the conjugate exponent as second parameter.
 #' 
-#' The divergence function associated with the range constraint needs two parameters, that define the upper and 
-#' lower bound. 
+#' The divergence function associated with the range constraint needs two parameters which define the upper and 
+#' lower bounds. 
 #' 
-#' If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
+#' 
+#' If the cost matrix is not provided, the support of the supply and demand distributions has to be provided as last element in the list. This can
 #' be omitted if a cost matrix is passed as argument.
 #' 
-#' @param demandList A list containing the information about the demand measure. It has to have the same structure as the supplyList.
 #' 
-#' @param maxIteration The maximum number of iterations.
-#' @param eps The regularization parameter.
-#' @param tol (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
-#' is terminated as it is already converged. The default value is 1e-10.
-#' @param algorithm (optional) Determines which algorithm to use. Possible values are "sinkhorn"
-#'  for \code{\link[unbalancedTransport]{sinkhornAlgorithm}} and "scaling" for \code{\link[unbalancedTransport]{scalingAlgorithm}}
-#' @param method (optional) Determines the method that is used to compute the cost matrix.
+#' 
+#' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
+#' @param eps A numeric value for the regularization parameter.
+#' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 5000
+#' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
+#' is terminated as it is already converged. The default value is 1e-5.
+#' @param method (optional) Determines the method that is used to compute the cost matrix:
 #' \itemize{
 #' \item "euclidean"
 #' \item "minkowski"
@@ -338,11 +360,30 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
 #' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
-#' @param Cxy (optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm. 
+#' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
+#' @return The regularized transport cost.
+#' @examples 
+#' I <- 1000
+#' J <- 1000
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample
+#' q <- demandExample
+#'
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
+#'
+#' eps <- 1e-3 
+#' supplyList <- list(p, "KL", 0.04, X)
+#' demandList <- list(q, "KL", 0.04, Y)
+#' 
+#' regularized_ot(supplyList, demandList, eps, exp = 2)
+#' 
+#' 
 #' @export
 #' 
-regularized_ot <- function(supplyList, demandList, eps, maxIteration = 100, tol = 1e-3, algorithm = "sinkhorn", method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
-                            Cxy = NULL){
+regularized_ot <- function(supplyList, demandList, eps, iterMax = 5000, tol = 1e-5,
+                           method = "euclidean", exp = 1, p = 2,  wfr = FALSE, Cxy = NULL){
     
     lenSup <- length(supplyList)
     lenDem <- length(demandList)
@@ -450,25 +491,35 @@ regularized_ot <- function(supplyList, demandList, eps, maxIteration = 100, tol 
 #' 
 regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costMatrix){
 
-    
-    print(f_xy)
-    print(g_xy)
-
-
     if(supplyList[[2]] == "TV"){
+        # 
+        # print(f_xy)
+        # print(g_xy)
+        # 
+        f_xy[!is.finite(f_xy) & supplyList[[1]] == 0] <- 0
+        g_xy[!is.finite(g_xy) & demandList[[1]] == 0] <- 0
+        
+        # print(f_xy)
+        # print(g_xy)
         
         func <- sum(supplyList[[1]] * f_xy) + sum(demandList[[1]] * g_xy)
         
-        expFun <- supplyList[[1]] %*% t(demandList[[1]]) * (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
         
+        expMat <- (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
+        supxdem <- supplyList[[1]] %*% t(demandList[[1]])
         
-        print("funcs")
-        print(sum(supplyList[[1]] * f_xy))
-        print(sum(demandList[[1]] * g_xy))
-        print(func)
-        print(sum(expFun))
-        print(sum(eps * expFun))
+        expMat[!is.finite(expMat) & supxdem == 0 ] <- 0
         
+        # expFun <- supplyList[[1]] %*% t(demandList[[1]]) * (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
+        expFun <- supxdem * expMat
+        
+        # print("funcs")
+        # print(sum(supplyList[[1]] * f_xy))
+        # print(sum(demandList[[1]] * g_xy))
+        # print(func)
+        # print(sum(expFun))
+        # print(sum(eps * expFun))
+        # 
         
         
         
@@ -483,23 +534,33 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         param1 <- supplyList[[3]]
         param2 <- supplyList[[4]]
         
+        expMat <- (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
         supxdem <- supplyList[[1]] %*% t(demandList[[1]])
-        
-        print("func")
-        print(sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2))))
-        print(sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2))))
-        
-        func <- sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)))+ 
-            sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2)))
+        expMat[!is.finite(expMat) & supxdem == 0 ] <- 0
         
         
-        print(sum(supxdem * (1-exp(expC(f_xy,g_xy,costMatrix)/eps))))
         
-        print(sum(eps * (supxdem * (1-exp(expC(f_xy,g_xy,costMatrix)/eps)))))
+        outf_xy <- (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2))
+        outg_xy <- (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2))
         
-        func <- func + sum(eps * (supxdem * (1-exp(expC(f_xy,g_xy,costMatrix)/eps))))
+        outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
+        outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
         
-        print(func)
+        # print("func")
+        # print(sum(supplyList[[1]] * outf_xy))
+        # print(sum(demandList[[1]] * outg_xy))
+        
+        func <- sum(supplyList[[1]] * outf_xy)+ 
+            sum(demandList[[1]] * outg_xy)
+        
+        # 
+        # print(sum(supxdem * expMat))
+        # 
+        # print(sum(eps * (supxdem * expMat)))
+        
+        func <- func + sum(eps * (supxdem * expMat))
+        
+        # print(func)
         
         return(func)
         
@@ -531,10 +592,28 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
         
+        print("funcs")
+
+        print(-legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0))
+        print(- 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1))
+        print(-legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0))
+        print(- 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1))
+        
+        
+        outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
+        outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
+        
+        print(supplyList[[1]] * outf_xy)
+        print(demandList[[1]] * outg_xy)
+
+        print(sum(supplyList[[1]] * outf_xy))
+        print(sum(demandList[[1]] * outg_xy))
+        print(eps*(sum(supplyList[[1]]) * sum(demandList[[1]])))
+                
         res = sum(supplyList[[1]] * outf_xy) + sum(demandList[[1]] * outg_xy) + 
             eps*(sum(supplyList[[1]]) * sum(demandList[[1]]))
         
-        
+        # print(res)
         
         return(res)
         
@@ -548,49 +627,50 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 
 
 
-#' @title Regularized transport cost
+#' @title Hausdorff Divergence
 #' 
-#' A function to calculate the regularized transport cost using the dual optimal optimal potentials.
+#' Calculating the Hausdorff divergence.
 #' 
-#' The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
-#' <\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}
+#' This function calculates the Hausdorff divergence using the dual optimal optimal potentials
+#' calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+#' The Hausdorff divergence is defined as 
+#' \eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
+#' \nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
+#' with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
+#' \eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
+#' \frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
 #' 
-#' with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b}, optimal dual potentials \eqn{f} and \eqn{g}, 
-#' Legendre transforms of the divergence function \eqn{\phi^*}, cost matrix \eqn{C} and regularization parameter \eqn{\varepsilon}{eps}.
 #' 
-#' The function uses the Sinkhorn algorithm to compute the optimal dual potentials.
+#' \insertRef{Sejourne2019}{unbalancedTransport}
 #' 
-#' 
-#' 
-#' [REF]
-#' 
-#' @param supplyList A list containing the information about the supply measure, 
-#' divergence function and parameter. The first element is the supply measure itself,
+#' @param supplyList A list containing the information about the supply distribution, 
+#' divergence function and parameter. The first element is the supply distribution itself,
 #' the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
-#' "TV" for total variation and "RG" for range constraint) followed by the parameters 
+#' "TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
 #' needed for the divergence function: 
 #' 
-#' In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+#' In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+#' TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+#' divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
 #' regularization parameter \eqn{\lambda}{lambda} has to be provided.
 #' 
-#' The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
-#' regularization parameter \eqn{\lambda}{lambda} has to be provided.
+#' The "Power" divergence also needs the conjugate exponent as second parameter.
 #' 
-#' The divergence function associated with the range constraint needs two parameters, that define the upper and 
-#' lower bound. 
+#' The divergence function associated with the range constraint needs two parameters which define the upper and 
+#' lower bounds. 
 #' 
-#' If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
+#' 
+#' If the cost matrix is not provided, the support of the supply and demand distributions has to be provided as last element in the list. This can
 #' be omitted if a cost matrix is passed as argument.
 #' 
-#' @param demandList A list containing the information about the demand measure. It has to have the same structure as the supplyList.
 #' 
-#' @param maxIteration The maximum number of iterations.
-#' @param eps The regularization parameter.
-#' @param tol (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
-#' is terminated as it is already converged. The default value is 1e-10.
-#' @param algorithm (optional) Determines which algorithm to use. Possible values are "sinkhorn"
-#'  for \code{\link[unbalancedTransport]{sinkhornAlgorithm}} and "scaling" for \code{\link[unbalancedTransport]{scalingAlgorithm}}
-#' @param method (optional) Determines the method that is used to compute the cost matrix.
+#' 
+#' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
+#' @param eps A numeric value for the regularization parameter.
+#' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 5000
+#' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
+#' is terminated as it is already converged. The default value is 1e-5.
+#' @param method (optional) Determines the method that is used to compute the cost matrix:
 #' \itemize{
 #' \item "euclidean"
 #' \item "minkowski"
@@ -601,10 +681,32 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 #' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
-#' @param Cxy (optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm. 
+#' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
+#' @param Cxx (optional) A cost matrix for transport between the supply and supply distributions.
+#' @param Cyy (optional) A cost matrix for transport between the demand and demand distributions.
+#' @return The Hausdorff divergence.
+#' 
+#' @examples 
+#' I <- 1000
+#' J <- 1000
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample
+#' q <- demandExample
+#'
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
+#'
+#' eps <- 1e-3 
+#' supplyList <- list(p, "KL", 0.04, X)
+#' demandList <- list(q, "KL", 0.04, Y)
+#' 
+#' hausdorff_divergence(supplyList, demandList, eps, exp = 2)
+#'
 #' @export
-hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
-                                Cxy = NULL, Cxx = NULL, Cyy = NULL){
+hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3,
+                                 method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+                                 Cxy = NULL, Cxx = NULL, Cyy = NULL){
 
     lenSup <- length(supplyList)
     lenDem <- length(demandList)

@@ -8,6 +8,8 @@ plotTransportByCost(
   transportPlan,
   supply = NULL,
   demand = NULL,
+  supplyCoordinates = NULL,
+  demandCoordinates = NULL,
   distanceMatrix = NULL,
   creationDestructionCost = rep(0, length(x))
 )

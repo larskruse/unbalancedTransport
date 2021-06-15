@@ -15,7 +15,8 @@
 #' to calcuated the positions of the points if they are not explicitly given.
 #'
 #' @export
-plotTransportByCost <- function(transportPlan, supply = NULL, demand = NULL, distanceMatrix = NULL,  creationDestructionCost = rep(0, length(x))){
+plotTransportByCost <- function(transportPlan, supply = NULL, demand = NULL, supplyCoordinates = NULL, demandCoordinates = NULL,
+                                distanceMatrix = NULL,  creationDestructionCost = rep(0, length(x))){
 
     # calculate the positions
         
@@ -95,14 +96,15 @@ plotTransportByCost <- function(transportPlan, supply = NULL, demand = NULL, dis
 
 #' A grid plot of the transport plan
 #'
-#' This function creates a grid plot of a transport plan. Import and export vectors can
-#' be given as additional arguments. These will be plotted along the sides of the grid 
-#' plot in order to indicate where mass is added or removed. Hence, the mass shown in
-#' each row or column is equal to the supply or demand vectors. 
+#' Creates a grid plot of a transport plan. 
+#' 
+#' This function creates a grid plot of the transport plan. Import and export
+#' vectors can be given as additional arguments. These will be plotted along the sides of the grid 
+#' plot in order to indicate where mass is added or removed. Therefore, the mass shown in
+#' each row or column is equal to the supply or demand vector. 
 #'
-#' @param transportPlan A non negative numeric matrix that indicates where the mass is
-#' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
-#' supply point \eqn{i} to demand point \eqn{j}.
+#' @param transportPlan A non negative numeric matrix that indicates the mass transport.
+#' The value at \eqn{\[i,j\]} is the amount of mass transported from supply point \eqn{i} to demand point \eqn{j}.
 #' @param import (optional) A non negative numeric vector that give the amount of mass created at each
 #' demand point. It length has to be equal to the number of columns in the transport matrix.  
 #' @param export (optional) A non negative numeric vector that give the amount of mass destroyed  at each
@@ -114,11 +116,11 @@ plotTransportByCost <- function(transportPlan, supply = NULL, demand = NULL, dis
 #' import <- runif(3)
 #' export <- runif(3)
 #' 
-#' gridPlotTransport(transport)
-#' gridPlotTransport(transport, import, export)
+#' plotGridTransport(transport)
+#' plotGridTransport(transport, import, export)
 #'
 #' @export
-gridPlotTransport <- function(transportPlan, import = NULL, export =  NULL){
+plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 
     # If no import or export vector is given, only the transport plan is plotted
     if(is.null(import) | is.null(export)){
@@ -178,7 +180,28 @@ gridPlotTransport <- function(transportPlan, import = NULL, export =  NULL){
 #' @param supplyList A list containing the non negative supply measure and the underlying discretization as vectors.
 #' @param demandList A list containing the non negative demand measure and the underlying discretization as vectors.
 #'
+#' @examples 
+#' 
+#' I <- 1000
+#' J <- 1000
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample
+#' q <- demandExample
 #'
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
+#'
+#' maxIter <- 2000
+#' eps <- 1e-3
+#' 
+#'
+#' suppList <- list(p, "KL", 0.04, X)
+#' demList <- list(q, "KL", 0.04, Y)
+#' res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
+#' 
+#' plot1DTransport(res$TransportPlan, supply, demand)
+#' 
 #'
 #' @export
 plot1DTransport <- function(transportPlan, supplyList, demandList){
@@ -319,11 +342,12 @@ findPath <- function(from, to, treeDF){
 #'
 #' This function visualizes the transport of mass on a tree. 
 #'
-#' @param tree A tree structure in list format: The first element is the index of the root node
-#'  followed by multiple vectors defining the edges of the tree. Each of these vectors has to be 
-#'  of the form \eqn{(parent, child, weight)}.
+#' @param tree A tree structure in list format:
+#' The first element is the index of the root node.
+#' The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
+#'  of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.
 #' @param tList (optional) The mass transport as list. Each element is a vector of the form
-#'  \eqn{(source, target, mass)}.
+#'  \eqn{(source_node_index, target_node_index, mass)}.
 #' @param supply (optional) A non negative numeric vector giving the mass supply at each tree node. The value at 
 #' position \eqn{i} give the supply at node \eqn{i}.
 #' @param demand (optional) A non negative numeric vector giving the mass demand at each tree node. The value at 

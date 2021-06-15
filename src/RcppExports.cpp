@@ -57,8 +57,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // Sinkhorn_Rcpp
-Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply, double param2Supply, double lambdaDemand, double param1Demand, double param2Demand, int DivSupply, int DivDemand, int iterMax, double eps, double tol);
-RcppExport SEXP _unbalancedTransport_Sinkhorn_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP param1SupplySEXP, SEXP param2SupplySEXP, SEXP lambdaDemandSEXP, SEXP param1DemandSEXP, SEXP param2DemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsSEXP, SEXP tolSEXP) {
+Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply, double param2Supply, double lambdaDemand, double param1Demand, double param2Demand, int DivSupply, int DivDemand, int iterMax, Rcpp::NumericVector& epsvec, double tol);
+RcppExport SEXP _unbalancedTransport_Sinkhorn_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP param1SupplySEXP, SEXP param2SupplySEXP, SEXP lambdaDemandSEXP, SEXP param1DemandSEXP, SEXP param2DemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -74,9 +74,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type DivSupply(DivSupplySEXP);
     Rcpp::traits::input_parameter< int >::type DivDemand(DivDemandSEXP);
     Rcpp::traits::input_parameter< int >::type iterMax(iterMaxSEXP);
-    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type epsvec(epsvecSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(Sinkhorn_Rcpp(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol));
+    rcpp_result_gen = Rcpp::wrap(Sinkhorn_Rcpp(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol));
     return rcpp_result_gen;
 END_RCPP
 }

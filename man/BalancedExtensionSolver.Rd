@@ -7,9 +7,9 @@
 BalancedExtensionSolver(
   supplyList,
   demandList,
-  method,
-  exp,
-  p,
+  method = "euclidean",
+  exp = 1,
+  p = 2,
   wfr = FALSE,
   Monge = FALSE,
   costMatrix = NULL
@@ -17,10 +17,10 @@ BalancedExtensionSolver(
 }
 \arguments{
 \item{supplyList}{A list containing the information about the supply. The first element hast to be the distribution followed by
- a vector specifying the cost for destruction of mass at each supply point. If no cost matrix is provided, the third list element has to be 
+ a vector specifying the cost for destruction of mass at each supply point. If no cost matrix is provided, the third element has to be 
 the positions of the supply points. This can either be a vector or a matrix where each row gives the coordinates for one point.}
 
-\item{demandList}{A list similar the the supplyList.}
+\item{demandList}{A list similar to the supplyList but holding the information about the demand.}
 
 \item{method}{(optional) Determines the method that is used to compute the cost matrix.
 \itemize{
@@ -30,25 +30,34 @@ the positions of the supply points. This can either be a vector or a matrix wher
 }
 The default value is "euclidean".}
 
-\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
+\item{exp}{(optional) The exponent that is applied to the cost matrix. Can
+be used to compute quadratic cost. The default value is 1.}
 
-\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted
+if either "euclidean" or "maximum" is used. The default value is 2.}
 
-\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
+\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao
+ distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 The default value is "false".}
 
 \item{Monge}{(optional) Set to TRUE to use the Monge algorithm.}
 
-\item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
+\item{costMatrix}{(optional) Instead of having the algorithm compute the
+cost matrix, a custom cost matrix can be passed to the algorithm.}
 }
 \description{
-This function solves unbalanced optimal transport problems by extending them to a balanced problem and applying the revised simplex algorithm.
+Solving unbalanced optimal transport problems by extending them to a balanced
+problem and applying the revised simplex algorithm.
 }
 \details{
+This function solves unbalanced optimal transport problems by extending them
+to a balanced problem and applying the revised simplex algorithm.
 The unbalanced optimal transport problem \eqn{<C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
-<C,r> + sum_i(p_i (a-sum_j r_ij)) + sum_j(q_j (b-sum_i r_ij))} with supply and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b},
-cost matrix C, transport plan \eqn{r} and construction and destruction costs \eqn{p} and \eqn{q} is transformed to a balanced transport 
-problem by extending the cost matrix and supply and demand vectors. 
+<C,r> + sum_i(p_i (a_i-sum_j r_ij)) + sum_j(q_j (b_j-sum_i r_ij))} with supply
+and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}, cost matrix C, 
+transport plan \eqn{r} and construction and destruction costs \eqn{p} and 
+\eqn{q} is transformed to a balanced transport problem by extending the cost
+ matrix as well as supply and demand vectors. 
 
 The resulting transport problem is then solved using the reverse simplex algorithm provided by the \code{\link[transport]{transport}} package.
 
@@ -57,4 +66,22 @@ Monge algorithm is not as efficient as the revised simplex algorithm.
 
 
 \insertRef{Guittet2002}{unbalancedTransport}
+}
+\examples{
+
+supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
+demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
+
+
+p <- c(2,2,2)
+q <- c(1,2,3)
+
+costCreate <- rep(10,3)
+costDestruct <- rep(10,3)
+
+supplyList <- list(p,costDestruct, supplyPoints)
+demandList <- list(q,costCreate, demandPoints)
+
+BalancedExtensionSolver(supplyList, demandList, exp = 2)
+
 }

@@ -25,3 +25,5 @@ Imports:
     logSumExp,
     Rdpack
 RdMacros: Rdpack
+Depends: 
+    R (>= 2.10)

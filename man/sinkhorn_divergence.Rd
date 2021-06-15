@@ -4,8 +4,10 @@
 \alias{sinkhorn_divergence}
 \title{Sinkhorn Divergence
 
-A function to calculate the sinkhorn divergence for regularized unbalanced optimal transport.
+Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 
+
+A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
 \eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
 \frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
@@ -14,7 +16,9 @@ For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn d
 with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
 and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 
-The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.}
+The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+
+\insertRef{Sejourne2019}{unbalancedTransport}}
 \usage{
 sinkhorn_divergence(
   supplyList,
@@ -32,32 +36,31 @@ sinkhorn_divergence(
 )
 }
 \arguments{
-\item{supplyList}{A list containing the information about the supply measure, 
-divergence function and parameter. The first element is the supply measure itself,
+\item{supplyList}{A list containing the information about the supply distribution, 
+divergence function and parameter. The first element is the supply distribution itself,
 the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
-"TV" for total variation and "RG" for range constraint) followed by the parameters 
+"TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
 needed for the divergence function: 
 
-In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
 regularization parameter \eqn{\lambda}{lambda} has to be provided.
 
-The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
-regularization parameter \eqn{\lambda}{lambda} has to be provided.
+The "Power" divergence also needs the conjugate exponent as second parameter.
 
 The divergence function associated with the range constraint needs two parameters, that define the upper and 
 lower bound. 
 
-If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
-be omitted if a cost matrix is passed as argument.
 
+If the cost matrix is not provided, the support of the supply distribution has to be provided as last element in the list. This can
+be omitted if a cost matrix is passed as argument.}
 
-[REF]}
+\item{demandList}{A list containing the information about the demand measure in the same form as the supplyList.}
 
-\item{demandList}{A list containing the information about the demand measure. It has to have the same structure as the supplyList.}
+\item{eps}{A numeric value for the regularization parameter.}
 
-\item{eps}{num val}
-
-\item{iterMax}{The maximum number of algorithm iterations}
+\item{iterMax}{(optional) The maximum number of algorithm iterations. The default value is 10000.}
 
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-5.}
@@ -77,17 +80,22 @@ The default value is "euclidean".}
 \item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 The default value is "false".}
 
-\item{Cxy}{(optional)}
+\item{Cxy}{(optional) A cost matrix for transport between the supply and demand distributions.}
 
-\item{Cxx}{(optional)}
+\item{Cxx}{(optional) A cost matrix for transport between the supply and supply distributions.}
 
-\item{Cyy}{(optional)}
+\item{Cyy}{(optional) A cost matrix for transport between the demand and demand distributions.}
+}
+\value{
+The Sinkhorn divergence.
 }
 \description{
 Sinkhorn Divergence
 
-A function to calculate the sinkhorn divergence for regularized unbalanced optimal transport.
+Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 
+
+A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
 \eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
 \frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
@@ -97,4 +105,25 @@ with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularizat
 and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 
 The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+
+\insertRef{Sejourne2019}{unbalancedTransport}
+}
+\examples{
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+eps <- 1e-3 
+supplyList <- list(p, "KL", 0.04, X)
+demandList <- list(q, "KL", 0.04, Y)
+
+sinkhorn_divergence(supplyList, demandList, eps, exp = 2)
+
+
 }

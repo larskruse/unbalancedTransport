@@ -17,3 +17,27 @@ gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.}
 \description{
 A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D.
 }
+\examples{
+
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+maxIter <- 2000
+eps <- 1e-3
+
+
+suppList <- list(p, "KL", 0.04, X)
+demList <- list(q, "KL", 0.04, Y)
+res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
+
+plot1DTransport(res$TransportPlan, supply, demand)
+
+
+}

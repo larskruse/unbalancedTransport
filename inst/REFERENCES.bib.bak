@@ -93,7 +93,6 @@
   author        = {Arturs Backurs and Yihe Dong and Piotr Indyk and Ilya Razenshteyn and Tal Wagner},
   title         = {Scalable Nearest Neighbor Search for Optimal Transport},
   journal       = {arXiv},
-  year          = {2019},
   __markedentry = {[lars:]},
   abstract      = {The Optimal Transport (a.k.a. Wasserstein) distance is an increasingly popular similarity measure for rich data domains, such as images or text documents. This raises the necessity for fast nearest neighbor search algorithms according to this distance, which poses a substantial computational bottleneck on massive datasets. In this work we introduce Flowtree, a fast and accurate approximation algorithm for the Wasserstein-$1$ distance. We formally analyze its approximation factor and running time. We perform extensive experimental evaluation of nearest neighbor search algorithms in the $W_1$ distance on real-world dataset. Our results show that compared to previous state of the art, Flowtree achieves up to $7.4$ times faster running time.},
   date          = {2019-10-09},

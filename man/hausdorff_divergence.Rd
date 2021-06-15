@@ -2,7 +2,21 @@
 % Please edit documentation in R/SinkhornDivergence.R
 \name{hausdorff_divergence}
 \alias{hausdorff_divergence}
-\title{hausdorff div}
+\title{Hausdorff Divergence
+
+Calculating the Hausdorff divergence.
+
+This function calculates the Hausdorff divergence using the dual optimal optimal potentials
+calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+The Hausdorff divergence is defined as 
+\eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
+\nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
+with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
+\eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
+\frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
+
+
+\insertRef{Sejourne2019}{unbalancedTransport}}
 \usage{
 hausdorff_divergence(
   supplyList,
@@ -20,30 +34,91 @@ hausdorff_divergence(
 )
 }
 \arguments{
-\item{supplyList}{sup list}
+\item{supplyList}{A list containing the information about the supply distribution, 
+divergence function and parameter. The first element is the supply distribution itself,
+the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
+"TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
+needed for the divergence function: 
 
-\item{demandList}{dem list}
+In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
+TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
+divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
+regularization parameter \eqn{\lambda}{lambda} has to be provided.
 
-\item{eps}{num val}
+The "Power" divergence also needs the conjugate exponent as second parameter.
 
-\item{iterMax}{num val}
+The divergence function associated with the range constraint needs two parameters which define the upper and 
+lower bounds. 
 
-\item{tol}{num val}
 
-\item{method}{cost method}
+If the cost matrix is not provided, the support of the supply and demand distributions has to be provided as last element in the list. This can
+be omitted if a cost matrix is passed as argument.}
 
-\item{exp}{cost exponent}
+\item{demandList}{A list containing the information about the demand measure in the same form as the supplyList.}
 
-\item{p}{cost parameter}
+\item{eps}{A numeric value for the regularization parameter.}
 
-\item{wfr}{wfr param}
+\item{iterMax}{(optional) The maximum number of algorithm iterations. The default value is 5000}
 
-\item{Cxy}{cost matrix}
+\item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
+is terminated as it is already converged. The default value is 1e-5.}
 
-\item{Cxx}{cost matrix}
+\item{method}{(optional) Determines the method that is used to compute the cost matrix:
+\itemize{
+\item "euclidean"
+\item "minkowski"
+\item "maximum" 
+}
+The default value is "euclidean".}
 
-\item{Cyy}{cost matrix}
+\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
+
+\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+
+\item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
+The default value is "false".}
+
+\item{Cxy}{(optional) A cost matrix for transport between the supply and demand distributions.}
+
+\item{Cxx}{(optional) A cost matrix for transport between the supply and supply distributions.}
+
+\item{Cyy}{(optional) A cost matrix for transport between the demand and demand distributions.}
+}
+\value{
+The Hausdorff divergence.
 }
 \description{
-hausdorff div
+Hausdorff Divergence
+
+Calculating the Hausdorff divergence.
+
+This function calculates the Hausdorff divergence using the dual optimal optimal potentials
+calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+The Hausdorff divergence is defined as 
+\eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
+\nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
+with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
+\eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
+\frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
+
+
+\insertRef{Sejourne2019}{unbalancedTransport}
+}
+\examples{
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+eps <- 1e-3 
+supplyList <- list(p, "KL", 0.04, X)
+demandList <- list(q, "KL", 0.04, Y)
+
+hausdorff_divergence(supplyList, demandList, eps, exp = 2)
+
 }

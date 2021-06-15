@@ -162,6 +162,7 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
     return temp2;
 
   }else if(DivFun == 2){
+      //remove exp
     return ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
   }else{
     return((beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp())));
@@ -224,10 +225,11 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
                                   Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
-                                  double tol = 1e-10){
+                                  double tol = 1e-8){
   // number of absorptions
   int numAbs = 0;
     
+
 
   // number of points in the reference measures
   int Nx = supply.size();
@@ -242,7 +244,8 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
   
   Eigen::VectorXd u_prev;
-
+  Eigen::VectorXd u_finite;
+  
   // main loop iteration counter
   int i = 1;
 
@@ -262,47 +265,62 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
   //ProfilerStart("scaling.log");
   
+  double converge;
+  
   
   
   while(i < iterMax){
       
-    u_prev = u;
+    u_prev = u.array() + eps*(a.array().log());
+    u_prev = u_prev.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+      
 
 
     // calculate scaling iterates
+    // b = b.array() * dy.array();
     a = Kernel * b;
-    a = a.array()/1;
+    //a = a.array(); ///Nx;
     //Rcpp::Rcout << "a: " << a << "\n\n";
     a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply, alphaSupply, betaSupply);
     //Rcpp::Rcout << "a: " << a << "\n\n";
 
+    
+    // a = a.array() * dx.array();
     b = Kernel.transpose() * a;
-    b = b.array()/1;
+    //b = b.array(); ///Nx;
     //Rcpp::Rcout << "b: " << b  << "\n\n";
     
     b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand, alphaDemand, betaDemand);
     //Rcpp::Rcout << "b: " << b  << "\n\n";
     // 
-    // if(i > 1 && ((u.array()-u_prev.array()).array().abs().maxCoeff()) < tol){
-    //     Rcpp::Rcout << "converged at: " << i << " \n";
-    // 
-    //     // absorbing a/b in u/v
-    //     u = u.array() + eps*(a.array().log());
-    //     v = v.array() + eps*(b.array().log());
-    // 
-    //     // update Kernel according to u and v
-    //     Kernel = updateK(u, v, eps, costMatrix);
-    // 
-    // 
-    // 
-    // 
-    //     //reset a and b
-    //     a = Eigen::VectorXd::Ones(Nx);
-    //     b = Eigen::VectorXd::Ones(Ny);
-    // 
-    // 
-    //     break;
-    // }
+    
+    
+    u_finite = u.array() + eps*(a.array().log());
+    u_finite = u_finite.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+    
+    if(((u_finite.array()-u_prev.array()).array().abs().maxCoeff()) < tol && epsind + 1 == epsvec.size()){
+        
+
+        // absorbing a/b in u/v
+        u = u.array() + eps*(a.array().log());
+        v = v.array() + eps*(b.array().log());
+
+        // update Kernel according to u and v
+        Kernel = updateK(u, v, eps, costMatrix);
+
+
+        converge = (u_finite.array()-u_prev.array()).array().abs().maxCoeff();
+
+        //reset a and b
+        a = Eigen::VectorXd::Ones(Nx);
+        b = Eigen::VectorXd::Ones(Ny);
+
+
+        break;
+    }
+    
+    
+    
     
     
     //Stabilizing step and changing epsilon
@@ -325,7 +343,8 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
 
       // update number of absorptions
       numAbs = numAbs +1;
-
+      u_prev = u;
+      
       // absorbing a/b in u/v
       u = u.array() + eps*(a.array().log());
       v = v.array() + eps*(b.array().log());
@@ -357,48 +376,28 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   //ProfilerStop();
   Rcpp::Rcout << 100 << "% done. \n";
 
-  pCost = 0;
-
-
-  if(DivSupply != 3){
-    pCost += vectorDivergence(Kernel.rowwise().sum() ,supply, DivSupply, lambdaSupply);
-    //Rcpp::Rcout << "cost1 add: " << vectorDivergence(Kernel.rowwise().sum()  ,supply, DivSupply, lambdaSupply) << "\n";
-      
-  }else{
-    pCost += vectorDivergence(Kernel.rowwise().sum(), supply, DivSupply, alphaSupply, betaSupply);
-    //Rcpp::Rcout << "cost1 add: " << vectorDivergence(Kernel.rowwise().sum(), supply, DivSupply, alphaSupply, betaSupply) << "\n";
-      
-  }
-  //Rcpp::Rcout << "cost1: " << pCost << "\n";
+ 
   
-  if(DivDemand != 3){
-
-    pCost += vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand);
-    //Rcpp::Rcout << "cost2 add: " << vectorDivergence(Kernel.colwise().sum().transpose(), demand, DivDemand, lambdaDemand) << "\n";
-      
-  }else{
-    pCost += vectorDivergence(Kernel.colwise().sum().transpose() , demand, DivDemand, alphaDemand, betaDemand);
-//    Rcpp::Rcout << "cost2 add: " << vectorDivergence(Kernel.colwise().sum().transpose() , demand, DivDemand, alphaDemand, betaDemand) << "\n";
-      
+  // 
+  // Rcpp::Rcout  << "u: " << u << "\n";
+  // Rcpp::Rcout << "u-prev: " << u_prev << "\n";
+  
+  u_finite = u.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+  
+  converge = (u_finite.array()-u_prev.array()).abs().maxCoeff();
+  
+  if(converge > tol){
+    Rcpp::Rcout << "The scaling Algorithm did not converge.\n";
   }
   
-  //Rcpp::Rcout << "cost2: " << pCost << "\n";
-
-
-  Eigen::Map<Eigen::VectorXd> vecKernel(Kernel.data(), Kernel.size());
-  Eigen::Map<Eigen::VectorXd> vecFirstKernel(originalKernel.data(), originalKernel.size());
-
-  pCost += vectorDivergence(vecKernel, vecFirstKernel, 1,eps);
-  //Rcpp::Rcout << "cost3 add: " << vectorDivergence(vecKernel, vecFirstKernel, 1,eps) << "\n";
   
-  //Rcpp::Rcout << "cost3: " << pCost << "\n";
   
   // returnING the transport plan
   // since the absorbtion is called in the last iteration of the loop,
   // the transport plan is equal to the kernel.
 return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
-                          Rcpp::Named("TransportCost") = pCost,
                           Rcpp::Named("dual_f") = u,
-                          Rcpp::Named("dual_g") = v);
+                          Rcpp::Named("dual_g") = v,
+                          Rcpp::Named("converge") = converge);
 
 }

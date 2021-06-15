@@ -7,12 +7,13 @@
 plotTree(tree, tList = NULL, supply = NULL, demand = NULL)
 }
 \arguments{
-\item{tree}{A tree structure in list format: The first element is the index of the root node
-followed by multiple vectors defining the edges of the tree. Each of these vectors has to be 
-of the form \eqn{(parent, child, weight)}.}
+\item{tree}{A tree structure in list format:
+The first element is the index of the root node.
+The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
+ of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.}
 
 \item{tList}{(optional) The mass transport as list. Each element is a vector of the form
-\eqn{(source, target, mass)}.}
+\eqn{(source_node_index, target_node_index, mass)}.}
 
 \item{supply}{(optional) A non negative numeric vector giving the mass supply at each tree node. The value at 
 position \eqn{i} give the supply at node \eqn{i}.}

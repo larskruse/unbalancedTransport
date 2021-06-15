@@ -7,41 +7,41 @@
 scalingAlgorithm(
   supplyList,
   demandList,
-  maxIteration,
   epsVector,
-  tol = 1e-10,
+  maxIteration = 5000,
+  tol = 1e-08,
   method = "euclidean",
   exp = 1,
   p = 2,
   wfr = FALSE,
-  costMatrix = NULL
+  costMatrix = NULL,
+  duals = FALSE
 )
 }
 \arguments{
-\item{supplyList}{A list containing the information about the supply measure, 
-divergence function and parameter. The first element is the supply measure itself,
+\item{supplyList}{A list containing the information about the supply distribution, 
+divergence function and parameter. The first element is the supply distribution itself,
 the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
 "TV" for total variation and "RG" for range constraint) followed by the parameters 
 needed for the divergence function: 
 
-In case of the KL divergence \eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()} and the 
+In case of the KL (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()})
+and TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()})
 regularization parameter \eqn{\lambda}{lambda} has to be provided.
 
-The same structure is used for the TV divergence: \eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()} and the 
-regularization parameter \eqn{\lambda}{lambda} has to be provided.
 
 The divergence function associated with the range constraint needs two parameters, that define the upper and 
 lower bound. 
 
-If the cost matrix is not provided, the support of the supply measure has to be provied as last element in the list. This can
+If the cost matrix is not provided, the support of the supply distribution has to be provided as last element in the list. This can
 be omitted if a cost matrix is passed as argument.}
 
-\item{demandList}{A list containing the information about the demand measure. It has to have the same structure as the supplyList.}
-
-\item{maxIteration}{The maximum number of iterations.}
+\item{demandList}{A list containing the information about the demand distribution It has to have the same structure as the supplyList.}
 
 \item{epsVector}{A vector containing a decreasing sequence of epsilon values. If no epsilon scaling is needed a vector with a single 
 value can be used.}
+
+\item{maxIteration}{The maximum number of iterations.}
 
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-10.}
@@ -62,11 +62,18 @@ The default value is "euclidean".}
 The default value is "false".}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the cost matrix, a custom cost matrix can be passed to the algorithm.}
+
+\item{duals}{(optional) set to TRUE to return the optimal dual potentials}
+}
+\value{
+A list containing the transport plan ("TransportPlan") , the transport cost ("TransportCost"),
+ the maximum change of the dual potential in the last iteration ("converge") and if "duals" is set to TRUE, the dual potentials.
 }
 \description{
-This functions uses to scaling algorithm to solve the regularized unbalanced optimal transport problem.
+Solving regularized unbalanced optimal transport using the Scaling algorithm.
 }
 \details{
+This functions uses to scaling algorithm to solve the regularized unbalanced optimal transport problem. 
 The algorithm minimizes the regularized unbalanced optimal transport problem given by
 
 \eqn{\min_{r \in \!R^{X \times Y}_+} \cdot F_1(P_X r) + \cdot F_2(P_Y r) + \varepsilon KL(r|K)}{min_r F1(P_X r) +  F_2(P_Y r) + epsilon * KL(r|K)}
@@ -76,7 +83,7 @@ where F_X and F_Y are divergence functions, \eqn{P_X r} and \eqn{P_Y r} the marg
 
 
 The algorithm uses a stabilization method called log-domain stabilization to handle 
-small values for \eqn{\varepsilon}{epsilon} and epsilon scaling to accelerate the convergence 
+small values for \eqn{\varepsilon}{epsilon}, and epsilon scaling to accelerate the convergence 
 for those small values.
 
 Three divergence functions are available to use with this algorithm: 
@@ -87,10 +94,35 @@ Three divergence functions are available to use with this algorithm:
 }
 
 Instead of providing a cost matrix to the algorithm, it is possible to provide the support of the supply and demand measures and 
-have the function compute the cost matrix. Four additional parameters can be provided to define the cost matrix to compute. 
+have the function compute the cost matrix. 
 
 
 \insertRef{Chizat2016}{unbalancedTransport}
 
 \insertRef{Schmitzer2016}{unbalancedTransport}
+}
+\examples{
+
+
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+maxIter <- 2000
+epsvec <- 10^(seq(-1,-5,length.out = 10))
+
+
+suppList <- list(p, "KL", 0.04, X)
+demList <- list(q, "KL", 0.04, Y)
+res <- scalingAlgorithm(suppList, demList, maxIter, epsvec, exp = 2)
+plot1DTransport(res$TransportPlan, supply, demand)
+gridPlotTransport(res$TransportPlan)
+
+
 }
