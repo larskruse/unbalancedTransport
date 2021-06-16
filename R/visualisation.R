@@ -1,95 +1,155 @@
-#' Plotting transport between points given by a distance matrix
+#' Plotting transport between single points.
 #'
-#' @param distanceMatrix A numeric distance matrix.
-#' @param transportPlan A numeric matrix.
-#' @param supply A numeric vector.
-#' @param demand A numeric vector.
-#' @param creationDestructionCost A numeric vector giving the cost for mass creation and destruction.
+#' Visualizing mass transport between point clouds. 
+#' 
 #'
+#' @param transportPlan A non negative numeric matrix that indicates where the mass is
+#' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
+#' supply point \eqn{i} to demand point \eqn{j}.
+#' @param supply (optional) A non negative numeric vector giving the mass supply at each point. The value at 
+#' position \eqn{i} give the supply at point \eqn{i}.
+#' @param demand (optional) A non negative numeric vector giving the mass demand at each point. The value at 
+#' position \eqn{i} give the supply at point \eqn{i}.
+#' @param supplyCoordinates The coordinates of the supply points in matrix form. Each row giving the coordinates for one point.
+#' @param demandCoordinates The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.
+#' @param creationCost A non negative numeric vector containing the  cost for creating mass at each demand point.
+#' @param destructionCost A non negative numeric vector containing the cost for destruction mass at each supply point.
+#'
+#' @examples 
+#' 
+#' 
+#' supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
+#' demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
+#' 
+#' cC <- rep(1,3)
+#' cD <- rep(1.5,3)
+#' 
+#'  
+#' sup <- c(1,2,3)
+#' dem <- c(2,3,1)
+#' 
+#' plan <- matrix(rep(0,12), nrow = 3 )
+#' plan[1,3] <- 1
+#' plan[2,2] <- 1
+#' plan[2,3] <- 1
+#' plan[3,1] <- 1
+#' 
+#' 
+#' plotTransportPoints(plan, supply = sup, demand = dem,
+#'  supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
+#'     creationCost = cC, destructionCost = cD)
 #'
 #' @export
-plotTransportByCost <- function(distanceMatrix, transportPlan = NULL, supply = NULL, demand = NULL,  creationDestructionCost = rep(0, length(x))){
-
-    # calculate the positions
-    positions <- positionsByEigenvalue(distanceMatrix)
-    print("Coordinates:")
-    print(positions)
-
-    # if the positions are in 1 dimension, add a second by using a 0L vector as
-    # y coordinates
-    if(is.null(dim(positions))){
-        x <- positions
-        y <- rep(0, length(positions))
-
-    # otherwise, use the projection on the first two dimensions
+plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, supplyCoordinates = NULL, demandCoordinates = NULL,
+                                creationCost = NULL, destructionCost = NULL){
+    
+    if(is.null(creationCost)){
+        creationCost <- rep(0, ncol(transportPlan))
+    }
+    if(is.null(destructionCost)){
+        destructionCost <- rep(0, nrow(transportPlan))
+        
+    }
+    
+    if(is.null(dim(supplyCoordinates))){
+        
+        
+        xS <- supplyCoordinates
+        yS <- rep(0, length(supplyCoordinates))
+        
+        xD <- demandCoordinates
+        yD <- rep(0,length(demandCoordinates))
     }else{
-        x <- positions[,1]
-        y <- positions[,2]
+        xS <- supplyCoordinates[,1]
+        yS <- supplyCoordinates[,2]
+        
+        xD <- demandCoordinates[,1]
+        yD <- demandCoordinates[,2]
     }
-    dim <- length(x)
-
-    if(!is.null(supply) & !is.null(demand)){
-        supDem <- supply-demand
-    }
-
+    
+    
     # create an empty plot
     plot(1, type = "n", xlab = "", ylab = "",
-         xlim = c(min(x)-0.3*abs(max(x)-min(x)),max(x)+0.3*abs(max(x)-min(x))),
-         ylim =c(min(y)-0.3*abs(max(y)-min(y)),max(y)+0.3*abs(max(y)-min(y))),
+         xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
+         ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
          asp = 1)
-
-
+    
+    
+    if(!is.null(transportPlan)){
+        for(i in 1:length(xS)){
+            
+            for(j in 1:length(xD)){
+                
+                if(transportPlan[i,j] > 0){
+                    curvedarrow(c(xS[i],yS[i]),c(xD[j],yD[j]), lwd = 0.5+transportPlan[[i,j]],
+                                arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
+                                curve = 0.2, lcol = "red", arr.col = "red")
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+    
+    
+    points(c(xS,xD), c(yS,yD) , pch = 1)
+    points(xS[which(supply > 0 )],yS[which(supply > 0)],
+           pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
+    points(xD[which(demand > 0 )],yD[which(demand > 0)], pch = 19,
+           cex = abs(demand[which(demand > 0)]),  col = "dodgerblue3")
+    
+    
     # if a transport plan is given, add arrows to indicate mass transport
     if(!is.null(transportPlan)){
-
+        
         # plot circles as indicators for the creation/destruction cost
         theta = seq(0, 2 * pi, length = 200)
-        for (i in 1:dim){
-            lines(x = creationDestructionCost[i] * cos(theta) + x[i], y = creationDestructionCost[i] * sin(theta) + y[i], col = "grey")
-
-            for (j in 1:dim){
-                if (transportPlan[[i,j]]>0 && i != j){
-                    curvedarrow(c(x[i],y[i]),c(x[j],y[j]), lwd = 0.5+transportPlan[[i,j]],
-                                         arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
-                                         curve = 0.2)
-                }
-            }
+        
+        for(i in 1:length(xS)){
+            
+            lines(x = destructionCost[i]*cos(theta) + xS[i], y = destructionCost[i]*sin(theta) + yS[i])
+            
         }
+        
+        for(i in 1:length(xD)){
+            lines(x = creationCost[i]*cos(theta) + xD[i], y = creationCost[i]*sin(theta) + yD[i])
+        }
+        
     }
-
-    # add the points
-    if(is.null(supply) | is.null(demand)){
-        points(x, y ,pch = 19 )
-
-
-    }else{
-
-        # if supply and demand values are given, the color indicates the supply
-        # and the size indicates the mass at each point
-
-        points(x[which(supDem == 0 )],y[which(supDem == 0)],  pch = 19 )
-
-        points(x[which(supDem > 0 )],y[which(supDem > 0)],
-               pch = 19, cex = supDem[which(supDem > 0)],  col = "chartreuse3")
-
-        points(x[which(supDem < 0 )],y[which(supDem < 0)],
-               pch = 19, cex = abs(supDem[which(supDem < 0)]),  col = "dodgerblue3")
-
-
-    }
-
+    
 }
 
 
-#' Plotting an unbalanced optimal transport plan
+#' A grid plot of the transport plan
 #'
-#' @param transportPlan A numeric matrix.
-#' @param import A numeric vector.
-#' @param export A numeric vector.
+#' Creates a grid plot of a transport plan. 
+#' 
+#' This function creates a grid plot of the transport plan. Import and export
+#' vectors can be given as additional arguments. These will be plotted along the sides of the grid 
+#' plot in order to indicate where mass is added or removed. Therefore, the mass shown in
+#' each row or column is equal to the supply or demand vector. 
 #'
+#' @param transportPlan A non negative numeric matrix that indicates the mass transport.
+#' The value at \eqn{\[i,j\]} is the amount of mass transported from supply point \eqn{i} to demand point \eqn{j}.
+#' @param import (optional) A non negative numeric vector that give the amount of mass created at each
+#' demand point. It length has to be equal to the number of columns in the transport matrix.  
+#' @param export (optional) A non negative numeric vector that give the amount of mass destroyed  at each
+#' supply point. It length has to be equal to the number of rows in the transport matrix.  
+#'
+#' @examples
+#' 
+#' transport <- matrix(runif(9), nrow = 3)
+#' import <- runif(3)
+#' export <- runif(3)
+#' 
+#' plotGridTransport(transport)
+#' plotGridTransport(transport, import, export)
 #'
 #' @export
-plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
+plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 
     # If no import or export vector is given, only the transport plan is plotted
     if(is.null(import) | is.null(export)){
@@ -141,18 +201,39 @@ plotUOTP <- function(transportPlan, import = NULL, export =  NULL){
 
 
 #' Plotting dense 1D transport
+#' 
+#' A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D. 
 #'
-#' @param transportMap A numeric matrix.
-#' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
-#'  a numeric supply vector, the reference measure as numeric vector and the
-#'  value for the lambda parameter.
-#' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
-#'  a numeric demand vector, the reference measure as numeric vector and the
-#'  value for the lambda parameter.
+#' @param transportPlan A non negative numeric matrix giving the mass transport. The value at \eqn{(i,j)}
+#' gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.
+#' @param supplyList A list containing the non negative supply measure and the underlying discretization as vectors.
+#' @param demandList A list containing the non negative demand measure and the underlying discretization as vectors.
 #'
+#' @examples 
+#' 
+#' I <- 1000
+#' J <- 1000
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample
+#' q <- demandExample
+#'
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
+#'
+#' maxIter <- 2000
+#' eps <- 1e-3
+#' 
+#'
+#' suppList <- list(p, "KL", 0.04, X)
+#' demList <- list(q, "KL", 0.04, Y)
+#' res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
+#' 
+#' plot1DTransport(res$TransportPlan, supply, demand)
+#' 
 #'
 #' @export
-plot1DTransport <- function(transportMap,supplyList, demandList){
+plot1DTransport <- function(transportPlan, supplyList, demandList){
 
     # Number of color intervals
     numIntervals <- 50
@@ -164,9 +245,11 @@ plot1DTransport <- function(transportMap,supplyList, demandList){
 
     colors <- rainbow(numIntervals, s = 1, v = 1, start = 0, end = max(1, numIntervals - 1)/numIntervals, alpha = 1, rev = FALSE)
 
-    ymax <- max(supplyList[[1]], demandList[[1]], t(transportMap) %*% x1Measure, transportMap %*% y1Measure)
+    ymax <- max(supplyList[[1]], demandList[[1]], t(transportPlan) %*% x1Measure, transportPlan %*% y1Measure)
 
     # Plotting the supply and demand measures
+    # plot(1, type = "n", xlab = "", ylab = "", xlim = c(min(X), max(X)), ylim= c(0, ymax))
+    
     plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", ylim= c(0, ymax), xlab = "Position", ylab = "Mass")
     lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
 
@@ -181,23 +264,23 @@ plot1DTransport <- function(transportMap,supplyList, demandList){
         colSuppInter[(i-1)/numIntervals > X | i/numIntervals < X] <- 0
 
         # Restricting the transport map on the interval
-        subK <- transportMap * colSuppInter
+        subK <- transportPlan * colSuppInter
 
         # Adding the color intervals
-        #lines(supplyList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
-        #lines(demandList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
+        #lines(demandList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
+        #lines(supplyList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
 
-        polygon(c(firstSupp,supplyList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
-        polygon(c(firstDem,demandList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
+        polygon(c(firstDem,demandList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
+        polygon(c(firstSupp,supplyList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
 
-        lines(supplyList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
-        lines(demandList[[2]], subK %*% y1Measure, type = "l", col = "black")
+        #lines(demandList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
+        #lines(supplyList[[2]], subK %*% y1Measure, type = "l", col = "black")
 
     }
 
-    lines(supplyList[[2]], t(transportMap) %*% x1Measure, type = "l", col = "red")
-    lines(demandList[[2]], transportMap %*% y1Measure, type = "l", col = "blue")
-
+    lines(demandList[[2]], t(transportPlan) %*% x1Measure, type = "l", col = "red")
+    lines(supplyList[[2]], transportPlan %*% y1Measure, type = "l", col = "blue")
+    # 
     lines(supplyList[[2]], rep(0, length(supplyList[[2]])), type = "l", col = "black")
 
 
@@ -284,18 +367,21 @@ findPath <- function(from, to, treeDF){
 }
 
 
-#' Tree plot
+#' Plotting transport on trees
 #'
-#' Plotting a tree structure. Supply and demand values as well as the transport plan
-#' can be plotted in one graph.
+#' This function visualizes the transport of mass on a tree. 
 #'
-#' @param tree A tree in list format: The root node followed by multiple vectors of the form
-#' (parent, child, weight)
-#' @param tList The transport list (optional)
-#' @param supply A numeric supply vector (optional)
-#' @param demand A numeric demand vector (optional)
+#' @param tree A tree structure in list format:
+#' The first element is the index of the root node.
+#' The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
+#'  of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.
+#' @param tList (optional) The mass transport as list. Each element is a vector of the form
+#'  \eqn{(source_node_index, target_node_index, mass)}.
+#' @param supply (optional) A non negative numeric vector giving the mass supply at each tree node. The value at 
+#' position \eqn{i} give the supply at node \eqn{i}.
+#' @param demand (optional) A non negative numeric vector giving the mass demand at each tree node. The value at 
+#' position \eqn{i} give the supply at node \eqn{i}.
 #'
-#' @export
 #'
 #' @examples
 #' tree <- list(1, c(1, 2, 1), c(2, 3, 1), c(3, 4, 1), c(3, 5, 1),
@@ -314,7 +400,8 @@ findPath <- function(from, to, treeDF){
 #' tList = list(c(3,6,1), c(4,8,1))
 #' plotTree(tree, tList, supply, demand)
 #'
-#'
+#' @export
+
 plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
 
     if(length(tList) == 0){
@@ -471,23 +558,4 @@ plotTree <- function(tree, tList = NULL , supply = NULL, demand = NULL){
 
 }
 
-
-
-
-
-#' Plotting dense 1D transport
-#'
-#' @param transportMap A numeric matrix.
-#' @param supplyList A supply list containing the divergence to use (either "KL" or "TV"),
-#'  a numeric supply vector, the reference measure as numeric vector and the
-#'  value for the lambda parameter.
-#' @param demandList A demand list containing the divergence to use (either "KL" or "TV"),
-#'  a numeric demand vector, the reference measure as numeric vector and the
-#'  value for the lambda parameter.
-#'
-#'
-#' @export
-plot2DTransport <- function(transportMap,supplyList, demandList){
-    
-}
 

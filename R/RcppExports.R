@@ -100,7 +100,7 @@ NULL
 #'
 #' @return The optimal transport plan
 #' @noRd
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-10) {
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-8) {
     .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
@@ -192,8 +192,8 @@ lambertInit <- function(x) {
 #'
 #' @return The optimal transport plan
 #' @noRd
-Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol) {
-    .Call(`_unbalancedTransport_Sinkhorn_Rcpp`, costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, eps, tol)
+Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol) {
+    .Call(`_unbalancedTransport_Sinkhorn_Rcpp`, costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
 #' The symmetric stabilized Scaling Algorithm

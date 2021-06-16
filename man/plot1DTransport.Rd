@@ -4,19 +4,40 @@
 \alias{plot1DTransport}
 \title{Plotting dense 1D transport}
 \usage{
-plot1DTransport(transportMap, supplyList, demandList)
+plot1DTransport(transportPlan, supplyList, demandList)
 }
 \arguments{
-\item{transportMap}{A numeric matrix.}
+\item{transportPlan}{A non negative numeric matrix giving the mass transport. The value at \eqn{(i,j)}
+gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.}
 
-\item{supplyList}{A supply list containing the divergence to use (either "KL" or "TV"),
-a numeric supply vector, the reference measure as numeric vector and the
-value for the lambda parameter.}
+\item{supplyList}{A list containing the non negative supply measure and the underlying discretization as vectors.}
 
-\item{demandList}{A demand list containing the divergence to use (either "KL" or "TV"),
-a numeric demand vector, the reference measure as numeric vector and the
-value for the lambda parameter.}
+\item{demandList}{A list containing the non negative demand measure and the underlying discretization as vectors.}
 }
 \description{
-Plotting dense 1D transport
+A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D.
+}
+\examples{
+
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+maxIter <- 2000
+eps <- 1e-3
+
+
+suppList <- list(p, "KL", 0.04, X)
+demList <- list(q, "KL", 0.04, Y)
+res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
+
+plot1DTransport(res$TransportPlan, supply, demand)
+
+
 }
