@@ -303,8 +303,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     int Nx = supply.length();
     int Ny = demand.length();
     
-    Rcpp::Rcout << "Nx: " << Nx << "\n";
-    Rcpp::Rcout << "Ny: " << Ny << "\n";
+   
     
     double converge;
     
@@ -314,10 +313,6 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     // initializing vectors
     Rcpp::NumericVector f = init_vectors(lambdaSupply, costMatrix, supply, demand, DivSupply, param1Supply, param2Supply, Nx, Ny, eps);
     Rcpp::NumericVector g = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
-    
-    
-    Rcpp::Rcout << "f: " << f.size() << "\n";
-    Rcpp::Rcout << "g: " << g.size() << "\n";
     
     
     // Rcpp::Rcout << "init: \n" << "f: " << f << "\n" << "g: " << g << "\n\n";
@@ -386,7 +381,6 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         if((static_cast<double>(k)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.length())){
             epsind = epsind + 1;
             eps = epsvec(epsind);
-            Rcpp::Rcout << "eps: " << eps << "\n";
         }
         
         
@@ -416,8 +410,6 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     
     
     
-    Rcpp::Rcout << "f: " << f.size() << "\n";
-    Rcpp::Rcout << "g: " << g.size() << "\n";
 
     // returnING the transport plan
     // since the absorbtion is called in the last iteration of the loop,

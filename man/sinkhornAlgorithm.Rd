@@ -120,7 +120,7 @@ suppList <- list(p, "KL", 0.04, X)
 demList <- list(q, "KL", 0.04, Y)
 res <- sinkhornAlgorithm(suppList, demList, eps, maxIter,  exp = 2)
 plot1DTransport(res$TransportPlan, supply, demand)
-gridPlotTransport(res$TransportPlan)
+plotGridTransport(res$TransportPlan)
 
 
 }

@@ -2,23 +2,7 @@
 % Please edit documentation in R/SinkhornDivergence.R
 \name{sinkhorn_divergence}
 \alias{sinkhorn_divergence}
-\title{Sinkhorn Divergence
-
-Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
-
-
-A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
-For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
-\eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
-\frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
-= OT_eps(a,b) - 0.5 OT_eps(a,a) - 0.5 OT_eps(b,b) + 0.5*eps (m(a) - m(b))²}
-
-with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
-and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
-
-The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
-
-\insertRef{Sejourne2019}{unbalancedTransport}}
+\title{Sinkhorn Divergence}
 \usage{
 sinkhorn_divergence(
   supplyList,
@@ -90,11 +74,9 @@ The default value is "false".}
 The Sinkhorn divergence.
 }
 \description{
-Sinkhorn Divergence
-
 Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
-
-
+}
+\details{
 A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
 \eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -

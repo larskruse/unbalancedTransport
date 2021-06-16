@@ -2,21 +2,7 @@
 % Please edit documentation in R/SinkhornDivergence.R
 \name{hausdorff_divergence}
 \alias{hausdorff_divergence}
-\title{Hausdorff Divergence
-
-Calculating the Hausdorff divergence.
-
-This function calculates the Hausdorff divergence using the dual optimal optimal potentials
-calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
-The Hausdorff divergence is defined as 
-\eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
-\nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
-with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
-\eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
-\frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
-
-
-\insertRef{Sejourne2019}{unbalancedTransport}}
+\title{Hausdorff Divergence}
 \usage{
 hausdorff_divergence(
   supplyList,
@@ -88,10 +74,9 @@ The default value is "false".}
 The Hausdorff divergence.
 }
 \description{
-Hausdorff Divergence
-
 Calculating the Hausdorff divergence.
-
+}
+\details{
 This function calculates the Hausdorff divergence using the dual optimal optimal potentials
 calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 The Hausdorff divergence is defined as 

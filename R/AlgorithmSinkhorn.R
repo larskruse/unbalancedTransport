@@ -94,7 +94,7 @@
 #' demList <- list(q, "KL", 0.04, Y)
 #' res <- sinkhornAlgorithm(suppList, demList, eps, maxIter,  exp = 2)
 #' plot1DTransport(res$TransportPlan, supply, demand)
-#' gridPlotTransport(res$TransportPlan)
+#' plotGridTransport(res$TransportPlan)
 #'
 #'
 #' @export
@@ -198,10 +198,7 @@ sinkhornAlgorithm <- function(supplyList, demandList, epsVector, maxIteration = 
     
     TransportPlan <- res$TransportPlan*(supply %*% t(demand))
     
-    
-    print(length(res$dual_f))
-    print(length(res$dual_g))
-    
+
     
     # calcuated transport cost
     

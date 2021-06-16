@@ -120,9 +120,9 @@ epsvec <- 10^(seq(-1,-5,length.out = 10))
 
 suppList <- list(p, "KL", 0.04, X)
 demList <- list(q, "KL", 0.04, Y)
-res <- scalingAlgorithm(suppList, demList, maxIter, epsvec, exp = 2)
+res <- scalingAlgorithm(suppList, demList, epsvec, maxIter, exp = 2)
 plot1DTransport(res$TransportPlan, supply, demand)
-gridPlotTransport(res$TransportPlan)
+plotGridTransport(res$TransportPlan)
 
 
 }

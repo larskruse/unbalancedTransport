@@ -2,20 +2,7 @@
 % Please edit documentation in R/SinkhornDivergence.R
 \name{regularized_ot}
 \alias{regularized_ot}
-\title{Regularized transport cost
-
-Calculating the regularized transport cost.
-
-This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
-The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
-<\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}
-
-with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b}, optimal dual potentials \eqn{f} and \eqn{g}, 
-Legendre transforms of the divergence function \eqn{\phi^*}, cost matrix \eqn{C} and regularization parameter \eqn{\varepsilon}{eps}.
-
-
-
-\insertRef{Sejourne2019}{unbalancedTransport}}
+\title{Regularized transport cost}
 \usage{
 regularized_ot(
   supplyList,
@@ -81,10 +68,9 @@ The default value is "false".}
 The regularized transport cost.
 }
 \description{
-Regularized transport cost
-
 Calculating the regularized transport cost.
-
+}
+\details{
 This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
 <\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}

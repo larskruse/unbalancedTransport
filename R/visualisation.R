@@ -1,7 +1,7 @@
 #' Plotting transport between single points.
 #'
-#' Visualizing mass transport between point clouds. The coordinates can either be given directly or calculated from a given
-#' distance matrix. 
+#' Visualizing mass transport between point clouds. 
+#' 
 #'
 #' @param transportPlan A non negative numeric matrix that indicates where the mass is
 #' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
@@ -10,87 +10,116 @@
 #' position \eqn{i} give the supply at point \eqn{i}.
 #' @param demand (optional) A non negative numeric vector giving the mass demand at each point. The value at 
 #' position \eqn{i} give the supply at point \eqn{i}.
-#' @param creationDestructionCost (optional) A numeric vector giving the cost for mass creation and destruction.
-#' @param distanceMatrix (optional) A non negative matrix containing the distances between all points. It is used
-#' to calcuated the positions of the points if they are not explicitly given.
+#' @param supplyCoordinates The coordinates of the supply points in matrix form. Each row giving the coordinates for one point.
+#' @param demandCoordinates The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.
+#' @param creationCost A non negative numeric vector containing the  cost for creating mass at each demand point.
+#' @param destructionCost A non negative numeric vector containing the cost for destruction mass at each supply point.
+#'
+#' @examples 
+#' 
+#' 
+#' supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
+#' demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
+#' 
+#' cC <- rep(1,3)
+#' cD <- rep(1.5,3)
+#' 
+#'  
+#' sup <- c(1,2,3)
+#' dem <- c(2,3,1)
+#' 
+#' plan <- matrix(rep(0,12), nrow = 3 )
+#' plan[1,3] <- 1
+#' plan[2,2] <- 1
+#' plan[2,3] <- 1
+#' plan[3,1] <- 1
+#' 
+#' 
+#' plotTransportPoints(plan, supply = sup, demand = dem,
+#'  supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
+#'     creationCost = cC, destructionCost = cD)
 #'
 #' @export
-plotTransportByCost <- function(transportPlan, supply = NULL, demand = NULL, supplyCoordinates = NULL, demandCoordinates = NULL,
-                                distanceMatrix = NULL,  creationDestructionCost = rep(0, length(x))){
-
-    # calculate the positions
-        
-    positions <- positionsByEigenvalue(distanceMatrix)    
-        
+plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, supplyCoordinates = NULL, demandCoordinates = NULL,
+                                creationCost = NULL, destructionCost = NULL){
     
+    if(is.null(creationCost)){
+        creationCost <- rep(0, ncol(transportPlan))
+    }
+    if(is.null(destructionCost)){
+        destructionCost <- rep(0, nrow(transportPlan))
+        
+    }
     
-    positions <- positionsByEigenvalue(distanceMatrix)
-    print("Coordinates:")
-    print(positions)
-
-    # if the positions are in 1 dimension, add a second by using a 0L vector as
-    # y coordinates
-    if(is.null(dim(positions))){
-        x <- positions
-        y <- rep(0, length(positions))
-
-    # otherwise, use the projection on the first two dimensions
+    if(is.null(dim(supplyCoordinates))){
+        
+        
+        xS <- supplyCoordinates
+        yS <- rep(0, length(supplyCoordinates))
+        
+        xD <- demandCoordinates
+        yD <- rep(0,length(demandCoordinates))
     }else{
-        x <- positions[,1]
-        y <- positions[,2]
+        xS <- supplyCoordinates[,1]
+        yS <- supplyCoordinates[,2]
+        
+        xD <- demandCoordinates[,1]
+        yD <- demandCoordinates[,2]
     }
-    dim <- length(x)
-
-    if(!is.null(supply) & !is.null(demand)){
-        supDem <- supply-demand
-    }
-
+    
+    
     # create an empty plot
     plot(1, type = "n", xlab = "", ylab = "",
-         xlim = c(min(x)-0.3*abs(max(x)-min(x)),max(x)+0.3*abs(max(x)-min(x))),
-         ylim =c(min(y)-0.3*abs(max(y)-min(y)),max(y)+0.3*abs(max(y)-min(y))),
+         xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
+         ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
          asp = 1)
-
-
+    
+    
+    if(!is.null(transportPlan)){
+        for(i in 1:length(xS)){
+            
+            for(j in 1:length(xD)){
+                
+                if(transportPlan[i,j] > 0){
+                    curvedarrow(c(xS[i],yS[i]),c(xD[j],yD[j]), lwd = 0.5+transportPlan[[i,j]],
+                                arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
+                                curve = 0.2, lcol = "red", arr.col = "red")
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+    
+    
+    points(c(xS,xD), c(yS,yD) , pch = 1)
+    points(xS[which(supply > 0 )],yS[which(supply > 0)],
+           pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
+    points(xD[which(demand > 0 )],yD[which(demand > 0)], pch = 19,
+           cex = abs(demand[which(demand > 0)]),  col = "dodgerblue3")
+    
+    
     # if a transport plan is given, add arrows to indicate mass transport
     if(!is.null(transportPlan)){
-
+        
         # plot circles as indicators for the creation/destruction cost
         theta = seq(0, 2 * pi, length = 200)
-        for (i in 1:dim){
-            lines(x = creationDestructionCost[i] * cos(theta) + x[i], y = creationDestructionCost[i] * sin(theta) + y[i], col = "grey")
-
-            for (j in 1:dim){
-                if (transportPlan[[i,j]]>0 && i != j){
-                    curvedarrow(c(x[i],y[i]),c(x[j],y[j]), lwd = 0.5+transportPlan[[i,j]],
-                                         arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
-                                         curve = 0.2)
-                }
-            }
+        
+        for(i in 1:length(xS)){
+            
+            lines(x = destructionCost[i]*cos(theta) + xS[i], y = destructionCost[i]*sin(theta) + yS[i])
+            
         }
+        
+        for(i in 1:length(xD)){
+            lines(x = creationCost[i]*cos(theta) + xD[i], y = creationCost[i]*sin(theta) + yD[i])
+        }
+        
     }
-
-    # add the points
-    if(is.null(supply) | is.null(demand)){
-        points(x, y ,pch = 19 )
-
-
-    }else{
-
-        # if supply and demand values are given, the color indicates the supply
-        # and the size indicates the mass at each point
-
-        points(x[which(supDem == 0 )],y[which(supDem == 0)],  pch = 19 )
-
-        points(x[which(supDem > 0 )],y[which(supDem > 0)],
-               pch = 19, cex = supDem[which(supDem > 0)],  col = "chartreuse3")
-
-        points(x[which(supDem < 0 )],y[which(supDem < 0)],
-               pch = 19, cex = abs(supDem[which(supDem < 0)]),  col = "dodgerblue3")
-
-
-    }
-
+    
 }
 
 

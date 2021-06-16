@@ -87,10 +87,10 @@ expC <- function(f, g, C){
 
 #' @title Sinkhorn Divergence
 #' 
-#' Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
+#' @description Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 #' 
 #' 
-#' A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
+#' @details  A function to calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
 #' For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn divergence is defined as 
 #' \eqn{S_{\varepsilon} = OT_\varepsilon(\alpha,\beta) - \frac{1}{2}OT_\varepsilon(\alpha,\alpha) -
 #' \frac{1}{2}OT_\varepsilon(\beta,\beta) + \frac{\varepsilon}{2}(m(\alpha) - m(\beta))^2 }{S_eps(a,b) 
@@ -199,11 +199,11 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
         
     }
     
-    res_xy <- sinkhornAlgorithm(supplyList, demandList, iterMax, eps, tol, costMatrix = Cxy, duals = TRUE)
-    res_x <- sinkhornAlgorithm(supplyList, supplyList, iterMax, eps, tol, costMatrix = Cxx, duals = TRUE)
-    res_y <- sinkhornAlgorithm(demandList, demandList, iterMax, eps, tol, costMatrix = Cyy, duals = TRUE)
+    res_xy <- sinkhornAlgorithm(supplyList, demandList, eps, iterMax, tol, costMatrix = Cxy, duals = TRUE)
+    res_x <- sinkhornAlgorithm(supplyList, supplyList, eps, iterMax, tol, costMatrix = Cxx, duals = TRUE)
+    res_y <- sinkhornAlgorithm(demandList, demandList, eps, iterMax, tol, costMatrix = Cyy, duals = TRUE)
     
-    print(res_xy)
+    # print(res_xy)
     
     f_xy <- res_xy$dual_f
     g_xy <- res_xy$dual_g
@@ -215,20 +215,29 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
     g_y2 <- res_y$dual_g
     
     
+    # print(f_xy)
+    # print(g_xy)
+    # print(f_x1)
+    # print(f_x2)
+    # print(g_y1)
+    # print(g_y2)
 
-    print(f_xy)
-    
-    
+
     if(supplyList[[2]] == "TV"){
         
         
         func <- sum(supplyList[[1]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)) + sum(demandList[[1]] * (g_xy - 0.5*g_y1 -0.5*g_y2))
         
-        
+        # print("funcs")
+        # print(func)
+        # 
         supxdem <- supplyList[[1]] %*% t(demandList[[1]])
         supxsup <- supplyList[[1]] %*% t(supplyList[[1]])
         demxdem <- demandList[[1]] %*% t(demandList[[1]])
         
+        # print(sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        # print(0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
+        # print(0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
 
         func <- func + sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
             0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
@@ -247,12 +256,22 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
         supxsup <- supplyList[[1]] %*% t(supplyList[[1]])
         demxdem <- demandList[[1]] %*% t(demandList[[1]])
         
-        
-       
-        func <- sum(supplyList[[2]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)-
+        # print("funcs")
+        # print(sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)-
+        #                                  0.5 * (-legendre_entropy(0, -f_x1, supplyList[[2]], param1, param2))-
+        #                                  0.5 * (-legendre_entropy(0, -f_x2, supplyList[[2]], param1, param2)))))
+        # print(sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2) -
+        #                                  0.5 * (-legendre_entropy(0, -g_y1, supplyList[[2]], param1, param2)) -
+        #                                  0.5 * (-legendre_entropy(0, -g_y2, supplyList[[2]], param1, param2)))))
+        # 
+        # print(sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
+        # print(0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
+        # print(0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
+        # 
+        func <- sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)-
                                           0.5 * (-legendre_entropy(0, -f_x1, supplyList[[2]], param1, param2))-
                                           0.5 * (-legendre_entropy(0, -f_x2, supplyList[[2]], param1, param2)))) +
-                                        sum(demandList[[2]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2) -
+                                        sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2) -
                                             0.5 * (-legendre_entropy(0, -g_y1, supplyList[[2]], param1, param2)) -
                                             0.5 * (-legendre_entropy(0, -g_y2, supplyList[[2]], param1, param2))))
                   
@@ -286,13 +305,15 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
             param1 <- supplyList[[4]]
         }
         
-        
+        # print("funcs")
         
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
         outf_xx <- -legendre_entropy(supplyList[[3]], -f_x1, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_x1, supplyList[[2]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
         outg_yy <- -legendre_entropy(supplyList[[3]], -g_y1, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_y1, supplyList[[2]], param1)
       
+        # print(sum(supplyList[[1]]*(outf_xy-outf_xx)))
+        # print(sum(demandList[[1]] * (outg_xy - outg_yy)))
         
         func <- sum(supplyList[[1]]*(outf_xy-outf_xx)) + sum(demandList[[1]] * (outg_xy - outg_yy))
         
@@ -309,9 +330,9 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
 
 #' @title Regularized transport cost
 #' 
-#' Calculating the regularized transport cost.
+#' @description Calculating the regularized transport cost.
 #' 
-#' This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+#' @details This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 #' The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
 #' <\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}
 #' 
@@ -398,7 +419,7 @@ regularized_ot <- function(supplyList, demandList, eps, iterMax = 5000, tol = 1e
         
     }
     
-    res_xy <- sinkhornAlgorithm(supplyList, demandList, maxIteration, eps, tol, costMatrix = Cxy, duals = TRUE)
+    res_xy <- sinkhornAlgorithm(supplyList, demandList, eps, iterMax, tol = tol, costMatrix = Cxy, duals = TRUE)
     
     f_xy <- res_xy$dual_f
     g_xy <- res_xy$dual_g
@@ -406,18 +427,12 @@ regularized_ot <- function(supplyList, demandList, eps, iterMax = 5000, tol = 1e
   
     if(supplyList[[2]] == "TV"){
   
-        
-        print("funcs")
-        print(sum(supplyList[[1]] * f_xy))
-        print(sum(demandList[[1]] * g_xy))
+      
         
         func = sum(supplyList[[1]] * f_xy) + sum(demandList[[1]] * g_xy)
       
-        print(func)
         
         expFun <- supplyList[[1]] %*% t(demandList[[1]]) * (1-exp(expC(f_xy,g_xy,Cxy)/eps))
-        print(expFun)
-        print(sum(eps * expFun))
         
         func <- func + sum(eps * expFun)
         return(func)
@@ -592,23 +607,23 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
         outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
         
-        print("funcs")
-
-        print(-legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0))
-        print(- 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1))
-        print(-legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0))
-        print(- 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1))
+        # print("funcs")
+        # 
+        # print(-legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0))
+        # print(- 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1))
+        # print(-legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0))
+        # print(- 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1))
         
         
         outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
         outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
         
-        print(supplyList[[1]] * outf_xy)
-        print(demandList[[1]] * outg_xy)
-
-        print(sum(supplyList[[1]] * outf_xy))
-        print(sum(demandList[[1]] * outg_xy))
-        print(eps*(sum(supplyList[[1]]) * sum(demandList[[1]])))
+        # print(supplyList[[1]] * outf_xy)
+        # print(demandList[[1]] * outg_xy)
+        # 
+        # print(sum(supplyList[[1]] * outf_xy))
+        # print(sum(demandList[[1]] * outg_xy))
+        # print(eps*(sum(supplyList[[1]]) * sum(demandList[[1]])))
                 
         res = sum(supplyList[[1]] * outf_xy) + sum(demandList[[1]] * outg_xy) + 
             eps*(sum(supplyList[[1]]) * sum(demandList[[1]]))
@@ -629,9 +644,9 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 
 #' @title Hausdorff Divergence
 #' 
-#' Calculating the Hausdorff divergence.
+#' @description Calculating the Hausdorff divergence.
 #' 
-#' This function calculates the Hausdorff divergence using the dual optimal optimal potentials
+#' @details This function calculates the Hausdorff divergence using the dual optimal optimal potentials
 #' calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
 #' The Hausdorff divergence is defined as 
 #' \eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
@@ -742,8 +757,8 @@ hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, to
     demand <- demandList[[1]]
 
 
-    res_x = sinkhornAlgorithm(supplyList, supplyList, iterMax, eps, tol, costMatrix = Cxx, duals = TRUE)
-    res_y = sinkhornAlgorithm(demandList, demandList, iterMax, eps, tol, costMatrix = Cyy, duals = TRUE)
+    res_x = sinkhornAlgorithm(supplyList, supplyList, eps, iterMax, tol, costMatrix = Cxx, duals = TRUE)
+    res_y = sinkhornAlgorithm(demandList, demandList, eps, iterMax, tol, costMatrix = Cyy, duals = TRUE)
 
     f_x = res_x$dual_f
     g_x = res_x$dual_g
