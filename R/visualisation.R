@@ -2,6 +2,9 @@
 #'
 #' Visualizing mass transport between point clouds. 
 #' 
+#' \if{html}{\figure{plotTransportPoints.png}}
+#' \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
+#' 
 #'
 #' @param transportPlan A non negative numeric matrix that indicates where the mass is
 #' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
@@ -12,42 +15,40 @@
 #' position \eqn{i} give the supply at point \eqn{i}.
 #' @param supplyCoordinates The coordinates of the supply points in matrix form. Each row giving the coordinates for one point.
 #' @param demandCoordinates The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.
-#' @param creationCost A non negative numeric vector containing the  cost for creating mass at each demand point.
-#' @param destructionCost A non negative numeric vector containing the cost for destruction mass at each supply point.
+#' @param costCreate A non negative numeric vector containing the  cost for creating mass at each demand point.
+#' @param costDestruct A non negative numeric vector containing the cost for destruction mass at each supply point.
 #'
+#' 
 #' @examples 
 #' 
+#' supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
+#' demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 #' 
-#' supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
-#' demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
-#' 
-#' cC <- rep(1,3)
-#' cD <- rep(1.5,3)
-#' 
-#'  
-#' sup <- c(1,2,3)
-#' dem <- c(2,3,1)
-#' 
-#' plan <- matrix(rep(0,12), nrow = 3 )
-#' plan[1,3] <- 1
-#' plan[2,2] <- 1
-#' plan[2,3] <- 1
-#' plan[3,1] <- 1
+#' cC <- rep(1.8,2)
+#' cD <- rep(2,2)
 #' 
 #' 
-#' plotTransportPoints(plan, supply = sup, demand = dem,
-#'  supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
-#'     creationCost = cC, destructionCost = cD)
+#' sup <- c(1,2)
+#' dem <- c(2.5,1)
+#' 
+#' res <- BalancedExtensionSolver(list(sup, cD,supplyPoints), list(dem, cC, demandPoints))
+#' transportPlan <- res$transportPlan
+#' 
+#' plotTransportPoints(transportPlan, supply = sup, demand = dem,
+#'                     supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
+#'                     costCreate = cC, costDestruct = cD)
+#'
 #'
 #' @export
-plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, supplyCoordinates = NULL, demandCoordinates = NULL,
-                                creationCost = NULL, destructionCost = NULL){
+plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
+                                supplyCoordinates = NULL, demandCoordinates = NULL,
+                                costCreate = NULL, costDestruct = NULL){
     
-    if(is.null(creationCost)){
-        creationCost <- rep(0, ncol(transportPlan))
+    if(is.null(costCreate)){
+        costCreate <- rep(0, ncol(transportPlan))
     }
-    if(is.null(destructionCost)){
-        destructionCost <- rep(0, nrow(transportPlan))
+    if(is.null(costDestruct)){
+        costDestruct <- rep(0, nrow(transportPlan))
         
     }
     
@@ -110,12 +111,12 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, sup
         
         for(i in 1:length(xS)){
             
-            lines(x = destructionCost[i]*cos(theta) + xS[i], y = destructionCost[i]*sin(theta) + yS[i])
+            lines(x = costDestruct[i]*cos(theta) + xS[i], y = costDestruct[i]*sin(theta) + yS[i], col = 'chartreuse3')
             
         }
         
         for(i in 1:length(xD)){
-            lines(x = creationCost[i]*cos(theta) + xD[i], y = creationCost[i]*sin(theta) + yD[i])
+            lines(x = costCreate[i]*cos(theta) + xD[i], y = costCreate[i]*sin(theta) + yD[i], col = 'dodgerblue3')
         }
         
     }
@@ -132,6 +133,9 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, sup
 #' plot in order to indicate where mass is added or removed. Therefore, the mass shown in
 #' each row or column is equal to the supply or demand vector. 
 #'
+#' \if{html}{\figure{Grid.png}}
+#' \if{latex}{\figure{Grid.png}{options: width=0.5in}}
+#'
 #' @param transportPlan A non negative numeric matrix that indicates the mass transport.
 #' The value at \eqn{\[i,j\]} is the amount of mass transported from supply point \eqn{i} to demand point \eqn{j}.
 #' @param import (optional) A non negative numeric vector that give the amount of mass created at each
@@ -140,13 +144,25 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL, sup
 #' supply point. It length has to be equal to the number of rows in the transport matrix.  
 #'
 #' @examples
+#' I <- 200
+#' J <- 200
+#' X <- seq(0,1,length.out = I)
+#' Y <- seq(0,1,length.out = J)
+#' p <- supplyExample[seq(0,1000,by = 1000/I)]
+#' q <- demandExample[seq(0,1000, by = 1000/J)]
 #' 
-#' transport <- matrix(runif(9), nrow = 3)
-#' import <- runif(3)
-#' export <- runif(3)
+#' supply <- list(p,X)
+#' demand <- list(q,Y)
 #' 
-#' plotGridTransport(transport)
-#' plotGridTransport(transport, import, export)
+#' maxIter <- 2000
+#' eps <- 1e-3
+#' 
+#' 
+#' suppyDiv <- list("KL", 0.04)
+#' demandDiv <- list("KL", 0.04)
+#' res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
+#'                             maxIteration = maxIter, epsVector = eps, p = 2)
+#' plotGridTransport(res$TransportPlan)
 #'
 #' @export
 plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
@@ -203,32 +219,33 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 #' Plotting dense 1D transport
 #' 
 #' A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D. 
-#'
+#' \if{html}{\figure{1D.png}}
+#' \if{latex}{\figure{1D.png}{options: width=0.5in}}
 #' @param transportPlan A non negative numeric matrix giving the mass transport. The value at \eqn{(i,j)}
 #' gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.
 #' @param supplyList A list containing the non negative supply measure and the underlying discretization as vectors.
 #' @param demandList A list containing the non negative demand measure and the underlying discretization as vectors.
 #'
 #' @examples 
-#' 
+#'  
 #' I <- 1000
 #' J <- 1000
 #' X <- seq(0,1,length.out = I)
 #' Y <- seq(0,1,length.out = J)
 #' p <- supplyExample
 #' q <- demandExample
-#'
+#' 
 #' supply <- list(p,X)
 #' demand <- list(q,Y)
-#'
+#' 
 #' maxIter <- 2000
 #' eps <- 1e-3
 #' 
-#'
-#' suppList <- list(p, "KL", 0.04, X)
-#' demList <- list(q, "KL", 0.04, Y)
-#' res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
 #' 
+#' suppyDiv <- list("KL", 0.04)
+#' demandDiv <- list("KL", 0.04)
+#' res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
+#'                             maxIteration = maxIter, epsVector = eps, p = 2)
 #' plot1DTransport(res$TransportPlan, supply, demand)
 #' 
 #'
@@ -270,9 +287,12 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
         #lines(supplyList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
 
-        polygon(c(firstDem,demandList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
-        polygon(c(firstSupp,supplyList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
+        # polygon(c(firstDem,demandList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
+        # polygon(c(firstSupp,supplyList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
 
+        polygon(c(firstDem,demandList[[2]]),c(0,rowSums(subK)), col = colors[i])
+        polygon(c(firstSupp,supplyList[[2]]), c(0,colSums(subK)), col = colors[i])
+        
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
         #lines(supplyList[[2]], subK %*% y1Measure, type = "l", col = "black")
 
@@ -370,6 +390,10 @@ findPath <- function(from, to, treeDF){
 #' Plotting transport on trees
 #'
 #' This function visualizes the transport of mass on a tree. 
+#'
+#' \if{html}{\figure{tree.png}}
+#' \if{latex}{\figure{tree.png}{options: width=0.5in}}
+#'
 #'
 #' @param tree A tree structure in list format:
 #' The first element is the index of the root node.

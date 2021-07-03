@@ -24,6 +24,10 @@ position \eqn{i} give the supply at node \eqn{i}.}
 \description{
 This function visualizes the transport of mass on a tree.
 }
+\details{
+\if{html}{\figure{tree.png}}
+\if{latex}{\figure{tree.png}{options: width=0.5in}}
+}
 \examples{
 tree <- list(1, c(1, 2, 1), c(2, 3, 1), c(3, 4, 1), c(3, 5, 1),
 c(2, 6, 1), c(1, 7, 1), c(7, 8, 1), c(7, 9, 1),

@@ -7,11 +7,9 @@
 BalancedExtensionSolver(
   supplyList,
   demandList,
-  method = "euclidean",
-  exp = 1,
-  p = 2,
+  p = 1,
+  q = 2,
   wfr = FALSE,
-  Monge = FALSE,
   costMatrix = NULL
 )
 }
@@ -22,25 +20,15 @@ the positions of the supply points. This can either be a vector or a matrix wher
 
 \item{demandList}{A list similar to the supplyList but holding the information about the demand.}
 
-\item{method}{(optional) Determines the method that is used to compute the cost matrix.
-\itemize{
-\item "euclidean"
-\item "minkowski"
-\item "maximum" 
-}
-The default value is "euclidean".}
-
-\item{exp}{(optional) The exponent that is applied to the cost matrix. Can
+\item{p}{(optional) The exponent that is applied to the cost matrix. Can
 be used to compute quadratic cost. The default value is 1.}
 
-\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted
+\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted
 if either "euclidean" or "maximum" is used. The default value is 2.}
 
 \item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao
  distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 The default value is "false".}
-
-\item{Monge}{(optional) Set to TRUE to use the Monge algorithm.}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the
 cost matrix, a custom cost matrix can be passed to the algorithm.}
@@ -82,6 +70,6 @@ costDestruct <- rep(10,3)
 supplyList <- list(p,costDestruct, supplyPoints)
 demandList <- list(q,costCreate, demandPoints)
 
-BalancedExtensionSolver(supplyList, demandList, exp = 2)
+BalancedExtensionSolver(supplyList, demandList, p = 2)
 
 }

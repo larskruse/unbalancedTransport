@@ -15,10 +15,12 @@ gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.}
 \item{demandList}{A list containing the non negative demand measure and the underlying discretization as vectors.}
 }
 \description{
-A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D.
+A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D. 
+\if{html}{\figure{1D.png}}
+\if{latex}{\figure{1D.png}{options: width=0.5in}}
 }
 \examples{
-
+ 
 I <- 1000
 J <- 1000
 X <- seq(0,1,length.out = I)
@@ -33,10 +35,10 @@ maxIter <- 2000
 eps <- 1e-3
 
 
-suppList <- list(p, "KL", 0.04, X)
-demList <- list(q, "KL", 0.04, Y)
-res <- sinkhornAlgorithm(suppList, demList, maxIter, eps, exp = 2)
-
+suppyDiv <- list("KL", 0.04)
+demandDiv <- list("KL", 0.04)
+res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
+                            maxIteration = maxIter, epsVector = eps, p = 2)
 plot1DTransport(res$TransportPlan, supply, demand)
 
 

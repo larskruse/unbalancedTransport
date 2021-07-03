@@ -112,7 +112,7 @@ getCostMatrix <- function(tree){
 #' supply <- c(0,0,2,0,0,4,0,0,2,0)
 #' demand <- c(0,0,0,0,7,0,0,0,0,1)
 #'
-#' transport <- treeAlgorithm(tree, supply, demand,
+#' transport <- treeTransport(tree, supply, demand,
 #'                            constructionCost, destructionCost,
 #'                            output = "list")
 #'
@@ -134,14 +134,14 @@ getCostMatrix <- function(tree){
 #' supply <- c(0,0,1,2,0,0,0,0,0,0,0,0,0)
 #' demand <- c(0,0,0,0,0,1,0,1,0,0,0,1,1)
 #'
-#' transport <- treeAlgorithm(tree, supply, demand,
+#' transport <- treeTransport(tree, supply, demand,
 #'                            constructionCost, destructionCost,
 #'                            output = "list")
 #'
 #' plotTree(tree, tList = transport$transportList,
 #'          supply = supply, demand = demand)
 #'
-treeAlgorithm <- function(tree, supply, demand, creationCost, destructionCost, output = "transportPlan"){
+treeTransport <- function(tree, supply, demand, creationCost, destructionCost, output = "transportPlan"){
 
 
     if(output != "list" & output != "transportPlan"  & output != "cost"){

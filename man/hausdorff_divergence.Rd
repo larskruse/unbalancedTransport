@@ -7,12 +7,13 @@
 hausdorff_divergence(
   supplyList,
   demandList,
+  supplyDivList,
+  demandDivList,
   eps,
   iterMax = 1000,
   tol = 0.001,
-  method = "euclidean",
-  exp = 1,
-  p = 2,
+  p = 1,
+  q = 2,
   wfr = FALSE,
   Cxy = NULL,
   Cxx = NULL,
@@ -42,6 +43,10 @@ be omitted if a cost matrix is passed as argument.}
 
 \item{demandList}{A list containing the information about the demand measure in the same form as the supplyList.}
 
+\item{supplyDivList}{aa}
+
+\item{demandDivList}{bb}
+
 \item{eps}{A numeric value for the regularization parameter.}
 
 \item{iterMax}{(optional) The maximum number of algorithm iterations. The default value is 5000}
@@ -49,17 +54,9 @@ be omitted if a cost matrix is passed as argument.}
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-5.}
 
-\item{method}{(optional) Determines the method that is used to compute the cost matrix:
-\itemize{
-\item "euclidean"
-\item "minkowski"
-\item "maximum" 
-}
-The default value is "euclidean".}
+\item{p}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
-\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
-
-\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
 
 \item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 The default value is "false".}
@@ -78,7 +75,7 @@ Calculating the Hausdorff divergence.
 }
 \details{
 This function calculates the Hausdorff divergence using the dual optimal optimal potentials
-calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+calculated by the \code{\link[unbalancedTransport]{regularizedTransport}}.
 The Hausdorff divergence is defined as 
 \eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
 \nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
@@ -101,9 +98,9 @@ supply <- list(p,X)
 demand <- list(q,Y)
 
 eps <- 1e-3 
-supplyList <- list(p, "KL", 0.04, X)
-demandList <- list(q, "KL", 0.04, Y)
+supplyDiv <- list("KL", 0.04)
+demandDiv <- list("KL", 0.04)
 
-hausdorff_divergence(supplyList, demandList, eps, exp = 2)
+hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
 
 }

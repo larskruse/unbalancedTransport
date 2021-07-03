@@ -10,8 +10,8 @@ plotTransportPoints(
   demand = NULL,
   supplyCoordinates = NULL,
   demandCoordinates = NULL,
-  creationCost = NULL,
-  destructionCost = NULL
+  costCreate = NULL,
+  costDestruct = NULL
 )
 }
 \arguments{
@@ -29,35 +29,35 @@ position \eqn{i} give the supply at point \eqn{i}.}
 
 \item{demandCoordinates}{The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.}
 
-\item{creationCost}{A non negative numeric vector containing the  cost for creating mass at each demand point.}
+\item{costCreate}{A non negative numeric vector containing the  cost for creating mass at each demand point.}
 
-\item{destructionCost}{A non negative numeric vector containing the cost for destruction mass at each supply point.}
+\item{costDestruct}{A non negative numeric vector containing the cost for destruction mass at each supply point.}
 }
 \description{
 Visualizing mass transport between point clouds.
 }
+\details{
+\if{html}{\figure{plotTransportPoints.png}}
+\if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
+}
 \examples{
 
+supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
+demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 
-supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
-demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
-
-cC <- rep(1,3)
-cD <- rep(1.5,3)
-
- 
-sup <- c(1,2,3)
-dem <- c(2,3,1)
-
-plan <- matrix(rep(0,12), nrow = 3 )
-plan[1,3] <- 1
-plan[2,2] <- 1
-plan[2,3] <- 1
-plan[3,1] <- 1
+cC <- rep(1.8,2)
+cD <- rep(2,2)
 
 
-plotTransportPoints(plan, supply = sup, demand = dem,
- supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
-    creationCost = cC, destructionCost = cD)
+sup <- c(1,2)
+dem <- c(2.5,1)
+
+res <- BalancedExtensionSolver(list(sup, cD,supplyPoints), list(dem, cC, demandPoints))
+transportPlan <- res$transportPlan
+
+plotTransportPoints(transportPlan, supply = sup, demand = dem,
+                    supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
+                    costCreate = cC, costDestruct = cD)
+
 
 }

@@ -155,6 +155,9 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 //' @noRd
 Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
   if (DivFun == 1){
+      
+    Eigen::setNbThreads(0);
+      
     Eigen::VectorXd temp = s.array()*exp(u.array()/lambda);
     Eigen::VectorXd temp1 = div0(p,temp);
     Eigen::VectorXd temp2 = temp1.array().pow(lambda/(lambda+eps));
@@ -226,6 +229,17 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
                                   double tol = 1e-8){
+    
+        // int n = 4000;
+        // Eigen::MatrixXd A = Eigen::MatrixXd::Ones(n,n);
+        // Eigen::MatrixXd B = Eigen::MatrixXd::Ones(n,n);
+        // Eigen::MatrixXd C = Eigen::MatrixXd::Ones(n,n);
+        // C.noalias() += A*B;
+        // Rcpp::Rcout << C.sum() << "\n";
+
+    
+    
+    
   // number of absorptions
   int numAbs = 0;
     
@@ -263,7 +277,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // since u and v are 0, the updateK function returns the Gibbs kernel
   Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
   Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
-  //ProfilerStart("scaling.log");
+  ProfilerStart("scaling.prof");
   
   double converge;
   
@@ -373,7 +387,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     i = i + 1;
 
   }
-  //ProfilerStop();
+  ProfilerStop();
   Rcpp::Rcout << 100 << "% done. \n";
 
  

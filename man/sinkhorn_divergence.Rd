@@ -7,12 +7,13 @@
 sinkhorn_divergence(
   supplyList,
   demandList,
+  supplyDivList,
+  demandDivList,
   eps,
   iterMax = 10000,
   tol = 1e-05,
-  method = "euclidean",
-  exp = 1,
-  p = 2,
+  p = 1,
+  q = 2,
   wfr = FALSE,
   Cxy = NULL,
   Cxx = NULL,
@@ -42,6 +43,10 @@ be omitted if a cost matrix is passed as argument.}
 
 \item{demandList}{A list containing the information about the demand measure in the same form as the supplyList.}
 
+\item{supplyDivList}{aa}
+
+\item{demandDivList}{bb}
+
 \item{eps}{A numeric value for the regularization parameter.}
 
 \item{iterMax}{(optional) The maximum number of algorithm iterations. The default value is 10000.}
@@ -49,17 +54,9 @@ be omitted if a cost matrix is passed as argument.}
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-5.}
 
-\item{method}{(optional) Determines the method that is used to compute the cost matrix.
-\itemize{
-\item "euclidean"
-\item "minkowski"
-\item "maximum" 
-}
-The default value is "euclidean".}
+\item{p}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
-\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
-
-\item{p}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
 
 \item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 The default value is "false".}
@@ -86,7 +83,7 @@ For supply and demand measures \eqn{\alpha}{a} and \eqn{\beta}{b} the Sinkhorn d
 with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
 and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 
-The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
 
 \insertRef{Sejourne2019}{unbalancedTransport}
 }
@@ -102,10 +99,10 @@ supply <- list(p,X)
 demand <- list(q,Y)
 
 eps <- 1e-3 
-supplyList <- list(p, "KL", 0.04, X)
-demandList <- list(q, "KL", 0.04, Y)
+supplyDiv <- list("KL", 0.04)
+demandDiv <- list("KL", 0.04)
 
-sinkhorn_divergence(supplyList, demandList, eps, exp = 2)
+sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
 
 
 }

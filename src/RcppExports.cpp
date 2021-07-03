@@ -6,21 +6,6 @@
 
 using namespace Rcpp;
 
-// Monge_Rcpp
-Rcpp::List Monge_Rcpp(Rcpp::NumericMatrix& costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double& constructionCost, double& destructionCost);
-RcppExport SEXP _unbalancedTransport_Monge_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP constructionCostSEXP, SEXP destructionCostSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type costMatrix(costMatrixSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type supply(supplySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type demand(demandSEXP);
-    Rcpp::traits::input_parameter< double& >::type constructionCost(constructionCostSEXP);
-    Rcpp::traits::input_parameter< double& >::type destructionCost(destructionCostSEXP);
-    rcpp_result_gen = Rcpp::wrap(Monge_Rcpp(costMatrix, supply, demand, constructionCost, destructionCost));
-    return rcpp_result_gen;
-END_RCPP
-}
 // StabilizedScaling_Rcpp
 Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix, Eigen::Map<Eigen::VectorXd> supply, Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply, double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand, int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec, double tol);
 RcppExport SEXP _unbalancedTransport_StabilizedScaling_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP alphaSupplySEXP, SEXP betaSupplySEXP, SEXP lambdaDemandSEXP, SEXP alphaDemandSEXP, SEXP betaDemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP) {
@@ -115,7 +100,6 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_unbalancedTransport_Monge_Rcpp", (DL_FUNC) &_unbalancedTransport_Monge_Rcpp, 5},
     {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 14},
     {"_unbalancedTransport_lambertInit", (DL_FUNC) &_unbalancedTransport_lambertInit, 1},
     {"_unbalancedTransport_Sinkhorn_Rcpp", (DL_FUNC) &_unbalancedTransport_Sinkhorn_Rcpp, 14},

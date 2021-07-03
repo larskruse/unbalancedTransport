@@ -1,5 +1,3 @@
-
-
 #' @title legendre Entropy
 #' @param lambda num value
 #' @param x num value
@@ -7,7 +5,6 @@
 #' @param param1 num val
 #' @param param2 num val
 #' @noRd
-#'
 legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
     if(DivFun == "KL"){
@@ -39,7 +36,7 @@ legendre_entropy <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
 #' @param DivFun div fun value
 #' @param param1 num val
 #' @param param2 num val
-#'
+#' 
 #' @noRd
 grad_legrende <- function(lambda, x, DivFun, param1 = 0, param2 = 0){
     
@@ -99,7 +96,7 @@ expC <- function(f, g, C){
 #' with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularization parameter \eqn{\varepsilon}{eps}
 #' and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 #' 
-#' The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+#' The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
 #' 
 #' \insertRef{Sejourne2019}{unbalancedTransport}
 #' 
@@ -127,19 +124,14 @@ expC <- function(f, g, C){
 #' 
 #' 
 #' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
+#' @param supplyDivList aa
+#' @param demandDivList bb
 #' @param eps A numeric value for the regularization parameter.
 #' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 10000.
 #' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 #' is terminated as it is already converged. The default value is 1e-5.
-#' @param method (optional) Determines the method that is used to compute the cost matrix.
-#' \itemize{
-#' \item "euclidean"
-#' \item "minkowski"
-#' \item "maximum" 
-#' }
-#' The default value is "euclidean".
-#' @param exp (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
-#' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
+#' @param p (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
+#' @param q (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
 #' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
@@ -158,14 +150,15 @@ expC <- function(f, g, C){
 #' demand <- list(q,Y)
 #'
 #' eps <- 1e-3 
-#' supplyList <- list(p, "KL", 0.04, X)
-#' demandList <- list(q, "KL", 0.04, Y)
+#' supplyDiv <- list("KL", 0.04)
+#' demandDiv <- list("KL", 0.04)
 #' 
-#' sinkhorn_divergence(supplyList, demandList, eps, exp = 2)
+#' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
 #' 
 #'
 #' @export
-sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, tol = 1e-5, method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, eps, iterMax = 10000, tol = 1e-5,
+                                p = 1, q = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
     
     
@@ -179,31 +172,36 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
 
 
         if(is.null(Cxy)){
-            Cxy <- costMatrix(X, Y , method, exp, p, wfr)
+            Cxy <- costMatrix(X, Y , p, q, wfr)
         }
 
         if(is.null(Cxx)){
-            Cxx <- costMatrix(X, X, method, exp, p, wfr)
+            Cxx <- costMatrix(X, X, p, q, wfr)
         }
 
         if(is.null(Cyy)){
-            Cyy <- costMatrix(Y, Y , method, exp, p, wfr)
+            Cyy <- costMatrix(Y, Y ,p, q, wfr)
         }
 
     }
     
     
-    if(supplyList[[2]] != demandList[[2]]){
+    if(supplyDivList[[1]] != demandDivList[[1]]){
         
         print("Please chose the same entropy for supply and demand.")
         
     }
     
-    res_xy <- sinkhornAlgorithm(supplyList, demandList, eps, iterMax, tol, costMatrix = Cxy, duals = TRUE)
-    res_x <- sinkhornAlgorithm(supplyList, supplyList, eps, iterMax, tol, costMatrix = Cxx, duals = TRUE)
-    res_y <- sinkhornAlgorithm(demandList, demandList, eps, iterMax, tol, costMatrix = Cyy, duals = TRUE)
+    res_xy <- regularizedTransport(supplyList, demandList, supplyDivList,
+                                   demandDivList, eps, iterMax, tol, costMatrix = Cxy,
+                                   duals = TRUE, algorithm = "sinkhorn")
+    res_x <- regularizedTransport(supplyList, supplyList, supplyDivList,
+                                  demandDivList, eps, iterMax, tol, costMatrix = Cxx,
+                                  duals = TRUE, algorithm = "sinkhorn")
+    res_y <- regularizedTransport(demandList, demandList, supplyDivList,
+                                  demandDivList, eps, iterMax, tol, costMatrix = Cyy,
+                                  duals = TRUE, algorithm = "sinkhorn")
     
-    # print(res_xy)
     
     f_xy <- res_xy$dual_f
     g_xy <- res_xy$dual_g
@@ -215,15 +213,8 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
     g_y2 <- res_y$dual_g
     
     
-    # print(f_xy)
-    # print(g_xy)
-    # print(f_x1)
-    # print(f_x2)
-    # print(g_y1)
-    # print(g_y2)
-
-
-    if(supplyList[[2]] == "TV"){
+    
+    if(supplyDivList[[1]] == "TV"){
         
         
         func <- sum(supplyList[[1]] * (f_xy - 0.5*f_x1 - 0.5*f_x2)) + sum(demandList[[1]] * (g_xy - 0.5*g_y1 -0.5*g_y2))
@@ -246,10 +237,10 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
         return(func)
         
         
-    }else if(supplyList[[2]] == "RG" ){
+    }else if(supplyDivList[[1]] == "RG" ){
         
-        param1 <- supplyList[[3]]
-        param2 <- supplyList[[4]]
+        param1 <- supplyDivList[[2]]
+        param2 <- supplyDivList[[3]]
         
       
         supxdem <- supplyList[[1]] %*% t(demandList[[1]])
@@ -268,12 +259,12 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
         # print(0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))))
         # print(0.5*sum(eps * demxdem * (1-exp(expC(g_y1,g_y2,Cyy)/eps))))
         # 
-        func <- sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)-
-                                          0.5 * (-legendre_entropy(0, -f_x1, supplyList[[2]], param1, param2))-
-                                          0.5 * (-legendre_entropy(0, -f_x2, supplyList[[2]], param1, param2)))) +
-                                        sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2) -
-                                            0.5 * (-legendre_entropy(0, -g_y1, supplyList[[2]], param1, param2)) -
-                                            0.5 * (-legendre_entropy(0, -g_y2, supplyList[[2]], param1, param2))))
+        func <- sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyDivList[[1]], param1, param2)-
+                                          0.5 * (-legendre_entropy(0, -f_x1, supplyDivList[[1]], param1, param2))-
+                                          0.5 * (-legendre_entropy(0, -f_x2, supplyDivList[[1]], param1, param2)))) +
+                                        sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyDivList[[1]], param1, param2) -
+                                            0.5 * (-legendre_entropy(0, -g_y1, supplyDivList[[1]], param1, param2)) -
+                                            0.5 * (-legendre_entropy(0, -g_y2, supplyDivList[[1]], param1, param2))))
                   
         func <- func + sum(eps * supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))) -
             0.5*sum(eps * supxsup * (1-exp(expC(f_x1,f_x2,Cxx)/eps))) -
@@ -287,33 +278,35 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
         
         param1 <- 0
         
-        if(supplyList[[2]] == "Berg"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
+        if(supplyDivList[[1]] == "Berg"){
+            supplyDivList[[1]] <- "Power"
+            demandDivList[[1]] <- "Power"
             
             param1 <- 0
             
             
-        }else if(supplyList[[2]] == "Hellinger"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
+        }else if(supplyDivList[[1]] == "Hellinger"){
+            supplyDivList[[1]] <- "Power"
+            demandDivList[[1]] <- "Power"
             
             param1 <- -1
             
-        }else if(supplyList[[2]] == "Power"){
+        }else if(supplyDivList[[1]] == "Power"){
             
-            param1 <- supplyList[[4]]
+            param1 <- supplyDivList[[3]]
         }
         
-        # print("funcs")
+        print("funcs")
         
-        outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
-        outf_xx <- -legendre_entropy(supplyList[[3]], -f_x1, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -f_x1, supplyList[[2]], param1)
-        outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
-        outg_yy <- -legendre_entropy(supplyList[[3]], -g_y1, supplyList[[2]], param1) - 0.5*eps*grad_legrende(supplyList[[3]], -g_y1, supplyList[[2]], param1)
+        outf_xy <- -legendre_entropy(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1) -
+            0.5*eps*grad_legrende(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1)
+        outf_xx <- -legendre_entropy(supplyDivList[[2]], -f_x1, supplyDivList[[1]], param1) -
+            0.5*eps*grad_legrende(supplyDivList[[2]], -f_x1, supplyDivList[[1]], param1)
+        outg_xy <- -legendre_entropy(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1) -
+            0.5*eps*grad_legrende(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1)
+        outg_yy <- -legendre_entropy(supplyDivList[[2]], -g_y1, supplyDivList[[1]], param1) -
+            0.5*eps*grad_legrende(supplyDivList[[2]], -g_y1, supplyDivList[[1]], param1)
       
-        # print(sum(supplyList[[1]]*(outf_xy-outf_xx)))
-        # print(sum(demandList[[1]] * (outg_xy - outg_yy)))
         
         func <- sum(supplyList[[1]]*(outf_xy-outf_xx)) + sum(demandList[[1]] * (outg_xy - outg_yy))
         
@@ -327,174 +320,6 @@ sinkhorn_divergence <- function(supplyList, demandList, eps, iterMax = 10000, to
 
 
 
-
-#' @title Regularized transport cost
-#' 
-#' @description Calculating the regularized transport cost.
-#' 
-#' @details This function calculates the regularized optimal transport costs using the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
-#' The regularized transport cost is defined as \eqn{OT_\varepsilon = sup_{f,g} -<\alpha, \phi^*(-f)> - 
-#' <\beta, \phi^*(-g)> - \varepilon <\alpha \times \beta , \exp{(f+g-C)/\varepsilon}- 1>}
-#' 
-#' with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b}, optimal dual potentials \eqn{f} and \eqn{g}, 
-#' Legendre transforms of the divergence function \eqn{\phi^*}, cost matrix \eqn{C} and regularization parameter \eqn{\varepsilon}{eps}.
-#' 
-#' 
-#' 
-#' \insertRef{Sejourne2019}{unbalancedTransport}
-#' 
-#' @param supplyList A list containing the information about the supply distribution, 
-#' divergence function and parameter. The first element is the supply distribution itself,
-#' the second the abbreviation of the divergence function ("KL" for Kullback Leibner, 
-#' "TV" for total variation, "RG" for range constraint, "Power", "Berg" and "Hellinger") followed by the parameters 
-#' needed for the divergence function: 
-#' 
-#' In case of the KL divergence (\eqn{F_1 = \lambda \cdot KL()}{F1 = lambda * KL()}),
-#' TV divergence (\eqn{F_1 = \lambda \cdot TV()}{F1 = lambda * TV()}) and all Power
-#' divergences (\eqn{F_1 = \lambda \cdot Power()}{F1 = lambda * Power()}) the
-#' regularization parameter \eqn{\lambda}{lambda} has to be provided.
-#' 
-#' The "Power" divergence also needs the conjugate exponent as second parameter.
-#' 
-#' The divergence function associated with the range constraint needs two parameters which define the upper and 
-#' lower bounds. 
-#' 
-#' 
-#' If the cost matrix is not provided, the support of the supply and demand distributions has to be provided as last element in the list. This can
-#' be omitted if a cost matrix is passed as argument.
-#' 
-#' 
-#' 
-#' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
-#' @param eps A numeric value for the regularization parameter.
-#' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 5000
-#' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
-#' is terminated as it is already converged. The default value is 1e-5.
-#' @param method (optional) Determines the method that is used to compute the cost matrix:
-#' \itemize{
-#' \item "euclidean"
-#' \item "minkowski"
-#' \item "maximum" 
-#' }
-#' The default value is "euclidean".
-#' @param exp (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
-#' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
-#' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
-#' The default value is "false". 
-#' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
-#' @return The regularized transport cost.
-#' @examples 
-#' I <- 1000
-#' J <- 1000
-#' X <- seq(0,1,length.out = I)
-#' Y <- seq(0,1,length.out = J)
-#' p <- supplyExample
-#' q <- demandExample
-#'
-#' supply <- list(p,X)
-#' demand <- list(q,Y)
-#'
-#' eps <- 1e-3 
-#' supplyList <- list(p, "KL", 0.04, X)
-#' demandList <- list(q, "KL", 0.04, Y)
-#' 
-#' regularized_ot(supplyList, demandList, eps, exp = 2)
-#' 
-#' 
-#' @export
-#' 
-regularized_ot <- function(supplyList, demandList, eps, iterMax = 5000, tol = 1e-5,
-                           method = "euclidean", exp = 1, p = 2,  wfr = FALSE, Cxy = NULL){
-    
-    lenSup <- length(supplyList)
-    lenDem <- length(demandList)
-    
-    if(is.null(Cxy)){
-        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, p, wfr)
-    }
-    
-    if(supplyList[[2]] != demandList[[2]]){
-        
-        print("Please chose the same entropy for supply and demand.")
-        
-    }
-    
-    res_xy <- sinkhornAlgorithm(supplyList, demandList, eps, iterMax, tol = tol, costMatrix = Cxy, duals = TRUE)
-    
-    f_xy <- res_xy$dual_f
-    g_xy <- res_xy$dual_g
-    
-  
-    if(supplyList[[2]] == "TV"){
-  
-      
-        
-        func = sum(supplyList[[1]] * f_xy) + sum(demandList[[1]] * g_xy)
-      
-        
-        expFun <- supplyList[[1]] %*% t(demandList[[1]]) * (1-exp(expC(f_xy,g_xy,Cxy)/eps))
-        
-        func <- func + sum(eps * expFun)
-        return(func)
-        
-       
-        
-    }else if(supplyList[[2]] == "RG" ){
-        
-        param1 <- supplyList[[3]]
-        param2 <- supplyList[[4]]
-        
-        supxdem <- supplyList[[1]] %*% t(demandList[[1]])
-        
-        
-        func <- sum(supplyList[[1]] * (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2)))+ 
-            sum(demandList[[1]] * (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2)))
-
-        func <- func + sum(eps * (supxdem * (1-exp(expC(f_xy,g_xy,Cxy)/eps))))
-        
-        return(func)
-        
-
-    
-    }else{
-        
-        param1 <- 0
-        
-        if(supplyList[[2]] == "Berg"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
-            
-            param1 <- 0
-            
-            
-        }else if(supplyList[[2]] == "Hellinger"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
-            
-            param1 <- -1
-            
-        }else if(supplyList[[2]] == "Power"){
-            
-            param1 <- supplyList[[4]]
-        }
-        
-
-        outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
-        outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
-        
-        res <- sum(supplyList[[1]] * outf_xy) + sum(demandList[[1]] * outg_xy) + 
-            eps*(sum(supplyList[[1]]) * sum(demandList[[1]]))
-        
-        return(res)
-        
-    }
-
-}
-
-
-
-
-
 #' @title regularized output
 #' @param supplyList sup list
 #' @param demandList dem list
@@ -504,18 +329,14 @@ regularized_ot <- function(supplyList, demandList, eps, iterMax = 5000, tol = 1e
 #' @param g_xy dual va
 #' @noRd
 #' 
-regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costMatrix){
+regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandDivList, f_xy, g_xy, eps, costMatrix){
 
-    if(supplyList[[2]] == "TV"){
-        # 
-        # print(f_xy)
-        # print(g_xy)
+    if(supplyDivList[[1]] == "TV"){
         # 
         f_xy[!is.finite(f_xy) & supplyList[[1]] == 0] <- 0
         g_xy[!is.finite(g_xy) & demandList[[1]] == 0] <- 0
         
-        # print(f_xy)
-        # print(g_xy)
+
         
         func <- sum(supplyList[[1]] * f_xy) + sum(demandList[[1]] * g_xy)
         
@@ -525,29 +346,18 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         
         expMat[!is.finite(expMat) & supxdem == 0 ] <- 0
         
-        # expFun <- supplyList[[1]] %*% t(demandList[[1]]) * (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
         expFun <- supxdem * expMat
-        
-        # print("funcs")
-        # print(sum(supplyList[[1]] * f_xy))
-        # print(sum(demandList[[1]] * g_xy))
-        # print(func)
-        # print(sum(expFun))
-        # print(sum(eps * expFun))
-        # 
-        
-        
-        
+
         
         func <- func + sum(eps * expFun)
         return(func)
         
 
         
-    }else if(supplyList[[2]] == "RG" ){
+    }else if(supplyDivList[[1]] == "RG" ){
         
-        param1 <- supplyList[[3]]
-        param2 <- supplyList[[4]]
+        param1 <- supplyDivList[[2]]
+        param2 <- supplyDivList[[3]]
         
         expMat <- (1-exp(expC(f_xy,g_xy,costMatrix)/eps))
         supxdem <- supplyList[[1]] %*% t(demandList[[1]])
@@ -555,8 +365,8 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         
         
         
-        outf_xy <- (-legendre_entropy(0, -f_xy, supplyList[[2]], param1, param2))
-        outg_xy <- (-legendre_entropy(0, -g_xy, supplyList[[2]], param1, param2))
+        outf_xy <- (-legendre_entropy(0, -f_xy, "RG", param1, param2))
+        outg_xy <- (-legendre_entropy(0, -g_xy, "RG", param1, param2))
         
         outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
         outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
@@ -585,27 +395,27 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
         
         param1 <- 0
         
-        if(supplyList[[2]] == "Berg"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
+        if(supplyDivList[[1]] == "Berg"){
+            supplyDivList[[1]] <- "Power"
+            demandDivList[[1]] <- "Power"
             
             param1 <- 0
             
             
-        }else if(supplyList[[2]] == "Hellinger"){
-            supplyList[[2]] <- "Power"
-            demandList[[2]] <- "Power"
+        }else if(supplyDivList[[1]] == "Hellinger"){
+            supplyDivList[[1]] <- "Power"
+            demandDivList[[1]] <- "Power"
             
             param1 <- -1
             
-        }else if(supplyList[[2]] == "Power"){
+        }else if(supplyDivList[[1]] == "Power"){
             
-            param1 <- supplyList[[4]]
+            param1 <- supplyDivList[[3]]
         }
         
         
-        outf_xy <- -legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -f_xy, supplyList[[2]], param1)
-        outg_xy <- -legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, 0) - 0.5*eps*grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1)
+        outf_xy <- -legendre_entropy(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1)
+        outg_xy <- -legendre_entropy(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1)
         
         # print("funcs")
         # 
@@ -647,7 +457,7 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 #' @description Calculating the Hausdorff divergence.
 #' 
 #' @details This function calculates the Hausdorff divergence using the dual optimal optimal potentials
-#' calculated by the \code{\link[unbalancedTransport]{sinkhornAlgorithm}}.
+#' calculated by the \code{\link[unbalancedTransport]{regularizedTransport}}.
 #' The Hausdorff divergence is defined as 
 #' \eqn{H_\varepsilon(\alpha, \beta) = <\alpha - \beta, \nabla F_\varepsilon(\alpha) - 
 #' \nabla F_\varepsilon(\beta)>}{H_eps(a,b) = <a-b, nabla(F_eps(a)) - nabla(F_eps(b)) >}  
@@ -681,19 +491,14 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 #' 
 #' 
 #' @param demandList A list containing the information about the demand measure in the same form as the supplyList.
+#' @param supplyDivList aa
+#' @param demandDivList bb
 #' @param eps A numeric value for the regularization parameter.
 #' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 5000
 #' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 #' is terminated as it is already converged. The default value is 1e-5.
-#' @param method (optional) Determines the method that is used to compute the cost matrix:
-#' \itemize{
-#' \item "euclidean"
-#' \item "minkowski"
-#' \item "maximum" 
-#' }
-#' The default value is "euclidean".
-#' @param exp (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
-#' @param p (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
+#' @param p (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
+#' @param q (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
 #' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
@@ -713,34 +518,34 @@ regularized_ot_intern <- function(supplyList, demandList, f_xy, g_xy, eps, costM
 #' demand <- list(q,Y)
 #'
 #' eps <- 1e-3 
-#' supplyList <- list(p, "KL", 0.04, X)
-#' demandList <- list(q, "KL", 0.04, Y)
+#' supplyDiv <- list("KL", 0.04)
+#' demandDiv <- list("KL", 0.04)
 #' 
-#' hausdorff_divergence(supplyList, demandList, eps, exp = 2)
+#' hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
 #'
 #' @export
-hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, tol = 1e-3,
-                                 method = "euclidean", exp = 1, p = 2,  wfr = FALSE,
+hausdorff_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, eps, iterMax = 1000, tol = 1e-3,
+                                 p = 1, q = 2,  wfr = FALSE,
                                  Cxy = NULL, Cxx = NULL, Cyy = NULL){
 
     lenSup <- length(supplyList)
     lenDem <- length(demandList)
 
     if(is.null(Cxy)){
-        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], method, exp, p, wfr)
+        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], p, q, wfr)
     }
 
     if(is.null(Cxx)){
-        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], method, exp, p, wfr)
+        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], p, q, wfr)
     }
 
     if(is.null(Cyy)){
-        Cyy <- costMatrix(demandList[[lenDem]], demandList[[lenDem]], method, exp, p, wfr)
+        Cyy <- costMatrix(demandList[[lenDem]], demandList[[lenDem]], p, q, wfr)
     }
 
 
 
-    if(supplyList[[2]] != demandList[[2]]){
+    if(supplyDivList[[1]] != demandDivList[[1]]){
 
         print("Please chose the same entropy for supply and demand.")
 
@@ -757,48 +562,52 @@ hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, to
     demand <- demandList[[1]]
 
 
-    res_x = sinkhornAlgorithm(supplyList, supplyList, eps, iterMax, tol, costMatrix = Cxx, duals = TRUE)
-    res_y = sinkhornAlgorithm(demandList, demandList, eps, iterMax, tol, costMatrix = Cyy, duals = TRUE)
+    res_x <- regularizedTransport(supplyList, supplyList, supplyDivList,
+                                  demandDivList, eps, iterMax, tol, costMatrix = Cxx,
+                                  duals = TRUE, algorithm = "sinkhorn")
+    res_y <- regularizedTransport(demandList, demandList, supplyDivList,
+                                  demandDivList, eps, iterMax, tol, costMatrix = Cyy,
+                                  duals = TRUE, algorithm = "sinkhorn")
 
-    f_x = res_x$dual_f
-    g_x = res_x$dual_g
-    g_y = res_y$dual_g
-    f_y = res_y$dual_f
+    f_x <- res_x$dual_f
+    g_x <- res_x$dual_g
+    g_y <- res_y$dual_g
+    f_y <- res_y$dual_f
     
-    f_x = 0.5*(f_x+g_x)
-    g_y = 0.5*(g_y+f_y)
+    f_x <- 0.5*(f_x+g_x)
+    g_y <- 0.5*(g_y+f_y)
     
 
-    if(supplyList[[2]] == "KL"){
+    if(supplyDivList[[1]] == "KL"){
         div <- 1
-        reg <- supplyList[[3]]
+        reg <- supplyDivList[[2]]
 
-    }else if(supplyList[[2]] == "TV"){
+    }else if(supplyDivList[[1]] == "TV"){
         div <- 2
-        reg <- supplyList[[3]]
-    }else if(supplyList[[2]] == "RG"){
+        reg <- supplyDivList[[2]]
+    }else if(supplyDivList[[1]] == "RG"){
         div <- 3
-        param1 <- supplyList[[3]]
-        param2 <- supplyList[[4]]
+        param1 <- supplyDivList[[2]]
+        param2 <- supplyDivList[[3]]
 
         if(param1 < 0 || param2 < param1){
             stop("0 <= Alpha <= Beta")
         }
 
-    }else if(supplyList[[2]] == "Berg"){
-        supplyList[[2]] <- "Power"
+    }else if(supplyDivList[[1]] == "Berg"){
+        supplyDivList[[1]] <- "Power"
         div <- 4
-        reg <- supplyList[[3]]
+        reg <- supplyDivList[[2]]
         param1 <- 0
-    }else if(supplyList[[2]] == "Hellinger"){
-        supplyList[[2]] <- "Power"
+    }else if(supplyDivList[[1]] == "Hellinger"){
+        supplyDivList[[1]] <- "Power"
         div <- 4
-        reg <- supplyList[[3]]
+        reg <- supplyDivList[[2]]
         param1 <- -1
-    }else if(supplyList[[2]] == "Power"){
+    }else if(supplyDivList[[1]] == "Power"){
         div <- 4
-        reg <- supplyList[[3]]
-        param1 <- supplyList[[4]]
+        reg <- supplyDivList[[2]]
+        param1 <- supplyDivList[[3]]
     }else{
         stop("Please supply a divergence")
     }
@@ -808,10 +617,10 @@ hausdorff_divergence <- function(supplyList, demandList, eps, iterMax = 1000, to
     f_xy = Hausdorff_Vec_Rcpp(t(Cxy), demand, g_y, reg, param1, param2, div, eps)
 
 
-    res <- sum(supplyList[[1]] * (legendre_entropy(supplyList[[3]], -f_x, supplyList[[2]], param1, param2) + eps * grad_legrende(supplyList[[3]], -f_x, supplyList[[2]], param1, param2) -
-                                      legendre_entropy(supplyList[[3]], -f_xy, supplyList[[2]], param1, param2) - eps * grad_legrende(supplyList[[3]], -f_xy,supplyList[[2]], param1, param2))) +
-        sum(demandList[[1]] *(legendre_entropy(supplyList[[3]], -g_y, supplyList[[2]], param1, param2) + eps * grad_legrende(supplyList[[3]], -g_y,supplyList[[2]], param1, param2)-
-                                  legendre_entropy(supplyList[[3]], -g_xy, supplyList[[2]], param1, param2) - eps * grad_legrende(supplyList[[3]], -g_xy, supplyList[[2]], param1, param2)))
+    res <- sum(supplyList[[1]] * (legendre_entropy(reg, -f_x, supplyDivList[[1]], param1, param2) + eps * grad_legrende(reg, -f_x, supplyDivList[[1]], param1, param2) -
+                                      legendre_entropy(reg, -f_xy, supplyDivList[[1]], param1, param2) - eps * grad_legrende(reg, -f_xy,supplyDivList[[1]], param1, param2))) +
+        sum(demandList[[1]] *(legendre_entropy(reg, -g_y, supplyDivList[[1]], param1, param2) + eps * grad_legrende(reg, -g_y,supplyDivList[[1]], param1, param2)-
+                                  legendre_entropy(reg, -g_xy, supplyDivList[[1]], param1, param2) - eps * grad_legrende(reg, -g_xy, supplyDivList[[1]], param1, param2)))
 
    
     return(res)

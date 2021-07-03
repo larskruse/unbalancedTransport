@@ -23,15 +23,30 @@ Creates a grid plot of a transport plan.
 This function creates a grid plot of the transport plan. Import and export
 vectors can be given as additional arguments. These will be plotted along the sides of the grid 
 plot in order to indicate where mass is added or removed. Therefore, the mass shown in
-each row or column is equal to the supply or demand vector.
+each row or column is equal to the supply or demand vector. 
+
+\if{html}{\figure{Grid.png}}
+\if{latex}{\figure{Grid.png}{options: width=0.5in}}
 }
 \examples{
+I <- 200
+J <- 200
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample[seq(0,1000,by = 1000/I)]
+q <- demandExample[seq(0,1000, by = 1000/J)]
 
-transport <- matrix(runif(9), nrow = 3)
-import <- runif(3)
-export <- runif(3)
+supply <- list(p,X)
+demand <- list(q,Y)
 
-plotGridTransport(transport)
-plotGridTransport(transport, import, export)
+maxIter <- 2000
+eps <- 1e-3
+
+
+suppyDiv <- list("KL", 0.04)
+demandDiv <- list("KL", 0.04)
+res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
+                            maxIteration = maxIter, epsVector = eps, p = 2)
+plotGridTransport(res$TransportPlan)
 
 }

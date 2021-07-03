@@ -26,23 +26,15 @@
 #'  a vector specifying the cost for destruction of mass at each supply point. If no cost matrix is provided, the third element has to be 
 #' the positions of the supply points. This can either be a vector or a matrix where each row gives the coordinates for one point.
 #' @param demandList A list similar to the supplyList but holding the information about the demand.
-#' @param method (optional) Determines the method that is used to compute the cost matrix.
-#' \itemize{
-#' \item "euclidean"
-#' \item "minkowski"
-#' \item "maximum" 
-#' }
-#' The default value is "euclidean".
-#' @param exp (optional) The exponent that is applied to the cost matrix. Can
+#' @param p (optional) The exponent that is applied to the cost matrix. Can
 #'  be used to compute quadratic cost. The default value is 1.
-#' @param p (optional) Parameter for the minkwski cost function. Can be omitted
+#' @param q (optional) Parameter for the minkwski cost function. Can be omitted
 #'  if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao
 #'  distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
 #' The default value is "false". 
 #' @param costMatrix (optional) Instead of having the algorithm compute the
 #'  cost matrix, a custom cost matrix can be passed to the algorithm. 
-#' @param Monge (optional) Set to TRUE to use the Monge algorithm.
 #'
 #' @examples 
 #'
@@ -59,82 +51,68 @@
 #' supplyList <- list(p,costDestruct, supplyPoints)
 #' demandList <- list(q,costCreate, demandPoints)
 #'
-#' BalancedExtensionSolver(supplyList, demandList, exp = 2)
+#' BalancedExtensionSolver(supplyList, demandList, p = 2)
 #'
 #' @export
 #'
-BalancedExtensionSolver <- function(supplyList, demandList, method = "euclidean", exp = 1, p = 2, wfr = FALSE, Monge = FALSE, costMatrix = NULL){
+BalancedExtensionSolver <- function(supplyList, demandList, p = 1, q = 2,
+                                    wfr = FALSE, costMatrix = NULL){
 
     
     if(is.null(costMatrix)){
     
-        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], method, exp, p, wfr)    
+        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], p, q, wfr)    
         
     }
     
 
-    if(Monge){
+    supply <- c(supplyList[[1]], sum(demandList[[1]]))
+    demand <- c(demandList[[1]], sum(supplyList[[1]]))
+
+    costMatrix <- cbind(costMatrix, supplyList[[2]])
+    costMatrix <- rbind(costMatrix, c(demandList[[2]],0))
+    
+
+    
+    res <- transport::transport(supply, demand, costMatrix, method = "revsimplex")
+    
+
+    cost <- 0
+    for (i in 1:nrow(res)){
+        cost = cost + res[i,3]*costMatrix[res[i,1], res[i,2]]
+    }
+    
+    import <-rep(0, length(demandList[[2]]))
+    export <- rep(0, length(supplyList[[2]]))
+    
+    expTransport <- res[res$to > length(demandList[[1]]) & res$from <= length(supplyList[[1]]) ,]
+    impTransport <- res[res$from > length(supplyList[[1]]) & res$to <= length(demandList[[1]]),]
+    
+    
+    
+    import[impTransport$to] <- impTransport$mass
+    export[expTransport$from] <- expTransport$mass
+    
+    
+    res <- res[res$to <= length(demandList[[1]]) & res$from <= length(supplyList[[1]]),]
+    
+    
+    
+    if(length(res$from) > 0){
         
-        res <- mongeAlgorithm(costMatrix, supplyList[[1]], demandList[[1]], supplyList[[2]], demandList[[2]] )
+        transportPlan <- matrix(0,length(supplyList[[1]]),length(demandList[[1]]))
+        transportPlan[cbind(res$from,res$to)] <- res$mass
         
     }else{
-        
-        supply <- c(supplyList[[1]], sum(demandList[[1]]))
-        demand <- c(demandList[[1]], sum(supplyList[[1]]))
-
-        costMatrix <- cbind(costMatrix, supplyList[[2]])
-        costMatrix <- rbind(costMatrix, c(demandList[[2]],0))
-        
-
-        
-        res <- transport::transport(supply, demand, costMatrix, method = "revsimplex")
-        
-
-        cost <- 0
-        for (i in 1:nrow(res)){
-            cost = cost + res[i,3]*costMatrix[res[i,1], res[i,2]]
-        }
-        
-        import <-rep(0, length(demandList[[2]]))
-        export <- rep(0, length(supplyList[[2]]))
-        
-        expTransport <- res[res$to > length(demandList[[1]]) & res$from <= length(supplyList[[1]]) ,]
-        impTransport <- res[res$from > length(supplyList[[1]]) & res$to <= length(demandList[[1]]),]
-        
-        
-        
-        import[impTransport$to] <- impTransport$mass
-        export[expTransport$from] <- expTransport$mass
-        
-        
-        res <- res[res$to <= length(demandList[[1]]) & res$from <= length(supplyList[[1]]),]
-        
-        
-        
-        if(length(res$from) > 0){
+        transportPlan <- matrix(0,length(supply),length(demand))
             
-            transportPlan <- matrix(0,length(supplyList[[1]]),length(demandList[[1]]))
-            transportPlan[cbind(res$from,res$to)] <- res$mass
-            
-        }else{
-            transportPlan <- matrix(0,length(supply),length(demand))
-            
-        }
-        
-        
-        transport <- list(cost = cost, transportPlan = transportPlan, import = import, export = export)
-        
-        
-        
     }
-    
-
-    
-
+        
+        
+    transport <- list(cost = cost, transportPlan = transportPlan, import = import, export = export)
+        
+        
+        
     return(transport)
 
 }
-
-
-
-
