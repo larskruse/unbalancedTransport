@@ -14,7 +14,11 @@ The value at \eqn{\[i,j\]} is the amount of mass transported from supply point \
 demand point. It length has to be equal to the number of columns in the transport matrix.}
 
 \item{export}{(optional) A non negative numeric vector that give the amount of mass destroyed  at each
-supply point. It length has to be equal to the number of rows in the transport matrix.}
+supply point. It length has to be equal to the number of rows in the transport matrix.  
+
+
+\if{html}{\figure{Grid.png}}
+\if{latex}{\figure{Grid.png}{options: width=0.5in}}}
 }
 \description{
 Creates a grid plot of a transport plan.
@@ -23,10 +27,7 @@ Creates a grid plot of a transport plan.
 This function creates a grid plot of the transport plan. Import and export
 vectors can be given as additional arguments. These will be plotted along the sides of the grid 
 plot in order to indicate where mass is added or removed. Therefore, the mass shown in
-each row or column is equal to the supply or demand vector. 
-
-\if{html}{\figure{Grid.png}}
-\if{latex}{\figure{Grid.png}{options: width=0.5in}}
+each row or column is equal to the supply or demand vector.
 }
 \examples{
 I <- 200

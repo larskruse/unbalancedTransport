@@ -2,8 +2,6 @@
 #'
 #' Visualizing mass transport between point clouds. 
 #' 
-#' \if{html}{\figure{plotTransportPoints.png}}
-#' \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
 #' 
 #'
 #' @param transportPlan A non negative numeric matrix that indicates where the mass is
@@ -18,6 +16,9 @@
 #' @param costCreate A non negative numeric vector containing the  cost for creating mass at each demand point.
 #' @param costDestruct A non negative numeric vector containing the cost for destruction mass at each supply point.
 #'
+#' 
+#' \if{html}{\figure{plotTransportPoints.png}}
+#' \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
 #' 
 #' @examples 
 #' 
@@ -54,7 +55,6 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
     
     if(is.null(dim(supplyCoordinates))){
         
-        
         xS <- supplyCoordinates
         yS <- rep(0, length(supplyCoordinates))
         
@@ -68,23 +68,22 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
         yD <- demandCoordinates[,2]
     }
     
-    
-    # create an empty plot
-    plot(1, type = "n", xlab = "", ylab = "",
-         xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
-         ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
-         asp = 1)
-    
-    
-    if(!is.null(transportPlan)){
-        for(i in 1:length(xS)){
-            
-            for(j in 1:length(xD)){
+    if(length(xS)+length(xD) > 20){
+        plot(1, type = "n", xlab = "", ylab = "",
+             xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
+             ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
+             asp = 1)
+        if(!is.null(transportPlan)){
+            for(i in 1:length(xS)){
                 
-                if(transportPlan[i,j] > 0){
-                    curvedarrow(c(xS[i],yS[i]),c(xD[j],yD[j]), lwd = 0.5+transportPlan[[i,j]],
-                                arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
-                                curve = 0.2, lcol = "red", arr.col = "red")
+                for(j in 1:length(xD)){
+                    
+                    if(transportPlan[i,j] > 0){
+                        curvedarrow(c(xS[i],yS[i]),c(xD[j],yD[j]), lwd = 0.3,
+                                    arr.pos = 0.5, arr.adj = 0.5, arr.type = "none",
+                                    curve = 0, lcol = "red", arr.col = "red")
+                        
+                    }
                     
                 }
                 
@@ -92,34 +91,71 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
             
         }
         
-    }
-    
-    
-    
-    points(c(xS,xD), c(yS,yD) , pch = 1)
-    points(xS[which(supply > 0 )],yS[which(supply > 0)],
-           pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
-    points(xD[which(demand > 0 )],yD[which(demand > 0)], pch = 19,
-           cex = abs(demand[which(demand > 0)]),  col = "dodgerblue3")
-    
-    
-    # if a transport plan is given, add arrows to indicate mass transport
-    if(!is.null(transportPlan)){
+        points(c(xS,xD), c(yS,yD) , pch = 1)
+        points(xS[which(supply > 0 )],yS[which(supply > 0)],
+               pch = 19,  col = "chartreuse3")
+        points(xD[which(demand > 0 )],yD[which(demand > 0)], pch = 19,
+                 col = "dodgerblue3")
         
-        # plot circles as indicators for the creation/destruction cost
-        theta = seq(0, 2 * pi, length = 200)
         
-        for(i in 1:length(xS)){
-            
-            lines(x = costDestruct[i]*cos(theta) + xS[i], y = costDestruct[i]*sin(theta) + yS[i], col = 'chartreuse3')
+    }else{
+        
+        
+        
+        # create an empty plot
+        plot(1, type = "n", xlab = "", ylab = "",
+             xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
+             ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
+             asp = 1)
+        
+        
+        if(!is.null(transportPlan)){
+            for(i in 1:length(xS)){
+                
+                for(j in 1:length(xD)){
+                    
+                    if(transportPlan[i,j] > 0){
+                        curvedarrow(c(xS[i],yS[i]),c(xD[j],yD[j]), lwd = 0.5+transportPlan[[i,j]],
+                                    arr.pos = 0.5, arr.adj = 0.5, arr.type = "triangle",
+                                    curve = 0.0, lcol = "red", arr.col = "red")
+                        
+                    }
+                    
+                }
+                
+            }
             
         }
         
-        for(i in 1:length(xD)){
-            lines(x = costCreate[i]*cos(theta) + xD[i], y = costCreate[i]*sin(theta) + yD[i], col = 'dodgerblue3')
+        
+        
+        points(c(xS,xD), c(yS,yD) , pch = 1)
+        points(xS[which(supply > 0 )],yS[which(supply > 0)],
+               pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
+        points(xD[which(demand > 0 )],yD[which(demand > 0)], pch = 19,
+               cex = abs(demand[which(demand > 0)]),  col = "dodgerblue3")
+        
+        
+        # if a transport plan is given, add arrows to indicate mass transport
+        if(!is.null(transportPlan)){
+            
+            # plot circles as indicators for the creation/destruction cost
+            theta = seq(0, 2 * pi, length = 200)
+            
+            for(i in 1:length(xS)){
+                
+                lines(x = costDestruct[i]*cos(theta) + xS[i], y = costDestruct[i]*sin(theta) + yS[i], col = 'chartreuse3')
+                
+            }
+            
+            for(i in 1:length(xD)){
+                lines(x = costCreate[i]*cos(theta) + xD[i], y = costCreate[i]*sin(theta) + yD[i], col = 'dodgerblue3')
+            }
+            
         }
         
     }
+    
     
 }
 
@@ -133,8 +169,6 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
 #' plot in order to indicate where mass is added or removed. Therefore, the mass shown in
 #' each row or column is equal to the supply or demand vector. 
 #'
-#' \if{html}{\figure{Grid.png}}
-#' \if{latex}{\figure{Grid.png}{options: width=0.5in}}
 #'
 #' @param transportPlan A non negative numeric matrix that indicates the mass transport.
 #' The value at \eqn{\[i,j\]} is the amount of mass transported from supply point \eqn{i} to demand point \eqn{j}.
@@ -142,6 +176,11 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
 #' demand point. It length has to be equal to the number of columns in the transport matrix.  
 #' @param export (optional) A non negative numeric vector that give the amount of mass destroyed  at each
 #' supply point. It length has to be equal to the number of rows in the transport matrix.  
+#'
+#'
+#' \if{html}{\figure{Grid.png}}
+#' \if{latex}{\figure{Grid.png}{options: width=0.5in}}
+#'
 #'
 #' @examples
 #' I <- 200
@@ -219,12 +258,17 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 #' Plotting dense 1D transport
 #' 
 #' A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D. 
-#' \if{html}{\figure{1D.png}}
-#' \if{latex}{\figure{1D.png}{options: width=0.5in}}
+#' 
+#' 
 #' @param transportPlan A non negative numeric matrix giving the mass transport. The value at \eqn{(i,j)}
 #' gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.
 #' @param supplyList A list containing the non negative supply measure and the underlying discretization as vectors.
 #' @param demandList A list containing the non negative demand measure and the underlying discretization as vectors.
+#'
+#'
+#' \if{html}{\figure{1D.png}}
+#' \if{latex}{\figure{1D.png}{options: width=0.5in}}
+#'
 #'
 #' @examples 
 #'  
@@ -389,10 +433,8 @@ findPath <- function(from, to, treeDF){
 
 #' Plotting transport on trees
 #'
-#' This function visualizes the transport of mass on a tree. 
 #'
-#' \if{html}{\figure{tree.png}}
-#' \if{latex}{\figure{tree.png}{options: width=0.5in}}
+#' This function visualizes the transport of mass on a tree. 
 #'
 #'
 #' @param tree A tree structure in list format:
@@ -405,6 +447,10 @@ findPath <- function(from, to, treeDF){
 #' position \eqn{i} give the supply at node \eqn{i}.
 #' @param demand (optional) A non negative numeric vector giving the mass demand at each tree node. The value at 
 #' position \eqn{i} give the supply at node \eqn{i}.
+#'
+#'
+#' \if{html}{\figure{tree.png}}
+#' \if{latex}{\figure{tree.png}{options: width=0.5in}}
 #'
 #'
 #' @examples

@@ -7,11 +7,11 @@
 regularizedTransport(
   supplyList,
   demandList,
-  supplyDivList = list("KL", 0.5),
-  demandDivList = list("KL", 0.5),
-  epsVector = c(0.5),
+  supplyDivList,
+  demandDivList,
+  epsVector,
   maxIteration = 5000,
-  tol = 1e-08,
+  tol = 1e-05,
   p = 1,
   q = 2,
   wfr = FALSE,
@@ -21,32 +21,108 @@ regularizedTransport(
 )
 }
 \arguments{
-\item{supplyList}{a}
+\item{supplyList}{A list containing the supply measure and, if the cost matrix is not provided, the support of the supply distribution.}
 
-\item{demandList}{a}
+\item{demandList}{A list containing the demand measure and, if the cost matrix is not provided, the support of the demand distribution.}
 
-\item{supplyDivList}{a}
+\item{supplyDivList}{A list containing the information about the divergence function for the supply measure. The first element is the
+abbreviation of the divergence function. The following values are available: 
 
-\item{demandDivList}{a}
+\itemize{
+  \item "KL" for the Kullback-Leibner divergence \eqn{F = \lambda \cdot KL()}{F1 = lambda * KL()}
+  \item "TV" for total variation divergence \eqn{F = \lambda \cdot TV()}{F1 = lambda * TV()}
+  \item "RG" for the range constraint 
+  \item "Power" for the Power divergence with conjugate exponent r: \eqn{F_1 = \lambda \cdot Power_{r}()}{F1 = lambda * Power_r()}
+  \item "Hellinger" for the Power divergence with conjugate exponent r = -1: \eqn{F_1 = \lambda \cdot Power_{-1}()}{F1 = lambda * Power_-1()}
+  \item "Berg" for the Power divergence with conjugate exponent r = 0: \eqn{F_1 = \lambda \cdot Power_0()}{F1 = lambda * Power_0()}
+}
 
-\item{epsVector}{a}
+The Power divergence and its special cases are only implemented for the Sinkhorn algorithm. 
 
-\item{maxIteration}{a}
+The next elements in supplyDivList are the additional parameters for the divergence functions. For "KL", "TV", "Hellinger"
+and "Berg" the only required parameter is the regularization parameter \eqn{\lambda}{lambda}. The "RG" divergence function requires two parameters
+alpha and beta with \eqn{0 \leq \alpha \leq \beta}{0 <= alpha <= beta} that define the lower and upper bounds. Lastly, "Power" requires
+two parameters as well. The first is the regularization parameter \eqn{\lambda}{lambda}, followed by the conjugate exponent \eqn{r}.  
+The default value is list("KL",0.5).}
 
-\item{tol}{a}
+\item{demandDivList}{A list containing the information about the divergence
+function for the demand measure in the same form as the supplyDivList. The default value is list("KL",0.5).}
 
-\item{p}{a}
+\item{epsVector}{A numeric value or vector holding the regularization parameter. If a vector is given, epsilon scaling will be performed.}
 
-\item{q}{a}
+\item{maxIteration}{(optional) The maximum number of algorithm iterations. The default value is 5000}
 
-\item{wfr}{a}
+\item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value the algorithm is 
+considered to be converged. The default value is 1e-5.}
 
-\item{costMatrix}{a}
+\item{p}{(optional) The exponent applied to the cost function. Default value is 1.}
 
-\item{duals}{a}
+\item{q}{(optional) The parameter for calculating the L_q cost. Can be a positive real number or Inf. Default value is 2 calculating the euclidean distance.}
 
-\item{algorithm}{a}
+\item{wfr}{(optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
+\eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".}
+
+\item{costMatrix}{(optinal) A cost matrix for transport between the supply and demand points.}
+
+\item{duals}{(optinal) Set to "TRUE" to return the value of the dual solutions as well. Default value is "FALSE"}
+
+\item{algorithm}{(optinal) Set to "sinkhorn" to use the Sinkhorn algorithm. Default value is "scaling". Only 
+these two algorithm are available.}
 }
 \description{
-Regularized Unbalanced Optimal Transport
+Solving regularized unbalanced optimal transport problems.
+}
+\details{
+This functions solves the regularized unbalanced optimal transport problem using either the Scaling 
+or Sinkhorn algorithm described in the papers given below.
+The algorithms minimize the regularized unbalanced optimal transport problem given by
+
+\eqn{\min_{b \in \!R^{X \times Y}_+} \cdot F_1(P_X b) + \cdot F_2(P_Y b) + \varepsilon KL(b|K)}{min_b F1(P_X b) +  F_2(P_Y b) + epsilon * KL(b|K)}
+
+where F_X and F_Y are divergence functions, \eqn{P_X b} and \eqn{P_Y b} the marginals of \eqn{b}, 
+\eqn{KL(\cdot | \cdot)}{KL( | )} the Kullback Leibner divergence and \eqn{K = \exp(-c(x,y)/eps)}{K = exp(-c(x,y)/eps)} the kernel associated with the cost matrix.
+
+
+
+The following divergence functions are currently implemented: 
+\itemize{
+  \item Kullback-Leibner divergence ("KL")
+  \item Total variation ("TV")
+  \item The divergence associated with the range constraint ("RG")
+  \item The Power divergence ("Power") and its special cases the Hellinger ("Hellinger") and Berg ("Berg") divergence. (Only available for the Sinkhorn algorithm.)
+}
+
+Instead of providing a cost matrix to the function, it is possible to provide the support of the supply and demand measures and 
+have the function compute the cost matrix itself. 
+
+
+
+\insertRef{Chizat2016}{unbalancedTransport}
+
+\insertRef{Schmitzer2016}{unbalancedTransport}
+
+\insertRef{Sejourne2019}{unbalancedTransport}
+}
+\examples{
+I <- 1000
+J <- 1000
+X <- seq(0,1,length.out = I)
+Y <- seq(0,1,length.out = J)
+p <- supplyExample
+q <- demandExample
+
+supply <- list(p,X)
+demand <- list(q,Y)
+
+maxIter <- 1000
+eps <- 1e-3
+
+
+suppyDiv <- list("KL", 0.04)
+demandDiv <- list("KL", 0.04)
+res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
+                            maxIteration = maxIter, epsVector = eps, p = 2)
+plot1DTransport(res$TransportPlan, supply, demand)
+
+
 }

@@ -77,9 +77,10 @@ getCostMatrix <- function(tree){
 #' , transport plan \eqn{r}, construction and destruction costs \eqn{p} and \eqn{q} and cost matrix \eqn{C} can be solved efficiently in
 #' O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
 #' from R and to be able to compute the transport map. 
-#' 
 #'
+#'  
 #' \insertRef{Sato2020}{unbalancedTransport}
+#'
 #'
 #' @param tree A tree structure in list format:
 #' The first element is the index of the root node.
@@ -99,7 +100,7 @@ getCostMatrix <- function(tree){
 #' }
 #'
 #' @return A list containing the transport cost, the mass import and export vectors, and the transport list or plan if specified in 'output'.
-#' @export
+#'
 #'
 #' @examples
 #'
@@ -141,6 +142,8 @@ getCostMatrix <- function(tree){
 #' plotTree(tree, tList = transport$transportList,
 #'          supply = supply, demand = demand)
 #'
+#'
+#' @export
 treeTransport <- function(tree, supply, demand, creationCost, destructionCost, output = "transportPlan"){
 
 

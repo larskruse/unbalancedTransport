@@ -75,7 +75,7 @@ positionsByEigenvalue <- function(c){
 #' @param q parameter for the minkowski metric. standard p = 2 give the minkowski metric.
 #' @return The distance matrix between the points. The rows correspond to the points in x, the columns to the
 #' points in y
-#' 
+#' @noRd
 costMatrix <- function(x, y, p = 1,q = 2, wfr = FALSE){
 
         if(is.null(ncol(x))){

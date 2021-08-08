@@ -5,11 +5,11 @@ Version: 0.1.2
 Authors@R: person("Lars", "Kruse", role = c("aut", "cre"),  email = "lars.kruse@stud.uni-goettingen.de")
 Maintainer: Lars Kruse <lars.kruse@stud.uni-goettingen.de>
 Description: This package provides functions to solve and plot the solutions of
-    unbalanced optimal transport problems. These include iterative methods to solve
-    regularized transport, a function to solve transport on a tree metric and a solver
+    unbalanced optimal transport problems. These include iterative methods for
+    regularized transport, a function to solve transport on tree metrics and a solver
     that extends a given unbalanced transport problem to a balanced problem and applies the 
-    well known reverse simplex algorithm.
-    Additionally, functions to plot the results and example distributions are provided. 
+    well known networkflow algorithm.
+    Additionally, functions to plot the results, and example distributions are provided. 
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

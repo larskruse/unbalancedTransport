@@ -19,14 +19,14 @@ The other elements are vectors defining the edges of the tree. Each of these vec
 position \eqn{i} give the supply at node \eqn{i}.}
 
 \item{demand}{(optional) A non negative numeric vector giving the mass demand at each tree node. The value at 
-position \eqn{i} give the supply at node \eqn{i}.}
+position \eqn{i} give the supply at node \eqn{i}.
+
+
+\if{html}{\figure{tree.png}}
+\if{latex}{\figure{tree.png}{options: width=0.5in}}}
 }
 \description{
 This function visualizes the transport of mass on a tree.
-}
-\details{
-\if{html}{\figure{tree.png}}
-\if{latex}{\figure{tree.png}{options: width=0.5in}}
 }
 \examples{
 tree <- list(1, c(1, 2, 1), c(2, 3, 1), c(3, 4, 1), c(3, 5, 1),

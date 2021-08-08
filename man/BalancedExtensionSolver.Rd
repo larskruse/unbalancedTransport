@@ -10,21 +10,22 @@ BalancedExtensionSolver(
   p = 1,
   q = 2,
   wfr = FALSE,
-  costMatrix = NULL
+  costMatrix = NULL,
+  algo = "networkflow"
 )
 }
 \arguments{
 \item{supplyList}{A list containing the information about the supply. The first element hast to be the distribution followed by
- a vector specifying the cost for destruction of mass at each supply point. If no cost matrix is provided, the third element has to be 
-the positions of the supply points. This can either be a vector or a matrix where each row gives the coordinates for one point.}
+a vector specifying the cost for destruction of mass at each supply point. If the cost matrix
+is not provided, the third element has to be the positions of the supply points.
+This can either be a vector or a matrix where each row gives the coordinates for one point.}
 
-\item{demandList}{A list similar to the supplyList but holding the information about the demand.}
+\item{demandList}{A list similar to the supplyList but holding the information about the demand distribution.}
 
-\item{p}{(optional) The exponent that is applied to the cost matrix. Can
-be used to compute quadratic cost. The default value is 1.}
+\item{p}{(optional) The exponent applied to the cost function. Default value is 1.}
 
-\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted
-if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{q}{(optional) The parameter for calculating the L_q cost. Can be a positive real
+number or Inf. Default value is 2 calculating the euclidean distance}
 
 \item{wfr}{(optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao
  distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
@@ -32,14 +33,16 @@ The default value is "false".}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the
 cost matrix, a custom cost matrix can be passed to the algorithm.}
+
+\item{algo}{www}
 }
 \description{
 Solving unbalanced optimal transport problems by extending them to a balanced
-problem and applying the revised simplex algorithm.
+problem and applying the networkflow algorithm.
 }
 \details{
 This function solves unbalanced optimal transport problems by extending them
-to a balanced problem and applying the revised simplex algorithm.
+to a balanced problem and applying the networkflow algorithm.
 The unbalanced optimal transport problem \eqn{<C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
 <C,r> + sum_i(p_i (a_i-sum_j r_ij)) + sum_j(q_j (b_j-sum_i r_ij))} with supply
 and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}, cost matrix C, 
@@ -47,10 +50,7 @@ transport plan \eqn{r} and construction and destruction costs \eqn{p} and
 \eqn{q} is transformed to a balanced transport problem by extending the cost
  matrix as well as supply and demand vectors. 
 
-The resulting transport problem is then solved using the reverse simplex algorithm provided by the \code{\link[transport]{transport}} package.
-
-If the cost matrix fulfils the Monge property, a algorithm designed take advantage of this special structure can be used as well. However, the 
-Monge algorithm is not as efficient as the revised simplex algorithm.
+The resulting transport problem is then solved using the networkflow algorithm provided by the \code{\link[transport]{transport}} package.
 
 
 \insertRef{Guittet2002}{unbalancedTransport}
@@ -71,5 +71,6 @@ supplyList <- list(p,costDestruct, supplyPoints)
 demandList <- list(q,costCreate, demandPoints)
 
 BalancedExtensionSolver(supplyList, demandList, p = 2)
+
 
 }

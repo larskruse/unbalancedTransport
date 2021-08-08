@@ -50,7 +50,7 @@ min_r <C,r> + sum_i(p_i (a-sum_j r_ij)) + sum_j(q_j (b-sum_i r_ij))} with supply
 O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
 from R and to be able to compute the transport map. 
 
-
+ 
 \insertRef{Sato2020}{unbalancedTransport}
 }
 \examples{
@@ -92,5 +92,6 @@ transport <- treeTransport(tree, supply, demand,
 
 plotTree(tree, tList = transport$transportList,
          supply = supply, demand = demand)
+
 
 }

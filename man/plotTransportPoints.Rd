@@ -31,14 +31,14 @@ position \eqn{i} give the supply at point \eqn{i}.}
 
 \item{costCreate}{A non negative numeric vector containing the  cost for creating mass at each demand point.}
 
-\item{costDestruct}{A non negative numeric vector containing the cost for destruction mass at each supply point.}
+\item{costDestruct}{A non negative numeric vector containing the cost for destruction mass at each supply point.
+
+
+\if{html}{\figure{plotTransportPoints.png}}
+\if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}}
 }
 \description{
 Visualizing mass transport between point clouds.
-}
-\details{
-\if{html}{\figure{plotTransportPoints.png}}
-\if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
 }
 \examples{
 

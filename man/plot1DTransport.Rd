@@ -12,12 +12,14 @@ gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.}
 
 \item{supplyList}{A list containing the non negative supply measure and the underlying discretization as vectors.}
 
-\item{demandList}{A list containing the non negative demand measure and the underlying discretization as vectors.}
+\item{demandList}{A list containing the non negative demand measure and the underlying discretization as vectors.
+
+
+\if{html}{\figure{1D.png}}
+\if{latex}{\figure{1D.png}{options: width=0.5in}}}
 }
 \description{
-A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D. 
-\if{html}{\figure{1D.png}}
-\if{latex}{\figure{1D.png}{options: width=0.5in}}
+A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D.
 }
 \examples{
  

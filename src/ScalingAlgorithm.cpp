@@ -2,7 +2,7 @@
 #include <chrono>
 #include <RcppEigen.h>
 
-#include "gperftools/profiler.h"
+//#include "gperftools/profiler.h"
 
 
 //' Elementwise division of two vectors with 'x/0 = 0'
@@ -277,7 +277,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // since u and v are 0, the updateK function returns the Gibbs kernel
   Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
   Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
-  ProfilerStart("scaling.prof");
+  //ProfilerStart("scaling.prof");
   
   double converge;
   
@@ -387,7 +387,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     i = i + 1;
 
   }
-  ProfilerStop();
+  //ProfilerStop();
   Rcpp::Rcout << 100 << "% done. \n";
 
  
