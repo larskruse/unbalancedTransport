@@ -1,13 +1,13 @@
 
-#' Unbalanced Transport Solver
+#' Solver for the unbalanced mass transportation problem
 #' 
-#' Solving unbalanced optimal transport problems by extending them to a balanced
+#' Solving the unbalanced mass transportation problem by extending to a balanced
 #' problem and applying the networkflow algorithm.
 #'
 #'
 #' This function solves unbalanced optimal transport problems by extending them
 #' to a balanced problem and applying the networkflow algorithm.
-#' The unbalanced optimal transport problem \eqn{<C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
+#' The unbalanced mass transportation problem \eqn{<C,r> + \sum_i p_i(\alpha_i - \sum_j r_{ij}) + \sum_j q_j(\beta-\sum_i r{ij})}{
 #' <C,r> + sum_i(p_i (a_i-sum_j r_ij)) + sum_j(q_j (b_j-sum_i r_ij))} with supply
 #' and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}, cost matrix C, 
 #' transport plan \eqn{r} and construction and destruction costs \eqn{p} and 
@@ -50,12 +50,12 @@
 #' supplyList <- list(p,costDestruct, supplyPoints)
 #' demandList <- list(q,costCreate, demandPoints)
 #'
-#' BalancedExtensionSolver(supplyList, demandList, p = 2)
+#' UMTPSolver(supplyList, demandList, p = 2)
 #'
 #'
 #' @export
 #'
-BalancedExtensionSolver <- function(supplyList, demandList, p = 1, q = 2,
+UMTPSolver <- function(supplyList, demandList, p = 1, q = 2,
                                     wfr = FALSE, costMatrix = NULL, algo = "networkflow"){
 
     
@@ -104,7 +104,7 @@ BalancedExtensionSolver <- function(supplyList, demandList, p = 1, q = 2,
         transportPlan[cbind(res$from,res$to)] <- res$mass
         
     }else{
-        transportPlan <- matrix(0,length(supply),length(demand))
+        transportPlan <- matrix(0,length(supplyList[[1]]),length(demandList[[1]]))
             
     }
         

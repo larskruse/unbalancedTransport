@@ -4,35 +4,19 @@
 \alias{plotTransportPoints}
 \title{Plotting transport between single points.}
 \usage{
-plotTransportPoints(
-  transportPlan,
-  supply = NULL,
-  demand = NULL,
-  supplyCoordinates = NULL,
-  demandCoordinates = NULL,
-  costCreate = NULL,
-  costDestruct = NULL
-)
+plotTransportPoints(transportPlan, supplyList, demandList)
 }
 \arguments{
 \item{transportPlan}{A non negative numeric matrix that indicates where the mass is
 transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
 supply point \eqn{i} to demand point \eqn{j}.}
 
-\item{supply}{(optional) A non negative numeric vector giving the mass supply at each point. The value at 
-position \eqn{i} give the supply at point \eqn{i}.}
+\item{supplyList}{A list containing the information about the supply measure. The first element hast to be the mass
+distribution followed by
+a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points. 
+Has to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.}
 
-\item{demand}{(optional) A non negative numeric vector giving the mass demand at each point. The value at 
-position \eqn{i} give the supply at point \eqn{i}.}
-
-\item{supplyCoordinates}{The coordinates of the supply points in matrix form. Each row giving the coordinates for one point.}
-
-\item{demandCoordinates}{The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.}
-
-\item{costCreate}{A non negative numeric vector containing the  cost for creating mass at each demand point.}
-
-\item{costDestruct}{A non negative numeric vector containing the cost for destruction mass at each supply point.
-
+\item{demandList}{A list similar to the supplyList but holding the information about the demand distribution.
 
 \if{html}{\figure{plotTransportPoints.png}}
 \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}}
@@ -45,19 +29,20 @@ Visualizing mass transport between point clouds.
 supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
 demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 
-cC <- rep(1.8,2)
-cD <- rep(2,2)
+creationCost <- rep(1.8,2)
+destructionCost <- rep(2,2)
 
 
-sup <- c(1,2)
-dem <- c(2.5,1)
+supplyMass <- c(1,2)
+demandMass <- c(2.5,1)
 
-res <- BalancedExtensionSolver(list(sup, cD,supplyPoints), list(dem, cC, demandPoints))
+supplyList <- list(supplyMass, destructionCost,supplyPoints)
+demandList <- list(demandMass, creationCost, demandPoints)
+
+res <- UMTPSolver(supplyList, demandList)
 transportPlan <- res$transportPlan
 
-plotTransportPoints(transportPlan, supply = sup, demand = dem,
-                    supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
-                    costCreate = cC, costDestruct = cD)
+plotTransportPoints(transportPlan, supplyList, demandList)
 
 
 }

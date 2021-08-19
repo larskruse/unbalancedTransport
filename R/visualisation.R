@@ -7,15 +7,11 @@
 #' @param transportPlan A non negative numeric matrix that indicates where the mass is
 #' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
 #' supply point \eqn{i} to demand point \eqn{j}.
-#' @param supply (optional) A non negative numeric vector giving the mass supply at each point. The value at 
-#' position \eqn{i} give the supply at point \eqn{i}.
-#' @param demand (optional) A non negative numeric vector giving the mass demand at each point. The value at 
-#' position \eqn{i} give the supply at point \eqn{i}.
-#' @param supplyCoordinates The coordinates of the supply points in matrix form. Each row giving the coordinates for one point.
-#' @param demandCoordinates The coordinates of the demand points in matrix form. Each row giving the coordinates for one point.
-#' @param costCreate A non negative numeric vector containing the  cost for creating mass at each demand point.
-#' @param costDestruct A non negative numeric vector containing the cost for destruction mass at each supply point.
-#'
+#' @param supplyList A list containing the information about the supply measure. The first element hast to be the mass
+#' distribution followed by
+#' a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points. 
+#' Has to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.
+#' @param demandList A list similar to the supplyList but holding the information about the demand distribution.
 #' 
 #' \if{html}{\figure{plotTransportPoints.png}}
 #' \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
@@ -25,25 +21,57 @@
 #' supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
 #' demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 #' 
-#' cC <- rep(1.8,2)
-#' cD <- rep(2,2)
+#' creationCost <- rep(1.8,2)
+#' destructionCost <- rep(2,2)
 #' 
 #' 
-#' sup <- c(1,2)
-#' dem <- c(2.5,1)
+#' supplyMass <- c(1,2)
+#' demandMass <- c(2.5,1)
 #' 
-#' res <- BalancedExtensionSolver(list(sup, cD,supplyPoints), list(dem, cC, demandPoints))
+#' supplyList <- list(supplyMass, destructionCost,supplyPoints)
+#' demandList <- list(demandMass, creationCost, demandPoints)
+#' 
+#' res <- UMTPSolver(supplyList, demandList)
 #' transportPlan <- res$transportPlan
 #' 
-#' plotTransportPoints(transportPlan, supply = sup, demand = dem,
-#'                     supplyCoordinates = supplyPoints, demandCoordinates =  demandPoints,
-#'                     costCreate = cC, costDestruct = cD)
+#' plotTransportPoints(transportPlan, supplyList, demandList)
 #'
 #'
 #' @export
-plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
-                                supplyCoordinates = NULL, demandCoordinates = NULL,
-                                costCreate = NULL, costDestruct = NULL){
+
+plotTransportPoints <- function(transportPlan, supplyList, demandList){
+    
+    
+    if(length(supplyList) == 2 ){
+        
+        supply <- supplyList[[1]]
+        costDestruct <- rep(0, length(supplyList[[1]]))
+        supplyCoordinates <- supplyList[[2]]
+        
+        
+    }else{
+        
+        supply <- supplyList[[1]]
+        costDestruct <- supplyList[[2]]
+        supplyCoordinates <- supplyList[[3]]
+        
+        
+    }
+    
+    if(length(demandList) == 2){
+        
+        demand <- demandList[[1]]
+        costCreate <- rep(0,length(demandList[[1]]))
+        demandCoordinates <- demandList[[2]]
+        
+    }else{
+        
+        demand <- demandList[[1]]
+        costCreate <- demandList[[2]]
+        demandCoordinates <- demandList[[3]]
+        
+    }
+    
     
     if(is.null(costCreate)){
         costCreate <- rep(0, ncol(transportPlan))
@@ -55,11 +83,20 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
     
     if(is.null(dim(supplyCoordinates))){
         
+        
+        
+        
         xS <- supplyCoordinates
         yS <- rep(0, length(supplyCoordinates))
         
         xD <- demandCoordinates
         yD <- rep(0,length(demandCoordinates))
+        
+        print(xS)
+        print(yS)
+        print(xD)
+        print(yD)
+        
     }else{
         xS <- supplyCoordinates[,1]
         yS <- supplyCoordinates[,2]
@@ -68,10 +105,10 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
         yD <- demandCoordinates[,2]
     }
     
-    if(length(xS)+length(xD) > 20){
+    if(length(xS)+length(xD) > 10){
         plot(1, type = "n", xlab = "", ylab = "",
-             xlim = c(min(c(xS,xD))-0.3*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.3*abs(max(c(xS,xD))-min(c(xS,xD)))),
-             ylim =c(min(c(yS,yD))-0.3*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.3*abs(max(c(yS,yD))-min(c(yS,yD)))),
+             xlim = c(min(c(xS,xD))-0.1*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.1*abs(max(c(xS,xD))-min(c(xS,xD)))),
+             ylim =c(min(c(yS,yD))-0.1*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.1*abs(max(c(yS,yD))-min(c(yS,yD)))),
              asp = 1)
         if(!is.null(transportPlan)){
             for(i in 1:length(xS)){
@@ -127,8 +164,7 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
             
         }
         
-        
-        
+
         points(c(xS,xD), c(yS,yD) , pch = 1)
         points(xS[which(supply > 0 )],yS[which(supply > 0)],
                pch = 19, cex = supply[which(supply > 0)],  col = "chartreuse3")
@@ -137,7 +173,7 @@ plotTransportPoints <- function(transportPlan, supply = NULL, demand = NULL,
         
         
         # if a transport plan is given, add arrows to indicate mass transport
-        if(!is.null(transportPlan)){
+        if(!is.null(costDestruct) & !is.null(costCreate)){
             
             # plot circles as indicators for the creation/destruction cost
             theta = seq(0, 2 * pi, length = 200)
