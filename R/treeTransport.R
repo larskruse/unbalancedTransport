@@ -78,7 +78,7 @@ getCostMatrix <- function(tree){
 #' O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
 #' from R and to be able to compute the transport map. 
 #'
-#'  
+#' @references
 #' \insertRef{Sato2020}{unbalancedTransport}
 #'
 #'
@@ -86,10 +86,8 @@ getCostMatrix <- function(tree){
 #' The first element is the index of the root node.
 #' The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
 #'  of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.
-#' @param supply A non negative numeric supply vector. 
-#' @param demand A non negative numeric demand vector
-#' @param creationCost A non negative vector giving the cost to create mass at each node.
-#' @param destructionCost A non negative vector giving the cost to destruct mass at each node.
+#' @param supplyList A non negative numeric supply vector. 
+#' @param demandList A non negative numeric demand vector
 #' @param output Determines the format of the output:
 #' \itemize{
 #' \item "transportPlan" give a standard transport plan matrix where the value at \eqn{i,j} gives the amount of mass transported from 
@@ -113,8 +111,10 @@ getCostMatrix <- function(tree){
 #' supply <- c(0,0,2,0,0,4,0,0,2,0)
 #' demand <- c(0,0,0,0,7,0,0,0,0,1)
 #'
-#' transport <- treeTransport(tree, supply, demand,
-#'                            constructionCost, destructionCost,
+#' supplyList = list(supply, destructionCost)
+#' demandList = list(demand, constructionCost)
+#'
+#' transport <- treeTransport(tree, supplyList, demandList,
 #'                            output = "list")
 #'
 #' plotTree(tree, tList = transport$transportList,
@@ -134,9 +134,11 @@ getCostMatrix <- function(tree){
 #'
 #' supply <- c(0,0,1,2,0,0,0,0,0,0,0,0,0)
 #' demand <- c(0,0,0,0,0,1,0,1,0,0,0,1,1)
+#' 
+#' supplyList = list(supply, destructionCost)
+#' demandList = list(demand, constructionCost)
 #'
-#' transport <- treeTransport(tree, supply, demand,
-#'                            constructionCost, destructionCost,
+#' transport <- treeTransport(tree, supplyList, demandList,
 #'                            output = "list")
 #'
 #' plotTree(tree, tList = transport$transportList,
@@ -144,8 +146,14 @@ getCostMatrix <- function(tree){
 #'
 #'
 #' @export
-treeTransport <- function(tree, supply, demand, creationCost, destructionCost, output = "transportPlan"){
+treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"){
 
+    supply = supplyList[[1]]
+    demand = demandList[[1]]
+    
+    creationCost = supplyList[[2]]
+    destructionCost = demandList[[2]]
+    
 
     if(output != "list" & output != "transportPlan"  & output != "cost"){
 

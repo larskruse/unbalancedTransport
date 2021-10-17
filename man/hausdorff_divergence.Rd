@@ -12,8 +12,8 @@ hausdorff_divergence(
   epsVector,
   iterMax = 1000,
   tol = 0.001,
-  p = 1,
-  q = 2,
+  exp = 1,
+  p = 2,
   wfr = FALSE,
   Cxy = NULL,
   Cxx = NULL,
@@ -51,9 +51,9 @@ two parameters as well. The first is the regularization parameter \eqn{\lambda}{
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-5.}
 
-\item{p}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
+\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
-\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{p}{(optional) Parameter for the L_p cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
 
 \item{wfr}{(optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".}
@@ -79,9 +79,6 @@ The Hausdorff divergence is defined as
 with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
 \eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
 \frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
-
-
-\insertRef{Sejourne2019}{unbalancedTransport}
 }
 \examples{
 I <- 1000
@@ -98,7 +95,10 @@ eps <- 1e-3
 supplyDiv <- list("KL", 0.04)
 demandDiv <- list("KL", 0.04)
 
-hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
+hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
 
 
+}
+\references{
+\insertRef{Sejourne2019}{unbalancedTransport}
 }

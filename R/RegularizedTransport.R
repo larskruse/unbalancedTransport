@@ -27,7 +27,7 @@
 #' have the function compute the cost matrix itself. 
 #' 
 #' 
-#' 
+#' @references
 #' \insertRef{Chizat2016}{unbalancedTransport}
 #' 
 #' \insertRef{Schmitzer2016}{unbalancedTransport}
@@ -65,8 +65,8 @@
 #' @param maxIteration (optional) The maximum number of algorithm iterations. The default value is 5000
 #' @param tol (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value the algorithm is 
 #' considered to be converged. The default value is 1e-5.  
-#' @param p (optional) The exponent applied to the cost function. Default value is 1.
-#' @param q (optional) The parameter for calculating the L_q cost. Can be a positive real number or Inf. Default value is 2 calculating the euclidean distance.
+#' @param exp (optional) The exponent applied to the cost function. Default value is 1.
+#' @param p (optional) The parameter for calculating the L_q cost. Can be a positive real number or Inf. Default value is 2 calculating the euclidean distance.
 #' @param wfr (optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 #' \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".
 #' @param costMatrix (optinal) A cost matrix for transport between the supply and demand points.
@@ -93,13 +93,13 @@
 #' suppyDiv <- list("KL", 0.04)
 #' demandDiv <- list("KL", 0.04)
 #' res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
-#'                             maxIteration = maxIter, epsVector = eps, p = 2)
+#'                             maxIteration = maxIter, epsVector = eps, exp = 2)
 #' plot1DTransport(res$TransportPlan, supply, demand)
 #'
 #'
 #' @export
 regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector,
-                                 maxIteration = 5000, tol = 1e-5, p = 1, q = 2, wfr = FALSE,
+                                 maxIteration = 5000, tol = 1e-5, exp = 1, p = 2, wfr = FALSE,
                                  costMatrix = NULL, duals = FALSE, algorithm = "scaling"){
     
     
@@ -203,7 +203,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
             
         }else if((is.null(costMatrix) & length(supply) <= 1000)){
             
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], p, q, wfr)
+            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
             res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                  supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                                  Div2, maxIteration, epsVector, tol)
@@ -216,7 +216,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
             # 
             # 
             
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], p, q, wfr)
+            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
             res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                                  supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                                  Div2, maxIteration, epsVector, tol)
@@ -255,7 +255,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         
         if(is.null(costMatrix)){
             
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], p, q, wfr)
+            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
             
         }
         

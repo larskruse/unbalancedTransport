@@ -12,8 +12,8 @@ regularizedTransport(
   epsVector,
   maxIteration = 5000,
   tol = 1e-05,
-  p = 1,
-  q = 2,
+  exp = 1,
+  p = 2,
   wfr = FALSE,
   costMatrix = NULL,
   duals = FALSE,
@@ -55,9 +55,9 @@ function for the demand measure in the same form as the supplyDivList. The defau
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value the algorithm is 
 considered to be converged. The default value is 1e-5.}
 
-\item{p}{(optional) The exponent applied to the cost function. Default value is 1.}
+\item{exp}{(optional) The exponent applied to the cost function. Default value is 1.}
 
-\item{q}{(optional) The parameter for calculating the L_q cost. Can be a positive real number or Inf. Default value is 2 calculating the euclidean distance.}
+\item{p}{(optional) The parameter for calculating the L_q cost. Can be a positive real number or Inf. Default value is 2 calculating the euclidean distance.}
 
 \item{wfr}{(optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".}
@@ -93,15 +93,7 @@ The following divergence functions are currently implemented:
 }
 
 Instead of providing a cost matrix to the function, it is possible to provide the support of the supply and demand measures and 
-have the function compute the cost matrix itself. 
-
-
-
-\insertRef{Chizat2016}{unbalancedTransport}
-
-\insertRef{Schmitzer2016}{unbalancedTransport}
-
-\insertRef{Sejourne2019}{unbalancedTransport}
+have the function compute the cost matrix itself.
 }
 \examples{
 I <- 1000
@@ -121,8 +113,15 @@ eps <- 1e-3
 suppyDiv <- list("KL", 0.04)
 demandDiv <- list("KL", 0.04)
 res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
-                            maxIteration = maxIter, epsVector = eps, p = 2)
+                            maxIteration = maxIter, epsVector = eps, exp = 2)
 plot1DTransport(res$TransportPlan, supply, demand)
 
 
+}
+\references{
+\insertRef{Chizat2016}{unbalancedTransport}
+
+\insertRef{Schmitzer2016}{unbalancedTransport}
+
+\insertRef{Sejourne2019}{unbalancedTransport}
 }

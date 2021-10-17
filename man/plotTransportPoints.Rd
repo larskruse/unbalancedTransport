@@ -39,7 +39,7 @@ demandMass <- c(2.5,1)
 supplyList <- list(supplyMass, destructionCost,supplyPoints)
 demandList <- list(demandMass, creationCost, demandPoints)
 
-res <- UMTPSolver(supplyList, demandList)
+res <- umtp(supplyList, demandList)
 transportPlan <- res$transportPlan
 
 plotTransportPoints(transportPlan, supplyList, demandList)

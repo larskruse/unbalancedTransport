@@ -616,9 +616,9 @@ Rcpp::List treegkr_Rcpp (Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::Nu
 
     // The import of mass depends on the position of the segment tree nodes.
     // If a segment generated at a transport tree node with initial minimum position
-    // in x > 0 ends up in x < 0 in the finale segment tree, it indicates destruction
+    // in x > 0 ends up in x > 0 in the finale segment tree, it indicates destruction
     // of mass at its transport tree node.
-    // A segment from x < 0 that ends up at x > 0 indicates mass creation.
+    // A segment from x < 0 that ends up at x < 0 indicates mass creation.
     // The length of the segment determines the amount of mass that is created
     // or destructed.
     // The import vector is updated accordingly.
@@ -663,7 +663,7 @@ Rcpp::List treegkr_Rcpp (Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::Nu
     }
 
 
-    // Otherwise, the function value at x = 0 has to be caluclated.
+    // Otherwise, the function value at x = 0 has to be calculated.
 
     // Starting at the leftmost segment tree node, all nodes are traversed in
     // order of their values until x = 0 is reached.

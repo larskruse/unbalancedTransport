@@ -98,7 +98,7 @@ expC <- function(f, g, C){
 #' 
 #' The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
 #' 
-#' 
+#' @references
 #' \insertRef{Sejourne2019}{unbalancedTransport}
 #'
 #'  
@@ -129,8 +129,8 @@ expC <- function(f, g, C){
 #' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 10000.
 #' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 #' is terminated as it is already converged. The default value is 1e-5.
-#' @param p (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
-#' @param q (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
+#' @param exp (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
+#' @param p (optional) Parameter for the L_p cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 #' \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".
 #' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
@@ -155,12 +155,12 @@ expC <- function(f, g, C){
 #' supplyDiv <- list("KL", 0.04)
 #' demandDiv <- list("KL", 0.04)
 #' 
-#' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
+#' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
 #'
 #'
 #' @export
 sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector, iterMax = 10000, tol = 1e-5,
-                                p = 1, q = 2,  wfr = FALSE,
+                                exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
     
     eps <- epsVector[length(epsVector)]
@@ -174,15 +174,15 @@ sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDiv
 
 
         if(is.null(Cxy)){
-            Cxy <- costMatrix(X, Y , p, q, wfr)
+            Cxy <- costMatrix(X, Y , exp, p, wfr)
         }
 
         if(is.null(Cxx)){
-            Cxx <- costMatrix(X, X, p, q, wfr)
+            Cxx <- costMatrix(X, X, exp, p, wfr)
         }
 
         if(is.null(Cyy)){
-            Cyy <- costMatrix(Y, Y ,p, q, wfr)
+            Cyy <- costMatrix(Y, Y , exp, p, wfr)
         }
 
     }
@@ -468,7 +468,7 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
 #' \eqn{F_\varepsilon(\alpha) = -\frac{1}{2} OT_\varepsilon(\alpha,\alpha) + 
 #' \frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
 #' 
-#' 
+#' @references
 #' \insertRef{Sejourne2019}{unbalancedTransport}
 #' 
 #' 
@@ -498,8 +498,8 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
 #' @param iterMax (optional) The maximum number of algorithm iterations. The default value is 5000
 #' @param tol  (optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 #' is terminated as it is already converged. The default value is 1e-5.
-#' @param p (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
-#' @param q (optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
+#' @param exp (optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.
+#' @param p (optional) Parameter for the L_p cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.
 #' @param wfr (optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 #' \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".
 #' @param Cxy (optional) A cost matrix for transport between the supply and demand distributions.
@@ -523,27 +523,27 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
 #' supplyDiv <- list("KL", 0.04)
 #' demandDiv <- list("KL", 0.04)
 #' 
-#' hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
+#' hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
 #' 
 #'
 #' @export
 hausdorff_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector, iterMax = 1000, tol = 1e-3,
-                                 p = 1, q = 2,  wfr = FALSE,
+                                 exp = 1, p = 2,  wfr = FALSE,
                                  Cxy = NULL, Cxx = NULL, Cyy = NULL){
     eps = epsVector[length(epsVector)]
     lenSup <- length(supplyList)
     lenDem <- length(demandList)
 
     if(is.null(Cxy)){
-        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], p, q, wfr)
+        Cxy <- costMatrix(supplyList[[lenSup]], demandList[[lenDem]], exp, p, wfr)
     }
 
     if(is.null(Cxx)){
-        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], p, q, wfr)
+        Cxx <- costMatrix(supplyList[[lenSup]], supplyList[[lenSup]], exp, p, wfr)
     }
 
     if(is.null(Cyy)){
-        Cyy <- costMatrix(demandList[[lenDem]], demandList[[lenDem]], p, q, wfr)
+        Cyy <- costMatrix(demandList[[lenDem]], demandList[[lenDem]], exp, p, wfr)
     }
 
 

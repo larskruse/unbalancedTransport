@@ -16,7 +16,7 @@
 #' 
 #' The resulting transport problem is then solved using the networkflow algorithm provided by the \code{\link[transport]{transport}} package.
 #'
-#' 
+#' @references
 #' \insertRef{Guittet2002}{unbalancedTransport}
 #' 
 #'
@@ -25,8 +25,8 @@
 #' is not provided, the third element has to be the positions of the supply points.
 #' This can either be a vector or a matrix where each row gives the coordinates for one point.
 #' @param demandList A list similar to the supplyList but holding the information about the demand distribution.
-#' @param p (optional) The exponent applied to the cost function. Default value is 1.
-#' @param q (optional) The parameter for calculating the L_q cost. Can be a positive real
+#' @param exp (optional) The exponent applied to the cost function. Default value is 1.
+#' @param p (optional) The parameter for calculating the L_p cost. Can be a positive real
 #' number or Inf. Default value is 2 calculating the euclidean distance
 #' @param wfr (optional) Computes the cost matrix needed for the Wasserstein-Fisher-Rao
 #'  distance \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}.
@@ -50,18 +50,19 @@
 #' supplyList <- list(p,costDestruct, supplyPoints)
 #' demandList <- list(q,costCreate, demandPoints)
 #'
-#' UMTPSolver(supplyList, demandList, p = 2)
+#' 
+#' umtp(supplyList, demandList, exp = 2)
 #'
 #'
 #' @export
 #'
-UMTPSolver <- function(supplyList, demandList, p = 1, q = 2,
+umtp <- function(supplyList, demandList, exp = 1, p = 2,
                                     wfr = FALSE, costMatrix = NULL, algo = "networkflow"){
 
     
     if(is.null(costMatrix)){
     
-        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], p, q, wfr)    
+        costMatrix <- costMatrix(supplyList[[3]], demandList[[3]], exp, p, wfr)    
         
     }
     

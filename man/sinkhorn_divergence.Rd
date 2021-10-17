@@ -12,8 +12,8 @@ sinkhorn_divergence(
   epsVector,
   iterMax = 10000,
   tol = 1e-05,
-  p = 1,
-  q = 2,
+  exp = 1,
+  p = 2,
   wfr = FALSE,
   Cxy = NULL,
   Cxx = NULL,
@@ -53,9 +53,9 @@ demand measure in the same form as the supplyDivList.}
 \item{tol}{(optional) A numeric value. If the change of the dual variables from one step to the next is smaller than this value. The algorithm
 is terminated as it is already converged. The default value is 1e-5.}
 
-\item{p}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
+\item{exp}{(optional) The exponent that is applied to the cost matrix. Can be used to compute quadratic cost. The default value is 1.}
 
-\item{q}{(optional) Parameter for the minkwski cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
+\item{p}{(optional) Parameter for the L_p cost function. Can be omitted if either "euclidean" or "maximum" is used. The default value is 2.}
 
 \item{wfr}{(optional) Set to "TRUE" to calculate the cost matrix for the Wasserstein-Fisher-Rao distance
 \eqn{c(x,y) = -\log(\cos^2_+(d(x,y)))}{c(x,y) = -log(cos_+(d(x,y)²))}. Default value is "FALSE".}
@@ -83,9 +83,6 @@ with transport cost \eqn{OT_\varepsilon(\alpha,\beta)}{OT_eps(a,b)}, regularizat
 and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 
 The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
-
-
-\insertRef{Sejourne2019}{unbalancedTransport}
 }
 \examples{
 I <- 1000
@@ -102,7 +99,10 @@ eps <- 1e-3
 supplyDiv <- list("KL", 0.04)
 demandDiv <- list("KL", 0.04)
 
-sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, p = 2)
+sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
 
 
+}
+\references{
+\insertRef{Sejourne2019}{unbalancedTransport}
 }

@@ -4,14 +4,7 @@
 \alias{treeTransport}
 \title{Transport on Trees}
 \usage{
-treeTransport(
-  tree,
-  supply,
-  demand,
-  creationCost,
-  destructionCost,
-  output = "transportPlan"
-)
+treeTransport(tree, supplyList, demandList, output = "transportPlan")
 }
 \arguments{
 \item{tree}{A tree structure in list format:
@@ -19,13 +12,9 @@ The first element is the index of the root node.
 The other elements are vectors defining the edges of the tree. Each of these vectors has to be 
  of the form \eqn{(parent_node_index, child_node_index, edge_weight)}.}
 
-\item{supply}{A non negative numeric supply vector.}
+\item{supplyList}{A non negative numeric supply vector.}
 
-\item{demand}{A non negative numeric demand vector}
-
-\item{creationCost}{A non negative vector giving the cost to create mass at each node.}
-
-\item{destructionCost}{A non negative vector giving the cost to destruct mass at each node.}
+\item{demandList}{A non negative numeric demand vector}
 
 \item{output}{Determines the format of the output:
 \itemize{
@@ -48,10 +37,7 @@ If the cost matrix is derived from a tree metric, the unbalanced optimal transpo
 min_r <C,r> + sum_i(p_i (a-sum_j r_ij)) + sum_j(q_j (b-sum_i r_ij))} with supply and demand measure \eqn{\alpha}{a} and \eqn{\beta}{b}
 , transport plan \eqn{r}, construction and destruction costs \eqn{p} and \eqn{q} and cost matrix \eqn{C} can be solved efficiently in
 O(n log²n) time. The C++ implementation of the algorithm used in this package can be found at https://github.com/joisino/treegkr. It was updated in order to make it accessible 
-from R and to be able to compute the transport map. 
-
- 
-\insertRef{Sato2020}{unbalancedTransport}
+from R and to be able to compute the transport map.
 }
 \examples{
 
@@ -64,8 +50,10 @@ destructionCost <- rep(2,13)
 supply <- c(0,0,2,0,0,4,0,0,2,0)
 demand <- c(0,0,0,0,7,0,0,0,0,1)
 
-transport <- treeTransport(tree, supply, demand,
-                           constructionCost, destructionCost,
+supplyList = list(supply, destructionCost)
+demandList = list(demand, constructionCost)
+
+transport <- treeTransport(tree, supplyList, demandList,
                            output = "list")
 
 plotTree(tree, tList = transport$transportList,
@@ -86,12 +74,17 @@ destructionCost <- rep(1,13)
 supply <- c(0,0,1,2,0,0,0,0,0,0,0,0,0)
 demand <- c(0,0,0,0,0,1,0,1,0,0,0,1,1)
 
-transport <- treeTransport(tree, supply, demand,
-                           constructionCost, destructionCost,
+supplyList = list(supply, destructionCost)
+demandList = list(demand, constructionCost)
+
+transport <- treeTransport(tree, supplyList, demandList,
                            output = "list")
 
 plotTree(tree, tList = transport$transportList,
          supply = supply, demand = demand)
 
 
+}
+\references{
+\insertRef{Sato2020}{unbalancedTransport}
 }
