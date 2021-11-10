@@ -264,10 +264,9 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
 
 
 
-//' The stabilized Scaling Algorithm
+//' The Sinkhorn Algorithm
 //'
-//' C++ implementation of the log-domain stabilized Version of the Scaling
-//' Algorithm.
+//' C++ implementation of the Sinkhorn Algorithm.
 //'
 //' @param costMatrix A numeric matrix.
 //' @param supply A numeric vector
@@ -295,7 +294,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
                                   
                                  
     int epsind = 0;
-    double eps = epsvec(epsind);
+    double eps = epsvec(0);
     
     
    
@@ -336,10 +335,10 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     
     for(size_t k=0; k < iterMax; k++){
         
-        f_prev = Rcpp::clone(f);
-       //  //Rcpp::Rcout << "k:" <<k << "\n";
-       // 
-       // // Rcpp::Rcout << "f: " << f << "\n";
+        // f_prev = Rcpp::clone(f);
+        // Rcpp::Rcout << "k:" <<k << "\n";
+        // 
+        
         
         for(int j = 0; j < Ny; j++){
             temp(Rcpp::_,j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
@@ -352,7 +351,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         // Rcpp::Rcout << "g min \n";
         // Rcpp::Rcout << g << "\n";
 
-        g = -aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
+        g = -aprox(lambdaDemand, g, eps, DivDemand, param1Demand, param2Demand);
+        //g = -aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
         // Rcpp::Rcout << "aprox \n";
         // Rcpp::Rcout << g << "\n";
         
@@ -373,31 +373,42 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
         // Rcpp::Rcout << "f min\n";
         // Rcpp::Rcout << f << "\n";
         
-        f = -aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
+        f = -aprox(lambdaSupply, f, eps, DivSupply, param1Supply, param2Supply);
+        //f = -aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
+        
         // Rcpp::Rcout << "f aprox \n";
         // Rcpp::Rcout << f << "\n\n";
+        
+        
+        Rcpp::Rcout << "f: " << f << "\n";
+        Rcpp::Rcout << "g: " << g << "\n\n";
         
         
         if((static_cast<double>(k)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.length())){
             epsind = epsind + 1;
             eps = epsvec(epsind);
+            
+            if(round(100*static_cast<double>(k)/static_cast<double>(iterMax)) < 100){
+                Rcpp::Rcout << round(100*static_cast<double>(k)/static_cast<double>(iterMax)) << "% done. \n";
+            }
+            
         }
         
         
         
-        if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol && epsind == (epsvec.length()-1)){
-            converge = Rcpp::max(Rcpp::abs(f-f_prev));
-
-            break;
-        }
+        // if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol && epsind == (epsvec.length()-1)){
+        //     converge = Rcpp::max(Rcpp::abs(f-f_prev));
+        // 
+        //     break;
+        // }
         
     }
     // ProfilerStop();
     
-    if(Rcpp::max(Rcpp::abs(f-f_prev)) > tol){
-        Rcpp::Rcout << "The Sinkhorn algorithm did not converge.\n"; 
-        
-    }
+    // if(Rcpp::max(Rcpp::abs(f-f_prev)) > tol){
+    //     Rcpp::Rcout << "The Sinkhorn algorithm did not converge.\n"; 
+    //     
+    // }
 
     
     
@@ -405,9 +416,11 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     for(int i = 0; i < Nx; i++){
         for(int j = 0; j < Ny ; j++){
             transportPlan(i,j) = exp((f(i) + g(j) - costMatrix(i,j))/eps);
+            Rcpp::Rcout << i << "," << j << ":  " << f(i) << "  " << g(j) << " " << costMatrix(i,j) <<  " " << eps << " " << transportPlan(i,j)<< "\n"; 
         }
     }
     
+    Rcpp::Rcout << 100 << "% done. \n";
     
     
 

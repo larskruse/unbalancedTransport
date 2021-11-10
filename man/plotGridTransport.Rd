@@ -40,7 +40,7 @@ q <- demandExample[seq(0,1000, by = 1000/J)]
 supply <- list(p,X)
 demand <- list(q,Y)
 
-maxIter <- 2000
+maxIter <- 200
 eps <- 1e-3
 
 

@@ -86,16 +86,16 @@
 #' supply <- list(p,X)
 #' demand <- list(q,Y)
 #' 
-#' maxIter <- 1000
+#' maxIter <- 100
 #' eps <- 1e-3
 #' 
 #' 
 #' suppyDiv <- list("KL", 0.04)
 #' demandDiv <- list("KL", 0.04)
+#' 
 #' res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
 #'                             maxIteration = maxIter, epsVector = eps, exp = 2)
 #' plot1DTransport(res$TransportPlan, supply, demand)
-#'
 #'
 #' @export
 regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector,
@@ -209,7 +209,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
                                  Div2, maxIteration, epsVector, tol)
             
         }else{
-            
+            supply %*% t(demand)
             # res <- Sinkhorn_SpaceOptim_Rcpp(supplyList[[2]], demandList[[2]], supply, demand, supplyReg, supplyAlpha,
             #                      supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
             #                      Div2, maxIteration, epsVector, tol)
@@ -233,8 +233,8 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         }else{
             
             cost = -epsVector[length(epsVector)]*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
-                sum(supply * legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta))-
-                sum(demand * legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta))
+                sum(supply * legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
+                sum(demand * legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
             
             
         }
@@ -263,17 +263,21 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
                              supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                              Div2, maxIteration, epsVector, tol)
         
+        
         TransportPlan <- res$TransportPlan
         
         
         if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
-            
             cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
             
         }else{
             
-            outf_xy <- legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta)
-            outg_xy <- legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta)
+            outf_xy <- legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta)
+            outg_xy <- legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta)
+            
+            # outf_xy <- legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta)
+            # outg_xy <- legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta)
+            # 
             outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
             outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
             

@@ -106,16 +106,16 @@ q <- demandExample
 supply <- list(p,X)
 demand <- list(q,Y)
 
-maxIter <- 1000
+maxIter <- 100
 eps <- 1e-3
 
 
 suppyDiv <- list("KL", 0.04)
 demandDiv <- list("KL", 0.04)
+
 res <- regularizedTransport(supply, demand, suppyDiv, demandDiv,
                             maxIteration = maxIter, epsVector = eps, exp = 2)
 plot1DTransport(res$TransportPlan, supply, demand)
-
 
 }
 \references{

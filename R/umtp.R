@@ -41,7 +41,7 @@
 #' demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
 #'
 #'
-#' p <- c(2,2,2)
+#' p <- c(2,1,2)
 #' q <- c(1,2,3)
 #'
 #' costCreate <- rep(10,3)
@@ -110,7 +110,7 @@ umtp <- function(supplyList, demandList, exp = 1, p = 2,
     }
         
         
-    transport <- list(cost = cost, transportPlan = transportPlan, import = import, export = export)
+    transport <- list(cost = cost, transportPlan = transportPlan, export = export, import = import)
         
         
         

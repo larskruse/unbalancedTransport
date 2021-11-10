@@ -155,7 +155,7 @@ expC <- function(f, g, C){
 #' supplyDiv <- list("KL", 0.04)
 #' demandDiv <- list("KL", 0.04)
 #' 
-#' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
+#' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, iterMax = 100, exp = 2)
 #'
 #'
 #' @export

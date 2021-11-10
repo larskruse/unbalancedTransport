@@ -229,7 +229,7 @@ plotTransportPoints <- function(transportPlan, supplyList, demandList){
 #' supply <- list(p,X)
 #' demand <- list(q,Y)
 #' 
-#' maxIter <- 2000
+#' maxIter <- 200
 #' eps <- 1e-3
 #' 
 #' 
@@ -318,7 +318,7 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 #' supply <- list(p,X)
 #' demand <- list(q,Y)
 #' 
-#' maxIter <- 2000
+#' maxIter <- 200
 #' eps <- 1e-3
 #' 
 #' 
@@ -346,13 +346,15 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
 
     # Plotting the supply and demand measures
     # plot(1, type = "n", xlab = "", ylab = "", xlim = c(min(X), max(X)), ylim= c(0, ymax))
+    print("asdfasdf")
     
     plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", ylim= c(0, ymax), xlab = "Position", ylab = "Mass")
     lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
 
     firstSupp <- supplyList[[2]][1]
     firstDem <- demandList[[2]][1]
-
+    print("asdfasdf")
+    
     # Plot the intervals for different colors
     for( i in 1:numIntervals){
 
@@ -362,16 +364,24 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
 
         # Restricting the transport map on the interval
         subK <- transportPlan * colSuppInter
-
+        print("asdfasdf")
+        
         # Adding the color intervals
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
         #lines(supplyList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
 
         # polygon(c(firstDem,demandList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
         # polygon(c(firstSupp,supplyList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
-
-        polygon(c(firstDem,demandList[[2]]),c(0,rowSums(subK)), col = colors[i])
-        polygon(c(firstSupp,supplyList[[2]]), c(0,colSums(subK)), col = colors[i])
+        print("asdfasdf")
+        
+        print(length(c(firstDem,demandList[[2]])))
+        print(length(c(0,rowSums(subK))))
+        print(length(c(firstSupp,supplyList[[2]])))
+        print(length(c(0,colSums(subK))))
+        
+        polygon(c(firstDem,demandList[[2]]),c(0,colSums(subK)), col = colors[i])
+        polygon(c(firstSupp,supplyList[[2]]),c(0,rowSums(subK)) , col = colors[i])
+        print("asdfasdf")
         
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
         #lines(supplyList[[2]], subK %*% y1Measure, type = "l", col = "black")

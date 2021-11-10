@@ -58,7 +58,7 @@ supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
 demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
 
 
-p <- c(2,2,2)
+p <- c(2,1,2)
 q <- c(1,2,3)
 
 costCreate <- rep(10,3)

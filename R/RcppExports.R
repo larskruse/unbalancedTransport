@@ -152,10 +152,9 @@ lambertInit <- function(x) {
     .Call(`_unbalancedTransport_lambertInit`, x)
 }
 
-#' The stabilized Scaling Algorithm
+#' The Sinkhorn Algorithm
 #'
-#' C++ implementation of the log-domain stabilized Version of the Scaling
-#' Algorithm.
+#' C++ implementation of the Sinkhorn Algorithm.
 #'
 #' @param costMatrix A numeric matrix.
 #' @param supply A numeric vector

@@ -102,23 +102,24 @@ getCostMatrix <- function(tree){
 #'
 #' @examples
 #'
-#' tree <- list(1, c(1,2,1), c(2,3,1), c(2,4,1), c(1,5,1), c(5,6,1),
-#'                 c(5,7,1), c(1,8,10), c(8,9,1), c(8,10,1))
+#'tree <- list(1, c(1,2,1), c(2,3,1), c(2,4,1), c(1,5,1), c(5,6,1),
+#'                c(5,7,1), c(1,8,10), c(8,9,1), c(8,10,1))
 #'
-#' constructionCost <- rep(2,13)
-#' destructionCost <- rep(2,13)
+#'constructionCost <- rep(2,10) 
+#'destructionCost <- rep(2,10)
 #'
-#' supply <- c(0,0,2,0,0,4,0,0,2,0)
-#' demand <- c(0,0,0,0,7,0,0,0,0,1)
+#'supply <- c(0,0,2,0,0,4,0,0,2,0)
+#'demand <- c(0,0,0,0,5,0,0,0,0,1)
 #'
-#' supplyList = list(supply, destructionCost)
-#' demandList = list(demand, constructionCost)
+#'supplyList = list(supply, destructionCost)
+#'demandList = list(demand, constructionCost)
 #'
-#' transport <- treeTransport(tree, supplyList, demandList,
-#'                            output = "list")
+#'transport <- treeTransport(tree, supplyList, demandList,
+#'                           output = "list")
 #'
-#' plotTree(tree, tList = transport$transportList,
-#'          supply = supply, demand = demand)
+#'plotTree(tree, tList = transport$transportList,
+#'         supply = supply, demand = demand)
+#'
 #'
 #'
 #'
@@ -209,7 +210,7 @@ treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"
     if(output == "list"){
 
         result <- list(treegkrOut$cost, transportList, import, export)
-        names(result) <- c("cost", "transportList", "import", "export")
+        names(result) <- c("cost", "transportList", "export", "import")
         return(result)
     }else if (output == "transportPlan"){
 
@@ -223,11 +224,11 @@ treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"
 
         }
         result <- list(treegkrOut$cost, tPlan, import, export)
-        names(result) <- c("cost", "transportPlan", "import", "export")
+        names(result) <- c("cost", "transportPlan", "export", "import")
 
     }else{
         result <- list(treegkrOut$cost, import, export)
-        names(result) <- c("cost", "import", "export")
+        names(result) <- c("cost", "export", "import")
         return(result)
     }
 }

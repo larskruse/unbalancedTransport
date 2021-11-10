@@ -104,6 +104,8 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 }
 
 
+
+
 // //' Computing the divergence functions values
 // //'
 // //' @param p input vector
@@ -156,7 +158,7 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
   if (DivFun == 1){
       
-    Eigen::setNbThreads(0);
+    //Eigen::setNbThreads(0);
       
     Eigen::VectorXd temp = s.array()*exp(u.array()/lambda);
     Eigen::VectorXd temp1 = div0(p,temp);
@@ -230,13 +232,6 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
                                   double tol = 1e-8){
     
-        // int n = 4000;
-        // Eigen::MatrixXd A = Eigen::MatrixXd::Ones(n,n);
-        // Eigen::MatrixXd B = Eigen::MatrixXd::Ones(n,n);
-        // Eigen::MatrixXd C = Eigen::MatrixXd::Ones(n,n);
-        // C.noalias() += A*B;
-        // Rcpp::Rcout << C.sum() << "\n";
-
     
     
     
@@ -248,6 +243,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // number of points in the reference measures
   int Nx = supply.size();
   int Ny = demand.size();
+  
 
   // initializing vectors
   Eigen::VectorXd a = Eigen::VectorXd::Ones(Nx);
@@ -256,6 +252,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // stabilization vectors
   Eigen::VectorXd u = Eigen::VectorXd::Zero(Nx);
   Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
+  
   
   Eigen::VectorXd u_prev;
   Eigen::VectorXd u_finite;
@@ -267,7 +264,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   int epsind = 0;
 
   // setting first epsilon value
-  double eps = epsvec(epsind);
+  double eps = epsvec(0);
   
   //Primal transport cost
   double pCost = 0;
@@ -276,17 +273,21 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // computing the initial kernel
   // since u and v are 0, the updateK function returns the Gibbs kernel
   Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
-  Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
+  // Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
+  Eigen::MatrixXd originalKernel = Kernel;
   //ProfilerStart("scaling.prof");
   
   double converge;
   
+  // Rcpp::Rcout << eps << ": eps\n";
+  // Rcpp::Rcout << Kernel << ": Kernel\n";
+  // Rcpp::Rcout << costMatrix << ": C\n";
   
   
   while(i < iterMax){
       
-    u_prev = u.array() + eps*(a.array().log());
-    u_prev = u_prev.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+    //u_prev = u.array() + eps*(a.array().log());
+    //u_prev = u_prev.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
       
 
 
@@ -309,29 +310,29 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     // 
     
     
-    u_finite = u.array() + eps*(a.array().log());
-    u_finite = u_finite.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+    //u_finite = u.array() + eps*(a.array().log());
+    //u_finite = u_finite.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
     
-    if(((u_finite.array()-u_prev.array()).array().abs().maxCoeff()) < tol && epsind + 1 == epsvec.size()){
-        
-
-        // absorbing a/b in u/v
-        u = u.array() + eps*(a.array().log());
-        v = v.array() + eps*(b.array().log());
-
-        // update Kernel according to u and v
-        Kernel = updateK(u, v, eps, costMatrix);
-
-
-        converge = (u_finite.array()-u_prev.array()).array().abs().maxCoeff();
-
-        //reset a and b
-        a = Eigen::VectorXd::Ones(Nx);
-        b = Eigen::VectorXd::Ones(Ny);
-
-
-        break;
-    }
+    // if(((u_finite.array()-u_prev.array()).array().abs().maxCoeff()) < tol && epsind + 1 == epsvec.size() && epsvec.size()> 1){
+    //     
+    // 
+    //     // absorbing a/b in u/v
+    //     u = u.array() + eps*(a.array().log());
+    //     v = v.array() + eps*(b.array().log());
+    // 
+    //     // update Kernel according to u and v
+    //     Kernel = updateK(u, v, eps, costMatrix);
+    // 
+    // 
+    //     converge = (u_finite.array()-u_prev.array()).array().abs().maxCoeff();
+    // 
+    //     //reset a and b
+    //     a = Eigen::VectorXd::Ones(Nx);
+    //     b = Eigen::VectorXd::Ones(Ny);
+    // 
+    // 
+    //     break;
+    // }
     
     
     
@@ -357,7 +358,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
 
       // update number of absorptions
       numAbs = numAbs +1;
-      u_prev = u;
+      //u_prev = u;
       
       // absorbing a/b in u/v
       u = u.array() + eps*(a.array().log());
@@ -396,15 +397,16 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   // Rcpp::Rcout  << "u: " << u << "\n";
   // Rcpp::Rcout << "u-prev: " << u_prev << "\n";
   
-  u_finite = u.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
+  //u_finite = u.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
   
-  converge = (u_finite.array()-u_prev.array()).abs().maxCoeff();
+  //converge = (u_finite.array()-u_prev.array()).abs().maxCoeff();
   
-  if(converge > tol){
-    Rcpp::Rcout << "The scaling Algorithm did not converge.\n";
-  }
+  //if(converge > tol){
+  //  Rcpp::Rcout << "The scaling Algorithm did not converge.\n";
+  //}
   
   
+
   
   // returnING the transport plan
   // since the absorbtion is called in the last iteration of the loop,
