@@ -1,7 +1,7 @@
 [
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-        "file_last_write": 1636489128.0,
+        "file_last_write": 1637449415.0,
         "definitions": [
             {
                 "usr": "c:@F@div0#I#I#",
@@ -36,7 +36,7 @@
                 "parent_name": "",
                 "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int, double, double)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 158,
+                "line": 161,
                 "column": 17
             },
             {
@@ -45,7 +45,7 @@
                 "parent_name": "",
                 "name": "updateK(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 189,
+                "line": 192,
                 "column": 17
             },
             {
@@ -54,14 +54,14 @@
                 "parent_name": "",
                 "name": "StabilizedScaling_Rcpp(int, int, int, double, double, double, double, double, double, int, int, int, int, double)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/ScalingAlgorithm.cpp",
-                "line": 229,
+                "line": 230,
                 "column": 12
             }
         ]
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/SinkhornAlgorithm.cpp",
-        "file_last_write": 1636499248.0,
+        "file_last_write": 1637447602.0,
         "definitions": [
             {
                 "usr": "c:@F@lambertInit#&I#",
@@ -123,7 +123,7 @@
                 "parent_name": "",
                 "name": "Sinkhorn_Rcpp(Rcpp::NumericMatrix, Rcpp::NumericVector &, Rcpp::NumericVector &, double, double, double, double, double, double, int, int, int, Rcpp::NumericVector &, double)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/SinkhornAlgorithm.cpp",
-                "line": 289,
+                "line": 291,
                 "column": 12
             },
             {
@@ -132,14 +132,14 @@
                 "parent_name": "",
                 "name": "Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix, Rcpp::NumericVector &, Rcpp::NumericVector &, double, double, double, int, double)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/SinkhornAlgorithm.cpp",
-                "line": 465,
+                "line": 467,
                 "column": 21
             }
         ]
     },
     {
         "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
-        "file_last_write": 1635198921.0,
+        "file_last_write": 1637586023.0,
         "definitions": [
             {
                 "usr": "c:@S@node",
@@ -336,7 +336,7 @@
                 "parent_name": "",
                 "name": "treegkr_Rcpp(Rcpp::List &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &)",
                 "file": "/home/lars/Documents/Master/Masterarbeit/unbalancedTransport/src/treegkr.cpp",
-                "line": 566,
+                "line": 565,
                 "column": 12
             }
         ]

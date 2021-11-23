@@ -145,11 +145,8 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     }else{
         stop("Please supply a divergence")
     }
-    
-    
-    
-    
-    if(demandDivList[[1]] == "KL"){
+
+        if(demandDivList[[1]] == "KL"){
         Div2 <- 1
         demandReg <- demandDivList[[2]]
     }else if(demandDivList[[1]] == "TV"){

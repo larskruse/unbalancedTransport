@@ -141,25 +141,30 @@ expC <- function(f, g, C){
 #' 
 #' 
 #' @examples 
+#' \donttest{
+#' 
 #' I <- 1000
 #' J <- 1000
 #' X <- seq(0,1,length.out = I)
 #' Y <- seq(0,1,length.out = J)
 #' p <- supplyExample
 #' q <- demandExample
-#'
+#' 
 #' supply <- list(p,X)
 #' demand <- list(q,Y)
-#'
-#' eps <- 1e-3 
-#' supplyDiv <- list("KL", 0.04)
-#' demandDiv <- list("KL", 0.04)
+#' 
+#' eps <- 1e-3
+#' supplyDiv <- list("KL", 1.05)
+#' demandDiv <- list("KL", 1.05)
 #' 
 #' sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, iterMax = 100, exp = 2)
+#' 
+#' }
+#'
 #'
 #'
 #' @export
-sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector, iterMax = 10000, tol = 1e-5,
+sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector, iterMax = 1000, tol = 1e-5,
                                 exp = 1, p = 2,  wfr = FALSE,
                             Cxy = NULL, Cxx = NULL, Cyy = NULL){
     
@@ -509,6 +514,8 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
 #' 
 #' 
 #' @examples 
+#' 
+#' \donttest{
 #' I <- 1000
 #' J <- 1000
 #' X <- seq(0,1,length.out = I)
@@ -520,10 +527,12 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
 #' demand <- list(q,Y)
 #'
 #' eps <- 1e-3 
-#' supplyDiv <- list("KL", 0.04)
-#' demandDiv <- list("KL", 0.04)
+#' supplyDiv <- list("KL", 1.05)
+#' demandDiv <- list("KL", 1.05)
 #' 
 #' hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
+#' }
+#' 
 #' 
 #'
 #' @export

@@ -4,7 +4,13 @@
 \alias{treeTransport}
 \title{Transport on Trees}
 \usage{
-treeTransport(tree, supplyList, demandList, output = "transportPlan")
+treeTransport(
+  tree,
+  supplyList,
+  demandList,
+  output = "transportPlan",
+  costMatrix = NULL
+)
 }
 \arguments{
 \item{tree}{A tree structure in list format:
@@ -24,6 +30,8 @@ note \eqn{i} to \eqn{j}.
 and the third the amount of mass transported between those nodes.
 \item "cost" returns only the transport cost
 }}
+
+\item{costMatrix}{the geodesic distance matrix defined by the given tree}
 }
 \value{
 A list containing the transport cost, the mass import and export vectors, and the transport list or plan if specified in 'output'.

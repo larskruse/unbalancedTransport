@@ -81,6 +81,8 @@ with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
 \frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
 }
 \examples{
+
+\donttest{
 I <- 1000
 J <- 1000
 X <- seq(0,1,length.out = I)
@@ -92,10 +94,12 @@ supply <- list(p,X)
 demand <- list(q,Y)
 
 eps <- 1e-3 
-supplyDiv <- list("KL", 0.04)
-demandDiv <- list("KL", 0.04)
+supplyDiv <- list("KL", 1.05)
+demandDiv <- list("KL", 1.05)
 
 hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
+}
+
 
 
 }

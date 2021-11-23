@@ -10,7 +10,7 @@ sinkhorn_divergence(
   supplyDivList,
   demandDivList,
   epsVector,
-  iterMax = 10000,
+  iterMax = 1000,
   tol = 1e-05,
   exp = 1,
   p = 2,
@@ -85,6 +85,8 @@ and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
 }
 \examples{
+\donttest{
+
 I <- 1000
 J <- 1000
 X <- seq(0,1,length.out = I)
@@ -95,11 +97,14 @@ q <- demandExample
 supply <- list(p,X)
 demand <- list(q,Y)
 
-eps <- 1e-3 
-supplyDiv <- list("KL", 0.04)
-demandDiv <- list("KL", 0.04)
+eps <- 1e-3
+supplyDiv <- list("KL", 1.05)
+demandDiv <- list("KL", 1.05)
 
 sinkhorn_divergence(supply, demand, supplyDiv, demandDiv, eps, iterMax = 100, exp = 2)
+
+}
+
 
 
 }

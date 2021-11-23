@@ -18,8 +18,8 @@ getCostMatrix <- function(tree){
 
     # Calulate the path between every pair of nodes
     for(i in uniqueNodes){
+        print(paste("i: ", i))
         for(j in uniqueNodes[uniqueNodes < i]){
-
             # Finding the paths between the root node and the two current nodes
             pathFrom <- unlist(findPath(rootNode,i,treeDF))
             pathTo <- unlist(findPath(rootNode,j, treeDF))
@@ -97,6 +97,8 @@ getCostMatrix <- function(tree){
 #' \item "cost" returns only the transport cost
 #' }
 #'
+#' @param costMatrix the geodesic distance matrix defined by the given tree 
+#'
 #' @return A list containing the transport cost, the mass import and export vectors, and the transport list or plan if specified in 'output'.
 #'
 #'
@@ -147,8 +149,11 @@ getCostMatrix <- function(tree){
 #'
 #'
 #' @export
-treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"){
+treeTransport <- function(tree, supplyList, demandList, output = "transportPlan", costMatrix = NULL){
 
+    
+    print("inside")
+    
     supply = supplyList[[1]]
     demand = demandList[[1]]
     
@@ -184,52 +189,69 @@ treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"
 
     }
 
-    # Compute the cost matrix from the tree.
-    costMatrix <- getCostMatrix(tree)
-
-    # Computing the transport plan using the revised simplex algorithm.
-    res <- transport::transport((supply-export), (demand-import), costMatrix,method = "revsimplex")
-
-
-    # Computing the transport plan in list form. Each entry consists of the node the mass
-    # comes from, the node the mass is transported to and the amount of mass.
-    transportList <- list()
-    if(length(res$from) > 0){
-
-        for(i in 1:length(res$from)){
-            if(res$mass[i] != 0){
-                transportList[[length(transportList)+1]] <- c(res[[1]][i], res[[2]][i], res[[3]][i])
-            }
-
+    
+    print("hey")
+    
+    if(output != "cost"){
+        
+        # Compute the cost matrix from the tree.
+        
+        if(is.null(costMatrix)){
+        
+            costMatrix <- getCostMatrix(tree)    
+            
         }
-    }else{
 
-    }
-
-    # return a list according to the "output" variable
-    if(output == "list"){
-
-        result <- list(treegkrOut$cost, transportList, import, export)
-        names(result) <- c("cost", "transportList", "export", "import")
-        return(result)
-    }else if (output == "transportPlan"){
-
+        
+        print(sum(supply-export))
+        print(sum(demand-import))
+        
+        # Computing the transport plan using the revised simplex algorithm.
+        res <- transport::transport((supply-export), (demand-import), costMatrix,method = "revsimplex")
+        
+        
+        # Computing the transport plan in list form. Each entry consists of the node the mass
+        # comes from, the node the mass is transported to and the amount of mass.
+        transportList <- list()
         if(length(res$from) > 0){
-
-            tPlan <- matrix(0,length(supply),length(demand))
-            tPlan[cbind(res$from,res$to)] <- res$mass
-
-        }else{
-            tPlan <- matrix(0,length(supply),length(demand))
-
+            
+            for(i in 1:length(res$from)){
+                if(res$mass[i] != 0){
+                    transportList[[length(transportList)+1]] <- c(res[[1]][i], res[[2]][i], res[[3]][i])
+                }
+                
+            }
         }
-        result <- list(treegkrOut$cost, tPlan, import, export)
-        names(result) <- c("cost", "transportPlan", "export", "import")
-
+        
+        if(output == "list"){
+            
+            result <- list(treegkrOut$cost, transportList, import, export)
+            names(result) <- c("cost", "transportList", "export", "import")
+            return(result)
+        }else if (output == "transportPlan"){
+            
+            if(length(res$from) > 0){
+                
+                tPlan <- matrix(0,length(supply),length(demand))
+                tPlan[cbind(res$from,res$to)] <- res$mass
+                
+            }else{
+                tPlan <- matrix(0,length(supply),length(demand))
+                
+            }
+            result <- list(treegkrOut$cost, tPlan, import, export)
+            names(result) <- c("cost", "transportPlan", "export", "import")
+            
+        }
+        
+        
+    # return a list according to the "output" variable
     }else{
         result <- list(treegkrOut$cost, import, export)
         names(result) <- c("cost", "export", "import")
         return(result)
     }
 }
+
+
 

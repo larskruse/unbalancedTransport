@@ -69,38 +69,41 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
 //' @noRd
 
 double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, double param1, double param2 = 0){
-  if (DivFun == 1){
-    // return  λ*sum(axb0(x,log(div0(x,p))) - x + p )
-    Eigen::VectorXd temp = div0(r,s).array().log();
+    // Kullback-Leibler
+    if (DivFun == 1){
+        Eigen::VectorXd temp = div0(r,s).array().log();
 
-    temp = axb0(r,temp);
-
-
-    temp = (temp.array() - r.array() + s.array());
-    return(param1 * temp.sum());
-
-   }else if(DivFun == 2){
-     Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
-
-     return(param1 * temp.sum());
-   }else if(DivFun == 3){
+        temp = axb0(r,temp);
 
 
+        temp = (temp.array() - r.array() + s.array());
+        return(param1 * temp.sum());
 
-      Eigen::VectorXd temp1 = (param1*s.array()).array()-r.array();
-      temp1 = temp1.array().max(Eigen::VectorXd::Zero(r.size()).array());
+    // Total variation
+    }else if(DivFun == 2){
+        Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
 
-      Eigen::VectorXd temp2 = (r.array()-(param2*s.array()).array());
-      temp2 = temp2.array().max(Eigen::VectorXd::Zero(r.size()).array());
-
-      temp1 = (temp1.array().exp() +temp2.array().exp()).array()-2;
-
-      return(temp1.sum());
+        return(param1 * temp.sum());
+        
+    // Range Constraint 
+    }else if(DivFun == 3){
 
 
-  }
 
-  return(0);
+        Eigen::VectorXd temp1 = (param1*s.array()).array()-r.array();
+        temp1 = temp1.array().max(Eigen::VectorXd::Zero(r.size()).array());
+
+        Eigen::VectorXd temp2 = (r.array()-(param2*s.array()).array());
+        temp2 = temp2.array().max(Eigen::VectorXd::Zero(r.size()).array());
+
+        temp1 = (temp1.array().exp() +temp2.array().exp()).array()-2;
+
+        return(temp1.sum());
+
+
+    }
+
+    return(0);
 }
 
 
@@ -201,8 +204,6 @@ Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen:
 
 }
 
-
-
 //' The stabilized Scaling Algorithm
 //'
 //' C++ implementation of the log-domain stabilized Version of the Scaling
@@ -279,11 +280,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
   
   double converge;
   
-  // Rcpp::Rcout << eps << ": eps\n";
-  // Rcpp::Rcout << Kernel << ": Kernel\n";
-  // Rcpp::Rcout << costMatrix << ": C\n";
-  
-  
+
   while(i < iterMax){
       
     //u_prev = u.array() + eps*(a.array().log());
@@ -347,40 +344,35 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
         (static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size()) ||
         i == iterMax - 1){
 
+        if(round(100*static_cast<double>(i)/static_cast<double>(iterMax)) < 100){
+            Rcpp::Rcout << round(100*static_cast<double>(i)/static_cast<double>(iterMax)) << "% done. \n";
+        }
 
-      if(round(100*static_cast<double>(i)/static_cast<double>(iterMax)) < 100){
-        Rcpp::Rcout << round(100*static_cast<double>(i)/static_cast<double>(iterMax)) << "% done. \n";
-      }
-
-
-
-
-
-      // update number of absorptions
-      numAbs = numAbs +1;
-      //u_prev = u;
-      
-      // absorbing a/b in u/v
-      u = u.array() + eps*(a.array().log());
-      v = v.array() + eps*(b.array().log());
+        // update number of absorptions
+        numAbs = numAbs +1;
+        //u_prev = u;
+     
+        // absorbing a/b in u/v
+        u = u.array() + eps*(a.array().log());
+        v = v.array() + eps*(b.array().log());
 
 
 
 
-      // updating epsilon
-      if((static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size())){
-        epsind = epsind + 1;
-        eps = epsvec(epsind);
-      }
-      // update Kernel according to u and v
-      Kernel = updateK(u, v, eps, costMatrix);
+        // updating epsilon
+        if((static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size())){
+            epsind = epsind + 1;
+            eps = epsvec(epsind);
+        }
+        // update Kernel according to u and v
+        Kernel = updateK(u, v, eps, costMatrix);
 
       
 
 
       //reset a and b
-      a = Eigen::VectorXd::Ones(Nx);
-      b = Eigen::VectorXd::Ones(Ny);
+        a = Eigen::VectorXd::Ones(Nx);
+        b = Eigen::VectorXd::Ones(Ny);
 
     }
 
@@ -388,22 +380,19 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     i = i + 1;
 
   }
+  
+  
+  
+  
   //ProfilerStop();
   Rcpp::Rcout << 100 << "% done. \n";
 
- 
-  
-  // 
-  // Rcpp::Rcout  << "u: " << u << "\n";
-  // Rcpp::Rcout << "u-prev: " << u_prev << "\n";
-  
-  //u_finite = u.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
-  
-  //converge = (u_finite.array()-u_prev.array()).abs().maxCoeff();
-  
+
   //if(converge > tol){
   //  Rcpp::Rcout << "The scaling Algorithm did not converge.\n";
   //}
+  
+  
   
   
 

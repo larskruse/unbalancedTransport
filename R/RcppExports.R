@@ -231,10 +231,9 @@ NULL
 #'          an edge: (first node, second node, edge weight)
 #' @param supply The supply vector.
 #' @param demand The demand vector.
-#' @param creationCost A numeric vector giving the creation cost at each node.
-#' @param destructionCost A numeric vector giving the destruction cost at each node.
+#' @param creation A numeric vector giving the creation cost at each node.
+#' @param destruction A numeric vector giving the destruction cost at each node.
 #' @return A list containing the optimal transport cost and the import vector.
-#' @noRd
 treegkr_Rcpp <- function(tree, supply, demand, creation, destruction) {
     .Call(`_unbalancedTransport_treegkr_Rcpp`, tree, supply, demand, creation, destruction)
 }

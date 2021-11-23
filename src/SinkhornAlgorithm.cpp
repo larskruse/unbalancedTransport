@@ -264,6 +264,8 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
 
 
 
+
+
 //' The Sinkhorn Algorithm
 //'
 //' C++ implementation of the Sinkhorn Algorithm.

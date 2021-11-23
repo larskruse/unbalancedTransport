@@ -33,7 +33,6 @@
 #' The default value is "false". 
 #' @param costMatrix (optional) Instead of having the algorithm compute the
 #'  cost matrix, a custom cost matrix can be passed to the algorithm. 
-#' @param algo www
 #'
 #' @examples 
 #'
@@ -57,7 +56,7 @@
 #' @export
 #'
 umtp <- function(supplyList, demandList, exp = 1, p = 2,
-                                    wfr = FALSE, costMatrix = NULL, algo = "networkflow"){
+                                    wfr = FALSE, costMatrix = NULL){
 
     
     if(is.null(costMatrix)){
@@ -74,8 +73,7 @@ umtp <- function(supplyList, demandList, exp = 1, p = 2,
     costMatrix <- rbind(costMatrix, c(demandList[[2]],0))
     
 
-    
-    res <- transport::transport(supply, demand, costMatrix, method = algo)
+    res <- transport::transport(supply, demand, costMatrix, method = "networkflow")
     
 
     cost <- 0

@@ -249,7 +249,7 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
         transportPlan <- t(transportPlan[(nrow(transportPlan)):1,])
 
         image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
-              col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
+              col=hcl.colors(20, palette = "YlOrRd", alpha = NULL, rev = TRUE, fixup = TRUE))
 
 
     }else{
@@ -346,15 +346,13 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
 
     # Plotting the supply and demand measures
     # plot(1, type = "n", xlab = "", ylab = "", xlim = c(min(X), max(X)), ylim= c(0, ymax))
-    print("asdfasdf")
-    
+
     plot(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue", ylim= c(0, ymax), xlab = "Position", ylab = "Mass")
-    lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "red")
+    
 
     firstSupp <- supplyList[[2]][1]
     firstDem <- demandList[[2]][1]
-    print("asdfasdf")
-    
+
     # Plot the intervals for different colors
     for( i in 1:numIntervals){
 
@@ -364,35 +362,31 @@ plot1DTransport <- function(transportPlan, supplyList, demandList){
 
         # Restricting the transport map on the interval
         subK <- transportPlan * colSuppInter
-        print("asdfasdf")
-        
+
         # Adding the color intervals
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "h", col = colors[i])
         #lines(supplyList[[2]], subK %*% y1Measure, type = "h", col = colors[i])
 
         # polygon(c(firstDem,demandList[[2]]),c(0,t(subK) %*% x1Measure), col = colors[i])
         # polygon(c(firstSupp,supplyList[[2]]), c(0,subK %*% y1Measure), col = colors[i])
-        print("asdfasdf")
-        
-        print(length(c(firstDem,demandList[[2]])))
-        print(length(c(0,rowSums(subK))))
-        print(length(c(firstSupp,supplyList[[2]])))
-        print(length(c(0,colSums(subK))))
         
         polygon(c(firstDem,demandList[[2]]),c(0,colSums(subK)), col = colors[i])
         polygon(c(firstSupp,supplyList[[2]]),c(0,rowSums(subK)) , col = colors[i])
-        print("asdfasdf")
-        
+
         #lines(demandList[[2]], t(subK) %*% x1Measure, type = "l", col = "black")
         #lines(supplyList[[2]], subK %*% y1Measure, type = "l", col = "black")
 
     }
 
-    lines(demandList[[2]], t(transportPlan) %*% x1Measure, type = "l", col = "red")
+    
+    
+    lines(demandList[[2]], t(transportPlan) %*% x1Measure, type = "l", col = "green")
     lines(supplyList[[2]], transportPlan %*% y1Measure, type = "l", col = "blue")
-    # 
+    
     lines(supplyList[[2]], rep(0, length(supplyList[[2]])), type = "l", col = "black")
 
+    lines(supplyList[[2]], supplyList[[1]], type = "l", lty = 3 , col = "blue")
+    lines(demandList[[2]], demandList[[1]], type = "l", lty = 3, col = "green")
 
 }
 
@@ -439,6 +433,43 @@ nextLayer <- function(treeDF, coordinates ,node, layer){
 }
 
 
+# #' findPath
+# #'
+# #' Finding the path between a node and a node in its subtree.
+# #'
+# #' @param from node at which the path starts
+# #' @param to node at which the path ends. Must be in the subtree of 'from'
+# #' @param treeDF tree in data.frame format
+# #'
+# #' @return A list of nodes from 'from' to 'to'
+# #' @noRd
+# findPath <- function(from, to, treeDF){
+# 
+#     # if the node has children, check if one of them is the wanted node
+#     if(length(treeDF[treeDF$parent == from,]$child) > 0){
+#         children <- treeDF[treeDF$parent == from,]$child
+# 
+#         # if one child is the wanted node, return the current node and the child
+#         if(to %in% children){
+#             return(c(from,to))
+#         }
+# 
+#         # if non of the children is the wanted node, search in all child nodes
+#         for(i in 1:length(children)){
+#             path <- findPath(children[i], to, treeDF)
+#             # if the node is found in a child node, add the current node to the return list
+#             if(!is.null(path)){
+#                 return(c(from,path))
+#             }
+#         }
+# 
+#         return(NULL)
+#     }else{
+#         return(NULL)
+#     }
+# 
+# }
+
 #' findPath
 #'
 #' Finding the path between a node and a node in its subtree.
@@ -450,31 +481,37 @@ nextLayer <- function(treeDF, coordinates ,node, layer){
 #' @return A list of nodes from 'from' to 'to'
 #' @noRd
 findPath <- function(from, to, treeDF){
-
-    # if the node has children, check if one of them is the wanted node
-    if(length(treeDF[treeDF$parent == from,]$child) > 0){
-        children <- treeDF[treeDF$parent == from,]$child
-
-        # if one child is the wanted node, return the current node and the child
-        if(to %in% children){
-            return(c(from,to))
-        }
-
-        # if non of the children is the wanted node, search in all child nodes
-        for(i in 1:length(children)){
-            path <- findPath(children[i], to, treeDF)
-            # if the node is found in a child node, add the current node to the return list
-            if(!is.null(path)){
-                return(c(from,path))
-            }
-        }
-
+    
+    if(from == to){
+        return(from)
+    }
+    
+    
+    parent = treeDF[treeDF$child == to,]$parent
+    if(identical(parent, numeric(0))){
         return(NULL)
+    }
+    
+    if(parent == from){
+        
+        return(c(from,to))
+        
     }else{
-        return(NULL)
+        path <- findPath(from, parent, treeDF)
+        if(is.null(path)){
+            return(NULL)
+        }else{
+            return( c(path, to))    
+        }
+        
     }
 
 }
+
+
+
+
+
 
 
 #' Plotting transport on trees
