@@ -103,7 +103,6 @@ getCostMatrix <- function(tree){
 #'
 #'
 #' @examples
-#'
 #'tree <- list(1, c(1,2,1), c(2,3,1), c(2,4,1), c(1,5,1), c(5,6,1),
 #'                c(5,7,1), c(1,8,10), c(8,9,1), c(8,10,1))
 #'
@@ -149,11 +148,10 @@ getCostMatrix <- function(tree){
 #'
 #'
 #' @export
-treeTransport <- function(tree, supplyList, demandList, output = "transportPlan", costMatrix = NULL){
+treeTransport <- function(tree, supplyList, demandList, output = "cost", costMatrix = NULL){
 
     
-    print("inside")
-    
+
     supply = supplyList[[1]]
     demand = demandList[[1]]
     
@@ -188,10 +186,12 @@ treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"
         }
 
     }
+    # print(export[export > 0])
+    # print(sum(supply-export))
+    # print(import[import > 0])
+    # print(sum(demand-import))
+    
 
-    
-    print("hey")
-    
     if(output != "cost"){
         
         # Compute the cost matrix from the tree.
@@ -203,8 +203,6 @@ treeTransport <- function(tree, supplyList, demandList, output = "transportPlan"
         }
 
         
-        print(sum(supply-export))
-        print(sum(demand-import))
         
         # Computing the transport plan using the revised simplex algorithm.
         res <- transport::transport((supply-export), (demand-import), costMatrix,method = "revsimplex")

@@ -4,13 +4,7 @@
 \alias{treeTransport}
 \title{Transport on Trees}
 \usage{
-treeTransport(
-  tree,
-  supplyList,
-  demandList,
-  output = "transportPlan",
-  costMatrix = NULL
-)
+treeTransport(tree, supplyList, demandList, output = "cost", costMatrix = NULL)
 }
 \arguments{
 \item{tree}{A tree structure in list format:
@@ -48,7 +42,6 @@ O(n log²n) time. The C++ implementation of the algorithm used in this package c
 from R and to be able to compute the transport map.
 }
 \examples{
-
 tree <- list(1, c(1,2,1), c(2,3,1), c(2,4,1), c(1,5,1), c(5,6,1),
                c(5,7,1), c(1,8,10), c(8,9,1), c(8,10,1))
 

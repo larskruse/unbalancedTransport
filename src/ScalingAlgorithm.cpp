@@ -1,144 +1,9 @@
 #include <algorithm>
 #include <chrono>
 #include <RcppEigen.h>
-
-//#include "gperftools/profiler.h"
-
-
-//' Elementwise division of two vectors with 'x/0 = 0'
-//'
-//' @param a The dividend vector
-//' @param b The divisor vector
-//' @return solution of elementwise division of a and b
-//' @noRd
-
-Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
-  // if all values in b are unequal 0, the result is the standard elementwise division
-  if((b.array() > 0).all()){
-    return a.array()/b.array();
-  }else{
-    // compute the standard division and check for elements that violate the rule x/0 = 0
-    Eigen::VectorXd res = a.array()/b.array();
-    for(int i = 0; i < a.size(); i++){
-      if(b(i) == 0){
-        res(i) = 0;
-      }
-
-    }
-    return res;
-  }
-
-}
-
-//' Elementwise multiplication of two vectors with 'x/0 = 0'
-//'
-//' @param a The dividend vector
-//' @param b The divisor vector
-//' @return solution of elementwise division of a and b
-//' @noRd
-
-Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
-  // if all values in b are unequal 0, the result is the standard elementwise division
-  if((a.array() > 0).all()){
-    return a.array()*b.array();
-  }else{
-    // compute the standard division and check for elements that violate the rule x/0 = 0
-    Eigen::VectorXd res = a.array()*b.array();
-    for(int i = 0; i < a.size(); i++){
-      if(a(i) == 0){
-        res(i) = 0;
-      }
-
-    }
-    return res;
-  }
-
-}
-
-
-
-
-//' Computing the divergence functions values
-//'
-//' @param r input vector
-//' @param s comparision vector
-//' @param DivFun kind of function to use
-//' @param param1 lambda or alpha
-//' @param param2 beta or 0
-//'
-//' @noRd
-
-double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, double param1, double param2 = 0){
-    // Kullback-Leibler
-    if (DivFun == 1){
-        Eigen::VectorXd temp = div0(r,s).array().log();
-
-        temp = axb0(r,temp);
-
-
-        temp = (temp.array() - r.array() + s.array());
-        return(param1 * temp.sum());
-
-    // Total variation
-    }else if(DivFun == 2){
-        Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
-
-        return(param1 * temp.sum());
-        
-    // Range Constraint 
-    }else if(DivFun == 3){
-
-
-
-        Eigen::VectorXd temp1 = (param1*s.array()).array()-r.array();
-        temp1 = temp1.array().max(Eigen::VectorXd::Zero(r.size()).array());
-
-        Eigen::VectorXd temp2 = (r.array()-(param2*s.array()).array());
-        temp2 = temp2.array().max(Eigen::VectorXd::Zero(r.size()).array());
-
-        temp1 = (temp1.array().exp() +temp2.array().exp()).array()-2;
-
-        return(temp1.sum());
-
-
-    }
-
-    return(0);
-}
-
-
-
-
-// //' Computing the divergence functions values
-// //'
-// //' @param p input vector
-// //' @param u comparision vector
-// //' @param DivFun kind of function to use
-// //' @param param1 lambda or alpha
-// //' @param param2 beta or 0
-// //'
-// //' @export
-// //'
-// //[[Rcpp::export]]
-// double fVectorDivergence (Eigen::VectorXd p, Eigen::VectorXd u, int DivFun, double param1, double param2 = 0){
-//   if (DivFun == 1){
-//     //Eigen::VectorXd temp = (p.array() * (u.array()/param1).array().exp()).array()-1;
-//     Eigen::VectorXd temp = axb0(p,(u.array()/param1).array().exp().array()-1);
-//     return(param1  * temp.sum());
-//
-//   }else if(DivFun == 2){
-//     Eigen::VectorXd temp = p.array().min(-p.array().max(p.array()*u.array()/param1));
-//
-//     return(param1 * temp.sum());
-//
-//   // }else if(DivFun == 3 && param1 <= param2 && 0 <= param1){
-//     // return(((param1*p.array()*u.array())).max(param2*p.array()*u.array()).sum());
-//
-//   }
-//
-//   return(0);
-// }
-
+#include <math.h>
+#include <Rcpp.h>
+#include "divergences.h"
 
 
 //' The proxdiv operator
@@ -159,50 +24,48 @@ double vectorDivergence (Eigen::VectorXd r, Eigen::VectorXd s, int DivFun, doubl
 //' @return A vector holding the proxdiv evaluation
 //' @noRd
 Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
+  
+  Eigen::VectorXd temp;
   if (DivFun == 1){
       
     //Eigen::setNbThreads(0);
       
-    Eigen::VectorXd temp = s.array()*exp(u.array()/lambda);
-    Eigen::VectorXd temp1 = div0(p,temp);
-    Eigen::VectorXd temp2 = temp1.array().pow(lambda/(lambda+eps));
+    temp = s.array()*exp(u.array()/lambda);
+    temp = div0(p,temp);
+    temp = temp.array().pow(lambda/(lambda+eps));
 
-    return temp2;
+    return temp;
 
   }else if(DivFun == 2){
       //remove exp
-    return ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
+      temp = ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
+      
+      for (int i =0 ; i < u.size(); i++){
+          
+          if(isinf(u(i))){
+                temp(i) = 0;
+              }
+          
+          }
+      
+    return (temp);
   }else{
-    return((beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp())));
+      temp= (beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp()));
+      
+      for (int i =0 ; i < u.size(); i++){
+          
+          if(isinf(u(i))){
+              temp(i) = 0;
+          }
+          
+      }
+      
+    return(temp);
   }
 
 }
 
-//' Updating the Kernel
-//'
-//' Calculating and updating the log-domain stabilized kernel. For 0 vectors u and v
-//' it calculates the Gibbs kernel.
-//'
-//' @param u A numeric vector
-//' @param v A numeric vector
-//' @param eps The epsilon value
-//' @param costMatrix A numeric matrix
-//' @return The updated kernel
-//' @noRd
-Eigen::MatrixXd updateK(Eigen::VectorXd u, Eigen::VectorXd v, double eps, Eigen::MatrixXd costMatrix){
 
-    int Nx = u.size();
-    int Ny = v.size();
-
-    Eigen::MatrixXd K = Eigen::MatrixXd::Zero(Nx, Ny);
-    for(int i = 0; i < Nx; i++){
-        for(int j = 0; j < Ny ; j++){
-          K(i,j) = exp((u(i) + v(j) - costMatrix(i,j))/eps);
-        }
-    }
-    return K;
-
-}
 
 //' The stabilized Scaling Algorithm
 //'
@@ -231,178 +94,274 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
                                   Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
                                   double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
                                   int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
-                                  double tol = 1e-8){
+                                  double tol = 1e-3){
     
     
     
     
-  // number of absorptions
-  int numAbs = 0;
+    // number of absorptions
+    int numAbs = 0;
     
 
 
-  // number of points in the reference measures
-  int Nx = supply.size();
-  int Ny = demand.size();
-  
-
-  // initializing vectors
-  Eigen::VectorXd a = Eigen::VectorXd::Ones(Nx);
-  Eigen::VectorXd b = Eigen::VectorXd::Ones(Ny);
-
-  // stabilization vectors
-  Eigen::VectorXd u = Eigen::VectorXd::Zero(Nx);
-  Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
-  
-  
-  Eigen::VectorXd u_prev;
-  Eigen::VectorXd u_finite;
-  
-  // main loop iteration counter
-  int i = 1;
-
-  // epsilon value index counter
-  int epsind = 0;
-
-  // setting first epsilon value
-  double eps = epsvec(0);
-  
-  //Primal transport cost
-  double pCost = 0;
-
-  
-  // computing the initial kernel
-  // since u and v are 0, the updateK function returns the Gibbs kernel
-  Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
-  // Eigen::MatrixXd originalKernel = updateK(u, v, eps, costMatrix);
-  Eigen::MatrixXd originalKernel = Kernel;
-  //ProfilerStart("scaling.prof");
-  
-  double converge;
-  
-
-  while(i < iterMax){
-      
-    //u_prev = u.array() + eps*(a.array().log());
-    //u_prev = u_prev.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
-      
-
-
-    // calculate scaling iterates
-    // b = b.array() * dy.array();
-    a = Kernel * b;
-    //a = a.array(); ///Nx;
-    //Rcpp::Rcout << "a: " << a << "\n\n";
-    a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply, alphaSupply, betaSupply);
-    //Rcpp::Rcout << "a: " << a << "\n\n";
-
-    
-    // a = a.array() * dx.array();
-    b = Kernel.transpose() * a;
-    //b = b.array(); ///Nx;
-    //Rcpp::Rcout << "b: " << b  << "\n\n";
-    
-    b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand, alphaDemand, betaDemand);
-    //Rcpp::Rcout << "b: " << b  << "\n\n";
-    // 
-    
-    
-    //u_finite = u.array() + eps*(a.array().log());
-    //u_finite = u_finite.array().unaryExpr([](double v) { return std::isfinite(v)? v : 0.0; });
-    
-    // if(((u_finite.array()-u_prev.array()).array().abs().maxCoeff()) < tol && epsind + 1 == epsvec.size() && epsvec.size()> 1){
-    //     
-    // 
-    //     // absorbing a/b in u/v
-    //     u = u.array() + eps*(a.array().log());
-    //     v = v.array() + eps*(b.array().log());
-    // 
-    //     // update Kernel according to u and v
-    //     Kernel = updateK(u, v, eps, costMatrix);
-    // 
-    // 
-    //     converge = (u_finite.array()-u_prev.array()).array().abs().maxCoeff();
-    // 
-    //     //reset a and b
-    //     a = Eigen::VectorXd::Ones(Nx);
-    //     b = Eigen::VectorXd::Ones(Ny);
-    // 
-    // 
-    //     break;
-    // }
+    // number of points in the reference measures
+    int Nx = supply.size();
+    int Ny = demand.size();
     
     
     
+    // initializing vectors
+    Eigen::VectorXd a = Eigen::VectorXd::Ones(Nx);
+    Eigen::VectorXd b = Eigen::VectorXd::Ones(Ny);
     
-    
-    //Stabilizing step and changing epsilon
-    // called when:
-    //  1. a or b are too large,
-    //  2. a new value for epsilon has to be assigned
-    //  3. in the last iteration to calculate the transport map
-    if ((abs(a.array()) > 1e+100).any() || (abs(b.array()) > 1e+100).any() ||
-        (static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size()) ||
-        i == iterMax - 1){
+    // stabilization vectors
+    Eigen::VectorXd u = Eigen::VectorXd::Zero(Nx);
+    Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
 
-        if(round(100*static_cast<double>(i)/static_cast<double>(iterMax)) < 100){
-            Rcpp::Rcout << round(100*static_cast<double>(i)/static_cast<double>(iterMax)) << "% done. \n";
+    Eigen::VectorXd u0 = Eigen::VectorXd::Zero(Nx);
+    Eigen::VectorXd v0 = Eigen::VectorXd::Zero(Ny);
+    
+    
+    // main loop iteration counter
+    int i = 1;
+    
+    // epsilon value index counter
+    int epsind = 0;
+    
+    // setting first epsilon value
+    double eps = epsvec(0);
+    
+    
+    // computing the initial kernel
+    // since u and v are 0, the updateK function returns the Gibbs kernel
+    Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
+    
+    Eigen::MatrixXd gaussKernel = Kernel;
+    //ProfilerStart("scaling.prof");
+    
+
+    double pCost;
+    double dCost;
+    
+    bool incEps = false;
+    
+    Eigen::VectorXd KVec;
+    Eigen::VectorXd gKVec(Eigen::Map<Eigen::VectorXd>(gaussKernel.data(), gaussKernel.cols()*gaussKernel.rows()));  
+
+    while(i < iterMax ){
+        // update iteration counter
+        i = i + 1;
+        
+        // calculate scaling iterates
+        a = Kernel * b;
+        a = proxdiv(lambdaSupply, supply, a, u, eps, DivSupply, alphaSupply, betaSupply);
+    
+    
+        b = Kernel.transpose() * a;
+        b = proxdiv(lambdaDemand, demand, b, v, eps, DivDemand, alphaDemand, betaDemand);
+    
+        //Stabilizing step and changing epsilon
+        // called when:
+        //  1. a or b are too large,
+        //  2. a new value for epsilon has to be assigned
+        //  3. in the last iteration to calculate the transport map
+        if ((abs(a.array()) > 1e+100).any() ||
+            (abs(b.array()) > 1e+100).any() ||
+            (static_cast<double>(i)/static_cast<double>(iterMax)) >
+            static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size()) ||
+            i == iterMax - 1  || i % 50 == 0 || incEps){
+                
+            // absorbing a/b in u/v
+            u = u.array() + eps*(a.array().log());
+            v = v.array() + eps*(b.array().log());
+
+
+            //updating epsilon
+            if((static_cast<double>(i)/static_cast<double>(iterMax)) >
+               static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size())||
+               incEps){
+                epsind = epsind + 1;
+                eps = epsvec(epsind);
+
+                gaussKernel = updateK(Eigen::VectorXd::Zero(Nx),
+                                      Eigen::VectorXd::Zero(Ny),
+                                      eps,
+                                      costMatrix);
+                gKVec = Eigen::Map<Eigen::VectorXd>(gaussKernel.data(),
+                                                    gaussKernel.cols()*gaussKernel.rows());
+
+                incEps = false;
+            }
+              // update Kernel according to u and v
+            Kernel = updateK(u, v, eps, costMatrix);
+            KVec = Eigen::Map<Eigen::VectorXd>(Kernel.data(),
+                                               Kernel.cols()*Kernel.rows());
+            
+            //reset a and b
+            a = Eigen::VectorXd::Ones(Nx);
+            b = Eigen::VectorXd::Ones(Ny);
+
+
+            pCost =  vectorDivergence(KVec,
+                                      gKVec,
+                                      1,
+                                      eps);
+            
+            pCost += vectorDivergence(Kernel.rowwise().sum(),
+                                      supply,
+                                      DivSupply,
+                                      lambdaSupply,
+                                      alphaSupply,
+                                      betaSupply);
+            
+            pCost += vectorDivergence(Kernel.colwise().sum(),
+                                      demand,
+                                      DivDemand,
+                                      lambdaDemand,
+                                      alphaDemand,
+                                      betaDemand);
+
+
+            dCost = -dualSolSummand(u,v,eps,gaussKernel);
+        
+
+            u0 = u;
+            v0 = v;
+
+            for(int itransportPlan = 0; i < u.size(); i++){
+                
+                if(supply(i) == 0){
+                    
+                    u0(i) = 0;
+                }
+            }
+            
+            for(int i = 0; i < u.size(); i++){
+                
+                if(demand(i) == 0){
+                    
+                    v0(i) = 0;
+                }
+            }
+            
+            dCost -= fVectorDivergence(supply,
+                                     -u0,
+                                       DivSupply,
+                                       lambdaSupply,
+                                       alphaSupply,
+                                       betaSupply);
+        
+            dCost -= fVectorDivergence(demand,
+                                       -v0,
+                                       DivDemand,
+                                       lambdaDemand,
+                                       alphaDemand,
+                                       betaDemand);
+        
+            Rcpp::Rcout << "gap: " << abs(dCost-pCost) << "\n";
+            
+            if(not(isnan(abs(dCost- pCost))) ){
+                if(abs(dCost- pCost)< tol ){
+                    if(epsind == epsvec.size()-1){
+
+                        Rcpp::Rcout << "Primal-Dual gap after " << i << " Iterations: " << abs(pCost- dCost) << "\n";
+
+                        return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
+                                                  Rcpp::Named("dual_f") = u,
+                                                  Rcpp::Named("dual_g") = v,
+                                                  Rcpp::Named("pCost") = pCost,
+                                                  Rcpp::Named("dCost") = dCost,
+                                                  Rcpp::Named("iterations") = i);
+                    }else{
+                        incEps = true;
+                    }
+                }
+            }
+    
         }
-
-        // update number of absorptions
-        numAbs = numAbs +1;
-        //u_prev = u;
-     
-        // absorbing a/b in u/v
-        u = u.array() + eps*(a.array().log());
-        v = v.array() + eps*(b.array().log());
-
-
-
-
-        // updating epsilon
-        if((static_cast<double>(i)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size())){
-            epsind = epsind + 1;
-            eps = epsvec(epsind);
+    
+        
+        
         }
-        // update Kernel according to u and v
-        Kernel = updateK(u, v, eps, costMatrix);
+  
+        for(int i = 0; i < Nx; i ++){
+            for(int j= 0; j < Ny; j++){
+        
+                Kernel(i,j) = Kernel(i,j)*a(i)*b(j);  
 
+            }
       
+        }
+  
+  
+  
+    u0 = u;
+    v0 = v;
+   
+    KVec = Eigen::Map<Eigen::VectorXd>(Kernel.data(),
+                                       Kernel.cols()*Kernel.rows());
+    
+ 
+    pCost =  vectorDivergence(KVec,
+                              gKVec,
+                              1,
+                              eps);
+    
+    pCost += vectorDivergence(Kernel.rowwise().sum(),
+                              supply,
+                              DivSupply,
+                              lambdaSupply,
+                              alphaSupply,
+                              betaSupply);
+  
+    pCost += vectorDivergence(Kernel.colwise().sum(),
+                              demand,
+                              DivDemand,
+                              lambdaDemand,
+                              alphaDemand,
+                              betaDemand);
+  
 
-
-      //reset a and b
-        a = Eigen::VectorXd::Ones(Nx);
-        b = Eigen::VectorXd::Ones(Ny);
-
+  
+    dCost = -dualSolSummand(u,v,eps,gaussKernel);
+    for(int i = 0; i < u.size(); i++){
+          if(supply(i) == 0){
+              u0(i) = 0;
+        }
+    }
+    for(int i = 0; i < v.size(); i++){
+        if(demand(i) == 0){
+            v0(i) = 0;
+        }
     }
 
-    // update iteration counter
-    i = i + 1;
-
-  }
   
-  
-  
-  
-  //ProfilerStop();
-  Rcpp::Rcout << 100 << "% done. \n";
-
-
-  //if(converge > tol){
-  //  Rcpp::Rcout << "The scaling Algorithm did not converge.\n";
-  //}
-  
-  
+    dCost -= fVectorDivergence(supply,
+                               -u0,
+                               DivSupply,
+                               lambdaSupply,
+                               alphaSupply,
+                               betaSupply);
   
   
 
+    dCost -= fVectorDivergence(demand,
+                               -v0,
+                               DivDemand,
+                               lambdaDemand,
+                               alphaDemand,
+                               betaDemand);
   
-  // returnING the transport plan
+
+ 
+  // returning the transport plan
   // since the absorbtion is called in the last iteration of the loop,
   // the transport plan is equal to the kernel.
-return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
+    return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
                           Rcpp::Named("dual_f") = u,
                           Rcpp::Named("dual_g") = v,
-                          Rcpp::Named("converge") = converge);
+                          Rcpp::Named("pCost") = pCost,
+                          Rcpp::Named("dCost") = dCost,
+                          Rcpp::Named("iterations") = i);
 
 }

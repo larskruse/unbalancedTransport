@@ -82,6 +82,9 @@ expC <- function(f, g, C){
     
 }
 
+
+
+
 #' @title Sinkhorn Divergence
 #' 
 #' @description Calculating the Sinkhorn divergence for regularized unbalanced optimal transport.
@@ -303,8 +306,7 @@ sinkhorn_divergence <- function(supplyList, demandList, supplyDivList, demandDiv
             param1 <- supplyDivList[[3]]
         }
         
-        print("funcs")
-        
+
         outf_xy <- -legendre_entropy(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1) -
             0.5*eps*grad_legrende(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1)
         outf_xx <- -legendre_entropy(supplyDivList[[2]], -f_x1, supplyDivList[[1]], param1) -
@@ -378,22 +380,14 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
         outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
         outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
         
-        # print("func")
-        # print(sum(supplyList[[1]] * outf_xy))
-        # print(sum(demandList[[1]] * outg_xy))
         
         func <- sum(supplyList[[1]] * outf_xy)+ 
             sum(demandList[[1]] * outg_xy)
         
-        # 
-        # print(sum(supxdem * expMat))
-        # 
-        # print(sum(eps * (supxdem * expMat)))
         
         func <- func + sum(eps * (supxdem * expMat))
         
-        # print(func)
-        
+
         return(func)
         
         
@@ -422,7 +416,12 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
         
         
         outf_xy <- -legendre_entropy(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyDivList[[2]], -f_xy, supplyDivList[[1]], param1)
+        
+        #print(outf_xy)
+        
         outg_xy <- -legendre_entropy(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1, 0) - 0.5*eps*grad_legrende(supplyDivList[[2]], -g_xy, supplyDivList[[1]], param1)
+        
+        #print(outg_xy)
         
         # print("funcs")
         # 
@@ -442,6 +441,7 @@ regularized_ot_intern <- function(supplyList, demandList, supplyDivList, demandD
         # print(sum(demandList[[1]] * outg_xy))
         # print(eps*(sum(supplyList[[1]]) * sum(demandList[[1]])))
                 
+
         res = sum(supplyList[[1]] * outf_xy) + sum(demandList[[1]] * outg_xy) + 
             eps*(sum(supplyList[[1]]) * sum(demandList[[1]]))
         

@@ -433,43 +433,6 @@ nextLayer <- function(treeDF, coordinates ,node, layer){
 }
 
 
-# #' findPath
-# #'
-# #' Finding the path between a node and a node in its subtree.
-# #'
-# #' @param from node at which the path starts
-# #' @param to node at which the path ends. Must be in the subtree of 'from'
-# #' @param treeDF tree in data.frame format
-# #'
-# #' @return A list of nodes from 'from' to 'to'
-# #' @noRd
-# findPath <- function(from, to, treeDF){
-# 
-#     # if the node has children, check if one of them is the wanted node
-#     if(length(treeDF[treeDF$parent == from,]$child) > 0){
-#         children <- treeDF[treeDF$parent == from,]$child
-# 
-#         # if one child is the wanted node, return the current node and the child
-#         if(to %in% children){
-#             return(c(from,to))
-#         }
-# 
-#         # if non of the children is the wanted node, search in all child nodes
-#         for(i in 1:length(children)){
-#             path <- findPath(children[i], to, treeDF)
-#             # if the node is found in a child node, add the current node to the return list
-#             if(!is.null(path)){
-#                 return(c(from,path))
-#             }
-#         }
-# 
-#         return(NULL)
-#     }else{
-#         return(NULL)
-#     }
-# 
-# }
-
 #' findPath
 #'
 #' Finding the path between a node and a node in its subtree.
@@ -481,37 +444,61 @@ nextLayer <- function(treeDF, coordinates ,node, layer){
 #' @return A list of nodes from 'from' to 'to'
 #' @noRd
 findPath <- function(from, to, treeDF){
-    
-    if(from == to){
-        return(from)
-    }
-    
+
     
     parent = treeDF[treeDF$child == to,]$parent
+
     if(identical(parent, numeric(0))){
         return(NULL)
-    }
-    
-    if(parent == from){
-        
-        return(c(from,to))
-        
+    }else if(parent == from){
+
+        return(c(from, to))
+
     }else{
-        path <- findPath(from, parent, treeDF)
+
+        path = findPath(from, parent, treeDF)
+
         if(is.null(path)){
             return(NULL)
         }else{
-            return( c(path, to))    
+
+            return(c(path, to))
+
         }
-        
+
+
+
+
     }
+    
+    
+    
+    
+    # 
+    # # if the node has children, check if one of them is the wanted node
+    # if(length(treeDF[treeDF$parent == from,]$child) > 0){
+    #     children <- treeDF[treeDF$parent == from,]$child
+    # 
+    #     # if one child is the wanted node, return the current node and the child
+    #     if(to %in% children){
+    #         return(c(from,to))
+    #     }
+    # 
+    #     # if non of the children is the wanted node, search in all child nodes
+    #     for(i in 1:length(children)){
+    #         path <- findPath(children[i], to, treeDF)
+    #         # if the node is found in a child node, add the current node to the return list
+    #         if(!is.null(path)){
+    #             return(c(from,path))
+    #         }
+    #     }
+    # 
+    #     return(NULL)
+    # }else{
+    #     return(NULL)
+    # }
 
 }
-
-
-
-
-
 
 
 #' Plotting transport on trees

@@ -1,15 +1,14 @@
 #include <algorithm>
 #include <chrono>
 #include <Rcpp.h>
+#include <RcppEigen.h>
 
-
-
+#include "divergences.h"
 
 //' init the lambert w function
 //' @param x numeric vector
 //' @return initial value 
 //' @noRd
-//[[Rcpp::export]]
 Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
     Rcpp::NumericVector temp;
     Rcpp::NumericVector z(x.length());
@@ -73,7 +72,6 @@ Rcpp::NumericVector inital(Rcpp::NumericVector& x){
     Rcpp::NumericVector c;
     Rcpp::NumericVector b;
     
-    // TODO: change eps
     double eps = std::numeric_limits<double>::epsilon();
     
     for(int i = 0; i < 4; i++){
@@ -109,14 +107,11 @@ Rcpp::NumericVector aprox(double lambda, Rcpp::NumericVector& p, double eps,
     Rcpp::NumericVector temp(p.length());
     
     if (DivFun == 1){
-        temp = lambda/(lambda+eps) * p;
+        temp = (lambda/(lambda+eps)) * p;
         
         return temp;
     
     }else if(DivFun == 2){
-        
-        //return torch.min(torch.max(-self.reach * torch.ones_like(x), x), self.reach * torch.ones_like(x))
-        
         
         temp = Rcpp::pmax(p,-lambda);
         temp = Rcpp::pmin(temp,lambda);
@@ -183,6 +178,8 @@ Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat, Rcpp::NumericVector& vec, i
 
 
 
+
+
 //' Inital values
 //'
 //' The aprix operators for different divergences in the form of 'lambda * DivFun(.|p)'
@@ -212,6 +209,13 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
     Rcpp::NumericVector temp(Nx);
 
     double val;
+    
+    
+    
+    // Rcpp::Rcout << "data: " << DivFun << "\n";
+    // Rcpp::Rcout << "dist: " << distribution << "\n";
+    // Rcpp::Rcout << "temp: " << temp << "\n";
+    // Rcpp::Rcout << "lambda: " << lambda << "\n";
     
     //KL
     if (DivFun == 1){
@@ -262,10 +266,6 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
 
 
 
-
-
-
-
 //' The Sinkhorn Algorithm
 //'
 //' C++ implementation of the Sinkhorn Algorithm.
@@ -288,11 +288,12 @@ Rcpp::NumericVector init_vectors(double lambda, Rcpp::NumericMatrix costMatrix,
 //' @return The optimal transport plan
 //' @noRd
 //[[Rcpp::export]]
-Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply,
+Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix, Rcpp::NumericVector& supply,
                                   Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply,
                                   double param2Supply, double lambdaDemand, double param1Demand,
                                   double param2Demand,int DivSupply, int DivDemand,
-                                  int iterMax, Rcpp::NumericVector& epsvec, double tol ){
+                                  int iterMax, Rcpp::NumericVector& epsvec, double tol,
+                                  Eigen::Map<Eigen::MatrixXd> supdem ){
                                   
                                  
     int epsind = 0;
@@ -305,134 +306,255 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& su
     int Ny = demand.length();
     
    
-    
-    double converge;
-    
+
     Rcpp::NumericVector logSup = Rcpp::log(supply);
     Rcpp::NumericVector logDem = Rcpp::log(demand);
 
     // initializing vectors
-    Rcpp::NumericVector f = init_vectors(lambdaSupply, costMatrix, supply, demand, DivSupply, param1Supply, param2Supply, Nx, Ny, eps);
-    Rcpp::NumericVector g = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
+    Rcpp::NumericVector f = init_vectors(lambdaDemand, Rcpp::transpose(costMatrix), demand, supply, DivDemand, param1Demand, param2Demand, Ny, Nx, eps);
+        
+    Rcpp::NumericVector g = init_vectors(lambdaSupply, costMatrix, supply, demand, DivSupply, param1Supply, param2Supply, Nx, Ny, eps); 
     
-    
-    // Rcpp::Rcout << "init: \n" << "f: " << f << "\n" << "g: " << g << "\n\n";
-    
-    Rcpp::NumericVector f_prev;
-    //Rcpp::NumericVector temp;
+    Rcpp::NumericVector f_prev(Nx);
+
     Rcpp::NumericMatrix temp(Nx,Ny);
-    
+    // Rcpp::Rcout << "init: \n";
+    // Rcpp::Rcout << "[" << g(0) << "," <<  g(1) << "]\n";
+    // Rcpp::Rcout << "[" << f(0) << "," <<  f(1) << "]\n";
     
     //Rcpp::Environment LogSumExp("package:logSumExp");
     Rcpp::Environment LogSumExp = Rcpp::Environment::namespace_env("logSumExp");
     Rcpp::Function lse = LogSumExp["colLogSumExps"]; 
     
-    Rcpp::NumericMatrix transportPlan(Nx,Ny);
+    // Rcpp::Environment unbalTrans = Rcpp::Environment::namespace_env("unbalancedTransport");
+    // Rcpp::Function lseTensor = unbalTrans["logsumexpTorch"]; 
+    
+    //Transport map
+    Rcpp::NumericMatrix Kernel(Nx,Ny);
+    
+    
+    bool incEps = false;
+    
+    
+    size_t k = 0;
+    Rcpp::Rcout << f << "\n";
+    Rcpp::Rcout << g << "\n\n\n";
 
     
-    
-    // ProfilerStart("sink.log");
-    
-    
-    
-    for(size_t k=0; k < iterMax; k++){
+    while(k < iterMax){
         
-        // f_prev = Rcpp::clone(f);
-        // Rcpp::Rcout << "k:" <<k << "\n";
-        // 
+        f_prev = Rcpp::clone(f);
         
+     
         
         for(int j = 0; j < Ny; j++){
             temp(Rcpp::_,j) = logSup + (f-costMatrix(Rcpp::_,j))/eps;
         }
-
         
         g = lse(temp);
+        
+        
+        
         g = eps*g;
-        // 
-        // Rcpp::Rcout << "g min \n";
-        // Rcpp::Rcout << g << "\n";
-
         g = -aprox(lambdaDemand, g, eps, DivDemand, param1Demand, param2Demand);
-        //g = -aprox(lambdaSupply, g, eps, DivSupply, param1Supply, param2Supply);
-        // Rcpp::Rcout << "aprox \n";
-        // Rcpp::Rcout << g << "\n";
         
-        // 
-        // for(int i = 0; i < Nx; i++){
-        //     temp(Rcpp::_,i) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
-        // }
-        
-
+        // Rcpp::Rcout << "[" << g(0) << "," <<  g(1) << "]\n";
+    
+    
         for(int i = 0; i < Nx; i++){
-            temp(i, Rcpp::_) = log(demand)+(g-costMatrix(i,Rcpp::_))/eps;
+            temp(i, Rcpp::_) = logDem+(g-costMatrix(i,Rcpp::_))/eps;
         }
         
         
         f = lse(Rcpp::transpose(temp));
         f = eps*f;
-        // 
-        // Rcpp::Rcout << "f min\n";
-        // Rcpp::Rcout << f << "\n";
-        
         f = -aprox(lambdaSupply, f, eps, DivSupply, param1Supply, param2Supply);
-        //f = -aprox(lambdaDemand, f, eps, DivDemand, param1Demand, param2Demand);
+        // Rcpp::Rcout << "[" << f(0) << "," <<  f(1) << "]\n\n";
         
-        // Rcpp::Rcout << "f aprox \n";
-        // Rcpp::Rcout << f << "\n\n";
+        // Rcpp::Rcout << k << "\n";
+        // Rcpp::Rcout << (f) << "\n";
+        // Rcpp::Rcout << (g) << "\n\n\n";
+        Rcpp::Rcout << "error: " << (Rcpp::max(Rcpp::abs(f-f_prev))) << "\n\n";
         
-        
-        Rcpp::Rcout << "f: " << f << "\n";
-        Rcpp::Rcout << "g: " << g << "\n\n";
-        
-        
-        if((static_cast<double>(k)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.length())){
-            epsind = epsind + 1;
-            eps = epsvec(epsind);
+        if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol ){
             
-            if(round(100*static_cast<double>(k)/static_cast<double>(iterMax)) < 100){
-                Rcpp::Rcout << round(100*static_cast<double>(k)/static_cast<double>(iterMax)) << "% done. \n";
+            if(epsind == epsvec.length()-1){
+                break;
+            }else{
+                
+                incEps = true;
+                
             }
+            
             
         }
         
         
         
-        // if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol && epsind == (epsvec.length()-1)){
-        //     converge = Rcpp::max(Rcpp::abs(f-f_prev));
-        // 
-        //     break;
-        // }
+        if((static_cast<double>(k)/static_cast<double>(iterMax)) > static_cast<double>(epsind + 1)/static_cast<double>(epsvec.length()) || 
+           incEps){
+            epsind = epsind + 1;
+            eps = epsvec(epsind);
+            
+            incEps = false;
+            
+        }
+        
+
+        
+      
+      k++;
         
     }
     // ProfilerStop();
-    
-    // if(Rcpp::max(Rcpp::abs(f-f_prev)) > tol){
-    //     Rcpp::Rcout << "The Sinkhorn algorithm did not converge.\n"; 
-    //     
-    // }
+
 
     
     
     
     for(int i = 0; i < Nx; i++){
         for(int j = 0; j < Ny ; j++){
-            transportPlan(i,j) = exp((f(i) + g(j) - costMatrix(i,j))/eps);
-            Rcpp::Rcout << i << "," << j << ":  " << f(i) << "  " << g(j) << " " << costMatrix(i,j) <<  " " << eps << " " << transportPlan(i,j)<< "\n"; 
+            Kernel(i,j) = exp((f(i) + g(j) - costMatrix(i,j))/eps)*supdem(i,j);
         }
     }
+
     
-    Rcpp::Rcout << 100 << "% done. \n";
+    double pCost = 0;
+    double dCost = 0;
     
+    Eigen::Map<Eigen::VectorXd> f0(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(f));
+    Eigen::Map<Eigen::VectorXd> g0(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(g));
+    Eigen::VectorXd gKVec;
+    Eigen::VectorXd KVec;
+
+
+    Eigen::Map<Eigen::MatrixXd> EKernel(Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(Kernel));
+    KVec = Eigen::Map<Eigen::VectorXd>(EKernel.data(), EKernel.cols()*EKernel.rows());
+
+
+    // Rcpp::Rcout << "EKernel: \n" <<  EKernel << "\n";
+    
+    // Eigen::MatrixXd cM = Rcpp::as<Eigen::MatrixXd>(costMatrix);
+    // 
+    Eigen::MatrixXd gaussKernel;
+
+    gaussKernel = updateK(Eigen::VectorXd::Zero(Nx), Eigen::VectorXd::Zero(Ny),
+                          eps, Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(costMatrix));
+    gKVec = Eigen::Map<Eigen::VectorXd>(gaussKernel.data(), gaussKernel.cols()*gaussKernel.rows());
+    // Rcpp::Rcout << "gaus: \n" <<  gKVec << "\n";
+    
+    
+    // Rcpp::Rcout << "kvec: \n" <<  KVec << "\n";
+    
+    // double pC;
+    
+    pCost =  vectorDivergence(KVec, gKVec, 1, eps);
+    
+    
+    // pC = vectorDivergence(KVec, gKVec, 1, eps);
+    // Rcpp::Rcout << pCost << "\n";
+    // Rcpp::Rcout << pC << "\n";
+    
+    
+    pCost += vectorDivergence(EKernel.rowwise().sum(),
+                              Rcpp::as<Eigen::Map<Eigen::VectorXd> >(supply),
+                              DivSupply, lambdaSupply, param1Supply, param2Supply);
+    // 
+    // Rcpp::Rcout << pCost << "\n";
+    
+    
+    pCost += vectorDivergence(EKernel.colwise().sum(),
+                              Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand),
+                              DivDemand, lambdaDemand, param1Demand, param2Demand);
+    
+    
+    // pC += vectorDivergence((EKernel.transpose() *Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand)) ,
+    //                       Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand),
+    //                       DivDemand, lambdaDemand, param1Demand, param2Demand);
+    // Rcpp::Rcout << pCost << "\n";
+
+    // dual Cost 
     
 
+    // Rcpp::Rcout << "data for first value : \n\n";
+    // 
+    // Rcpp::Rcout << "f0 : " << f0 << "\n";
+    // Rcpp::Rcout << "g0 : " << g0 << "\n";
+    // Rcpp::Rcout << "eps : " << eps << "\n";
+    // Rcpp::Rcout << "gausker : " << gaussKernel << "\n";
+    // Rcpp::Rcout << "supdem : " << supdem << "\n";
+    
+    
+    // 
+    // Rcpp::Rcout << "f: " << f << "\n\n";
+    // Rcpp::Rcout << "g: " << g << "\n\n";
+    // Rcpp::Rcout << "costM: " << costMatrix << "\n\n";
+    // Rcpp::Rcout << "supdem: " << supdem << "\n\n";
+    // Rcpp::Rcout << "gauss: " << gaussKernel << "\n\n";
+    
+    dCost  = - dualSolSummandSink(f0, g0, eps,Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(costMatrix),
+                                  supdem);
+    // Rcpp::Rcout << "dcost: " << dCost << "\n";
+    
+    // Rcpp::Rcout << "dcost alt: " << - dualSolSummand(f0, g0, eps, gaussKernel.array()) << "\n";
+    // Rcpp::Rcout << "dcost alt2: " << - dualSolSummand(f0, g0, eps, gaussKernel.array()* supdem.array() ) << "\n";
+    // 
+    // dCost = - dualSolSummand(f0, g0, eps, gaussKernel.array());
+    
+    // Rcpp::Rcout << "dcost: " << dCost << "\n";
+    
+    // for(int i = 0; i < f0.size(); i++){
+    //     if(supply(i) == 0){
+    //         f0(i) = 0;
+    //     }
+    // }
+    // for(int i = 0; i < g0.size(); i++){
+    //     if(demand(i) == 0){
+    //         g0(i) = 0;
+    //     }
+    // }
+
+
+    dCost -= fVectorDivergence(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(supply),
+                               -f0, DivSupply, lambdaSupply,  param1Supply, param2Supply);
+    // Rcpp::Rcout << "dcost: " << dCost << "\n";
+    // Rcpp::Rcout <<"fdiv: " << fVectorDivergence(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(supply),
+    //                                       -f0, DivSupply, lambdaSupply,  param1Supply, param2Supply) << "\n";
+    // 
+    // Rcpp::Rcout << "dem: " << Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand) << "\n\n";
+    // Rcpp::Rcout << "g: " << -g0 << "\n\n";
+    // Rcpp::Rcout << "DivDem: " << DivDemand << "\n\n";
+    // Rcpp::Rcout << "lambda: " << lambdaDemand << "\n\n";
+    // Rcpp::Rcout << "p1: " << param1Demand << "\n\n";
+    // Rcpp::Rcout << "p2: " << param2Demand << "\n\n";
+    
+    
+    dCost -= fVectorDivergence(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand),
+    -g0, DivDemand, lambdaDemand,  param1Demand, param2Demand);
+    
+    
+    // Rcpp::Rcout << "dcost: " << dCost << "\n";
+    // Rcpp::Rcout <<"fdiv: " << fVectorDivergence(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(demand),
+    //                                       -g0, DivDemand, lambdaDemand,  param1Demand, param2Demand) << "\n";
+    // 
+    // 
+    // Rcpp::Rcout << "dcost: " << dCost << "\n";
+    // Rcpp::Rcout << "pcost: " << pCost << "\n";
+    // 
+    // Rcpp::Rcout << 100 << "% done. \n";
+    
+    double conv = Rcpp::max(Rcpp::abs(f-f_prev));
+    
     // returnING the transport plan
     // since the absorbtion is called in the last iteration of the loop,
     // the transport plan is equal to the kernel.
-    return Rcpp::List::create(Rcpp::Named("TransportPlan") = transportPlan,
+    return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
+                              Rcpp::Named("cost") = pCost,
+                              Rcpp::Named("dualCost") = dCost,
                               Rcpp::Named("dual_f") = f,
                               Rcpp::Named("dual_g") = g,
-                              Rcpp::Named("converge") = converge);
+                              Rcpp::Named("converge") = conv,
+                              Rcpp::Named("Iterations") = k);
 
 }
 

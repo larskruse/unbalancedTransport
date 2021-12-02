@@ -11,7 +11,7 @@ regularizedTransport(
   demandDivList,
   epsVector,
   maxIteration = 5000,
-  tol = 1e-05,
+  tol = 1e-07,
   exp = 1,
   p = 2,
   wfr = FALSE,

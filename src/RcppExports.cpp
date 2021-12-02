@@ -35,24 +35,13 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// lambertInit
-Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x);
-RcppExport SEXP _unbalancedTransport_lambertInit(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(lambertInit(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // Sinkhorn_Rcpp
-Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply, double param2Supply, double lambdaDemand, double param1Demand, double param2Demand, int DivSupply, int DivDemand, int iterMax, Rcpp::NumericVector& epsvec, double tol);
-RcppExport SEXP _unbalancedTransport_Sinkhorn_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP param1SupplySEXP, SEXP param2SupplySEXP, SEXP lambdaDemandSEXP, SEXP param1DemandSEXP, SEXP param2DemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP) {
+Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix& costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply, double param2Supply, double lambdaDemand, double param1Demand, double param2Demand, int DivSupply, int DivDemand, int iterMax, Rcpp::NumericVector& epsvec, double tol, Eigen::Map<Eigen::MatrixXd> supdem);
+RcppExport SEXP _unbalancedTransport_Sinkhorn_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP param1SupplySEXP, SEXP param2SupplySEXP, SEXP lambdaDemandSEXP, SEXP param1DemandSEXP, SEXP param2DemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP, SEXP supdemSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type costMatrix(costMatrixSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix& >::type costMatrix(costMatrixSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type supply(supplySEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type demand(demandSEXP);
     Rcpp::traits::input_parameter< double >::type lambdaSupply(lambdaSupplySEXP);
@@ -66,7 +55,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type iterMax(iterMaxSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector& >::type epsvec(epsvecSEXP);
     Rcpp::traits::input_parameter< double >::type tol(tolSEXP);
-    rcpp_result_gen = Rcpp::wrap(Sinkhorn_Rcpp(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol));
+    Rcpp::traits::input_parameter< Eigen::Map<Eigen::MatrixXd> >::type supdem(supdemSEXP);
+    rcpp_result_gen = Rcpp::wrap(Sinkhorn_Rcpp(costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol, supdem));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -88,6 +78,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// fVectorDivergence
+double fVectorDivergence(Eigen::VectorXd p, Eigen::VectorXd u, int DivFun, double param1, double param2, double param3);
+RcppExport SEXP _unbalancedTransport_fVectorDivergence(SEXP pSEXP, SEXP uSEXP, SEXP DivFunSEXP, SEXP param1SEXP, SEXP param2SEXP, SEXP param3SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type p(pSEXP);
+    Rcpp::traits::input_parameter< Eigen::VectorXd >::type u(uSEXP);
+    Rcpp::traits::input_parameter< int >::type DivFun(DivFunSEXP);
+    Rcpp::traits::input_parameter< double >::type param1(param1SEXP);
+    Rcpp::traits::input_parameter< double >::type param2(param2SEXP);
+    Rcpp::traits::input_parameter< double >::type param3(param3SEXP);
+    rcpp_result_gen = Rcpp::wrap(fVectorDivergence(p, u, DivFun, param1, param2, param3));
+    return rcpp_result_gen;
+END_RCPP
+}
 // treegkr_Rcpp
 Rcpp::List treegkr_Rcpp(Rcpp::List& tree, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, Rcpp::NumericVector& creation, Rcpp::NumericVector& destruction);
 RcppExport SEXP _unbalancedTransport_treegkr_Rcpp(SEXP treeSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP creationSEXP, SEXP destructionSEXP) {
@@ -106,9 +112,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 14},
-    {"_unbalancedTransport_lambertInit", (DL_FUNC) &_unbalancedTransport_lambertInit, 1},
-    {"_unbalancedTransport_Sinkhorn_Rcpp", (DL_FUNC) &_unbalancedTransport_Sinkhorn_Rcpp, 14},
+    {"_unbalancedTransport_Sinkhorn_Rcpp", (DL_FUNC) &_unbalancedTransport_Sinkhorn_Rcpp, 15},
     {"_unbalancedTransport_Hausdorff_Vec_Rcpp", (DL_FUNC) &_unbalancedTransport_Hausdorff_Vec_Rcpp, 8},
+    {"_unbalancedTransport_fVectorDivergence", (DL_FUNC) &_unbalancedTransport_fVectorDivergence, 6},
     {"_unbalancedTransport_treegkr_Rcpp", (DL_FUNC) &_unbalancedTransport_treegkr_Rcpp, 5},
     {NULL, NULL, 0}
 };

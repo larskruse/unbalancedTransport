@@ -99,7 +99,7 @@
 #'
 #' @export
 regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector,
-                                 maxIteration = 5000, tol = 1e-5, exp = 1, p = 2, wfr = FALSE,
+                                 maxIteration = 5000, tol = 1e-7, exp = 1, p = 2, wfr = FALSE,
                                  costMatrix = NULL, duals = FALSE, algorithm = "scaling"){
     
     
@@ -145,8 +145,11 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     }else{
         stop("Please supply a divergence")
     }
-
-        if(demandDivList[[1]] == "KL"){
+    
+    
+    
+    
+    if(demandDivList[[1]] == "KL"){
         Div2 <- 1
         demandReg <- demandDivList[[2]]
     }else if(demandDivList[[1]] == "TV"){
@@ -180,7 +183,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     if((Div1 > 3 | Div2 > 3) & algorithm == "scaling"){
         
         print("These divergence functions are not implemeted for the Scaling algorithm.")
-        print("The Sinkhorn algorithm is used instead of the Scaling algorithm.")
+        print("The Sinkhorn algorithm is used instead.")
         algorithm <- "sinkhorn"
         
     }
@@ -188,62 +191,76 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     supply <- supplyList[[1]]
     demand <- demandList[[1]]
     
+    supdem <- supply %*% t(demand)
     
     if(algorithm == "sinkhorn"){
         
-        if(!is.null(costMatrix)){
-            
-            res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
-                                 supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-                                 Div2, maxIteration, epsVector, tol)
-            
-            
-        }else if((is.null(costMatrix) & length(supply) <= 1000)){
-            
+        if(is.null(costMatrix)){
             costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
-            res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
-                                 supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-                                 Div2, maxIteration, epsVector, tol)
+        }    
             
-        }else{
-            supply %*% t(demand)
-            # res <- Sinkhorn_SpaceOptim_Rcpp(supplyList[[2]], demandList[[2]], supply, demand, supplyReg, supplyAlpha,
-            #                      supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-            #                      Div2, maxIteration, epsVector, tol)
-            # 
-            # 
+        res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
+                    supplyBeta, demandReg, demandAlpha, demandBeta, Div1, 
+                    Div2, maxIteration, epsVector, tol, supdem)
             
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
-            res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
-                                 supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-                                 Div2, maxIteration, epsVector, tol)
             
-        }
         
-        TransportPlan <- res$TransportPlan*(supply %*% t(demand))
+            
+            
+        
+        # else{
+        #     #supply %*% t(demand)
+        #     # res <- Sinkhorn_SpaceOptim_Rcpp(supplyList[[2]], demandList[[2]], supply, demand, supplyReg, supplyAlpha,
+        #     #                      supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
+        #     #                      Div2, maxIteration, epsVector, tol)
+        #     # 
+        #     # 
+        #     
+        #     costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
+        #     res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
+        #                          supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
+        #                          Div2, maxIteration, epsVector, tol)
+        #     
+        # }
         
         
-        if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
+        #print(res$TransportPlan)
+        TransportPlan <- res$TransportPlan #*(supply %*% t(demand))
+        #print(TransportPlan)
+        
+        # if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
+        #     
+        #     cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
+        #     
+        # }else{
+        #     
+            # cost = -epsVector[length(epsVector)]*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
+            #     sum(supply * legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
+            #     sum(demand * legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
+            # print(cost)
             
-            cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
-            
-        }else{
-            
-            cost = -epsVector[length(epsVector)]*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
-                sum(supply * legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
-                sum(demand * legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
-            
-            
-        }
+        # }
         
         
         
         if(duals){
-            returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost,
-                               "dual_f" = res$dual_f, "dual_g" = res$dual_g, "converge" = res$converge)
+            returnList <- list("TransportPlan" = TransportPlan,
+                               "cost" = res$cost,
+                               "dualCost" = res$dualCost,
+                               "dual_f" = res$dual_f,
+                               "dual_g" = res$dual_g,
+                               "converge" = res$converge,
+                               "Iterations" = res$Iterations)
             return(returnList)
         }else{
-            returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost, "converge" = res$converge)
+            returnList <-
+                list(
+                    "TransportPlan" = TransportPlan,
+                    "cost" = res$cost,
+                    "DualCost" = res$dualCost,
+                    "converge" = res$coverage,
+                    "Iterations" = res$Iterations
+                )
             return(returnList)
         }
     
@@ -256,44 +273,108 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
             
         }
         
+        supdem <- supply %*% t(demand)
+        
+        
         res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                              supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                              Div2, maxIteration, epsVector, tol)
         
-        
+
         TransportPlan <- res$TransportPlan
         
+        pCost <- res$pCost
+        dCost <- res$dCost
         
-        if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
-            cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
+        
+        
+        pdGap <- abs(pCost - dCost)
+        if(any(is.nan(TransportPlan))){
+            
+            print("NaNs in Transport Plan")
+            return(0)
+        }
+        
+        
+        if(!is.nan(pdGap)){
+            
+            if(duals){
+                returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost, "DualCost" = dCost,
+                                   "dual_f" = res$dual_f, "dual_g" = res$dual_g, "PrimalDualGap" = pdGap,
+                                   "Iterations" = res$iterations)
+                return(returnList)
+            }else{
+                returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost, "DualCost" = dCost,
+                                   "PrimalDualGap" = pdGap, "Iterations" = res$iterations)
+                return(returnList)
+            }
+           
             
         }else{
+            if(!is.nan(pCost)){
+                if(duals){
+                    returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost,
+                                       "dual_f" = res$dual_f, "dual_g" = res$dual_g,
+                                       "Iterations" = res$iterations)
+                    return(returnList)
+                }else{
+                    returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost,
+                                       "Iterations" = res$iterations)
+                    return(returnList)
+                }
+                
+            }else if(!is.nan(dCost)){
+                if(duals){
+                    returnList <- list("TransportPlan" = TransportPlan, "cost" = dCost,
+                                       "dual_f" = res$dual_f, "dual_g" = res$dual_g,
+                                       "Iterations" = res$iterations)
+                    return(returnList)
+                }else{
+                    returnList <- list("TransportPlan" = TransportPlan, "cost" = dCost,
+                                       "Iterations" = res$iterations)
+                    return(returnList)
+                }
+                
+            }else{
+                if(duals){
+                    returnList <- list("TransportPlan" = TransportPlan,
+                                       "dual_f" = res$dual_f, "dual_g" = res$dual_g,
+                                       "Iterations" = res$iterations)
+                    return(returnList)
+                }else{
+                    returnList <- list("TransportPlan" = TransportPlan, "Iterations" = res$iterations)
+                    return(returnList)
+                }
+                
+            }
             
-            outf_xy <- legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta)
-            outg_xy <- legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta)
-            
-            # outf_xy <- legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta)
-            # outg_xy <- legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta)
-            # 
-            outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
-            outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
-            
-            
-            cost = -epsVector[length(epsVector)]*(sum((TransportPlan-1)*(supply %*% t(demand))))-
-                sum(supply * outf_xy)-
-                sum(demand * outg_xy)
             
         }
+        
+        
+        # if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
+        #     cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
+        #     
+        # }else{
+        #     
+        #     outf_xy <- legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta)
+        #     outg_xy <- legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta)
+        #     
+        #     # outf_xy <- legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta)
+        #     # outg_xy <- legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta)
+        #     # 
+        #     outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
+        #     outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
+        #     
+        #     
+        #     cost = -epsVector[length(epsVector)]*(sum((TransportPlan-1)*(supply %*% t(demand))))-
+        #         sum(supply * outf_xy)-
+        #         sum(demand * outg_xy)
+        #     
+        # }
         
 
-        if(duals){
-            returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost,
-                               "dual_f" = res$dual_f, "dual_g" = res$dual_g, "converge" = res$converge)
-            return(returnList)
-        }else{
-            returnList <- list("TransportPlan" = TransportPlan, "TransportCost" = cost, "converge" = res$converge)
-            return(returnList)
-        }
+        
         
     }
     
