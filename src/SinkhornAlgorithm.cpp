@@ -374,7 +374,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix, Rcpp::NumericVector& s
         // Rcpp::Rcout << k << "\n";
         // Rcpp::Rcout << (f) << "\n";
         // Rcpp::Rcout << (g) << "\n\n\n";
-        Rcpp::Rcout << "error: " << (Rcpp::max(Rcpp::abs(f-f_prev))) << "\n\n";
+        // Rcpp::Rcout << "error: " << (Rcpp::max(Rcpp::abs(f-f_prev))) << "\n\n";
         
         if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol ){
             
@@ -409,7 +409,6 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix, Rcpp::NumericVector& s
     // ProfilerStop();
 
 
-    
     
     
     for(int i = 0; i < Nx; i++){

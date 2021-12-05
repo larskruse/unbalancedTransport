@@ -28,8 +28,6 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
   Eigen::VectorXd temp;
   if (DivFun == 1){
       
-    //Eigen::setNbThreads(0);
-      
     temp = s.array()*exp(u.array()/lambda);
     temp = div0(p,temp);
     temp = temp.array().pow(lambda/(lambda+eps));
@@ -258,13 +256,13 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
                                        alphaDemand,
                                        betaDemand);
         
-            Rcpp::Rcout << "gap: " << abs(dCost-pCost) << "\n";
+            // Rcpp::Rcout << "gap: " << abs(dCost-pCost) << "\n";
             
             if(not(isnan(abs(dCost- pCost))) ){
                 if(abs(dCost- pCost)< tol ){
                     if(epsind == epsvec.size()-1){
 
-                        Rcpp::Rcout << "Primal-Dual gap after " << i << " Iterations: " << abs(pCost- dCost) << "\n";
+                        // Rcpp::Rcout << "Primal-Dual gap after " << i << " Iterations: " << abs(pCost- dCost) << "\n";
 
                         return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
                                                   Rcpp::Named("dual_f") = u,

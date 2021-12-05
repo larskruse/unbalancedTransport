@@ -72,8 +72,6 @@ umtp <- function(supplyList, demandList, exp = 1, p = 2,
 
     costMatrix <- cbind(costMatrix, supplyList[[2]])
     costMatrix <- rbind(costMatrix, c(demandList[[2]],0))
-    
-
     res <- transport::transport(supply, demand, costMatrix, method = algo)
     
 
