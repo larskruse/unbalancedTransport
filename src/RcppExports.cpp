@@ -35,6 +35,36 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// logFunc
+Rcpp::NumericVector logFunc(Rcpp::NumericVector logSup, Rcpp::NumericVector f, Rcpp::NumericMatrix costMatrix, double eps, int Ny);
+RcppExport SEXP _unbalancedTransport_logFunc(SEXP logSupSEXP, SEXP fSEXP, SEXP costMatrixSEXP, SEXP epsSEXP, SEXP NySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type logSup(logSupSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type f(fSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type costMatrix(costMatrixSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type Ny(NySEXP);
+    rcpp_result_gen = Rcpp::wrap(logFunc(logSup, f, costMatrix, eps, Ny));
+    return rcpp_result_gen;
+END_RCPP
+}
+// parallelVectorLse
+Rcpp::NumericVector parallelVectorLse(Rcpp::NumericVector logSup, Rcpp::NumericVector f, Rcpp::NumericMatrix costMatrix, double eps, int Ny);
+RcppExport SEXP _unbalancedTransport_parallelVectorLse(SEXP logSupSEXP, SEXP fSEXP, SEXP costMatrixSEXP, SEXP epsSEXP, SEXP NySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type logSup(logSupSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type f(fSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type costMatrix(costMatrixSEXP);
+    Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< int >::type Ny(NySEXP);
+    rcpp_result_gen = Rcpp::wrap(parallelVectorLse(logSup, f, costMatrix, eps, Ny));
+    return rcpp_result_gen;
+END_RCPP
+}
 // Sinkhorn_Rcpp
 Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix& costMatrix, Rcpp::NumericVector& supply, Rcpp::NumericVector& demand, double lambdaSupply, double param1Supply, double param2Supply, double lambdaDemand, double param1Demand, double param2Demand, int DivSupply, int DivDemand, int iterMax, Rcpp::NumericVector& epsvec, double tol, Eigen::Map<Eigen::MatrixXd> supdem);
 RcppExport SEXP _unbalancedTransport_Sinkhorn_Rcpp(SEXP costMatrixSEXP, SEXP supplySEXP, SEXP demandSEXP, SEXP lambdaSupplySEXP, SEXP param1SupplySEXP, SEXP param2SupplySEXP, SEXP lambdaDemandSEXP, SEXP param1DemandSEXP, SEXP param2DemandSEXP, SEXP DivSupplySEXP, SEXP DivDemandSEXP, SEXP iterMaxSEXP, SEXP epsvecSEXP, SEXP tolSEXP, SEXP supdemSEXP) {
@@ -112,6 +142,8 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_unbalancedTransport_StabilizedScaling_Rcpp", (DL_FUNC) &_unbalancedTransport_StabilizedScaling_Rcpp, 14},
+    {"_unbalancedTransport_logFunc", (DL_FUNC) &_unbalancedTransport_logFunc, 5},
+    {"_unbalancedTransport_parallelVectorLse", (DL_FUNC) &_unbalancedTransport_parallelVectorLse, 5},
     {"_unbalancedTransport_Sinkhorn_Rcpp", (DL_FUNC) &_unbalancedTransport_Sinkhorn_Rcpp, 15},
     {"_unbalancedTransport_Hausdorff_Vec_Rcpp", (DL_FUNC) &_unbalancedTransport_Hausdorff_Vec_Rcpp, 8},
     {"_unbalancedTransport_fVectorDivergence", (DL_FUNC) &_unbalancedTransport_fVectorDivergence, 6},

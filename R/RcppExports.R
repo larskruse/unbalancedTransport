@@ -42,7 +42,7 @@ NULL
 #'
 #' @return The optimal transport plan
 #' @noRd
-StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-3) {
+StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol = 1e-7) {
     .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
@@ -109,6 +109,41 @@ NULL
 #' @return A vector holding the proxdiv evaluation
 #' @noRd
 NULL
+
+#' The LogSumExp Function
+#'
+#' @param vec a numeric vector
+#' @return The function LogSumExp applied to vec
+#' @noRd
+NULL
+
+#' The Sinkhorn Algorithm
+#'
+#' C++ implementation of the Sinkhorn Algorithm.
+#'
+#' @param logSup A numeric vector
+#' @param f f
+#' @param costMatrix cm
+#' @param eps eps
+#' @param Ny y
+#' @export
+logFunc <- function(logSup, f, costMatrix, eps, Ny) {
+    .Call(`_unbalancedTransport_logFunc`, logSup, f, costMatrix, eps, Ny)
+}
+
+#' The Sinkhorn Algorithm
+#'
+#' C++ implementation of the Sinkhorn Algorithm.
+#'
+#' @param logSup A numeric vector
+#' @param f f
+#' @param costMatrix cm
+#' @param eps eps
+#' @param Ny y
+#' @export
+parallelVectorLse <- function(logSup, f, costMatrix, eps, Ny) {
+    .Call(`_unbalancedTransport_parallelVectorLse`, logSup, f, costMatrix, eps, Ny)
+}
 
 #' The Sinkhorn Algorithm
 #'
@@ -201,8 +236,8 @@ NULL
 
 #' Updating the Kernel
 #'
-#' Calculating and updating the log-domain stabilized kernel. For 0 vectors u and v
-#' it calculates the Gibbs kernel.
+#' Calculating and updating the log-domain stabilized kernel.
+#' For 0 vectors u and v it calculates the Gibbs kernel.
 #'
 #' @param u A numeric vector
 #' @param v A numeric vector

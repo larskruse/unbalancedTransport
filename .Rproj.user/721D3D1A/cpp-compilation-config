@@ -10,6 +10,7 @@
         "-I/usr/include",
         "-I/home/lars/R/x86_64-pc-linux-gnu-library/3.6/Rcpp/include",
         "-I/home/lars/R/x86_64-pc-linux-gnu-library/3.6/RcppEigen/include",
+        "-I/home/lars/R/x86_64-pc-linux-gnu-library/3.6/RcppParallel/include",
         "-std=gnu++11",
         "-I/usr/share/R/include",
         "-DNDEBUG",
@@ -20,5 +21,5 @@
     ],
     "pch": "RcppEigen",
     "is_cpp": true,
-    "hash": "16383765231625168201"
+    "hash": "16394115591639411623"
 }

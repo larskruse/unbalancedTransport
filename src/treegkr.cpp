@@ -3,7 +3,8 @@
 #include "Rcpp.h"
 #include "utilTree.cpp"
 
-// Nodes for the binary search tree (splay tree) that is used to store the linear function segments
+// Nodes for the binary search tree (splay tree) that is used to store
+// the linear function segments
 struct node{
     using np = node*;
 
@@ -19,7 +20,9 @@ struct node{
     // nb: number of elements in the subtree of this node
     double val, add, len, size, nb;
 
-    // key: index of the node in the transport tree, where this segment node was generated
+    // key: index of the node in the transport tree, where this segment node
+    // was generated
+    
     // it is used to determine where mass is created or destructed
     int key;
 
@@ -39,7 +42,8 @@ struct node{
 
 
 
-    // determines whether this node is the left or right child of its parent, or if it is the root node
+    // determines whether this node is the left or right child of
+    // its parent, or if it is the root node
     int pos(){
         if(p){
             if(p->chl == this) return -1;
@@ -50,7 +54,8 @@ struct node{
 };
 
 
-// used for storing the keys and lengths of segments that vanish to the left of right side
+// used for storing the keys and lengths of segments that
+// vanish to the left of right side
 Rcpp::NumericVector keysLeft;
 Rcpp::NumericVector keysRight;
 
@@ -346,7 +351,13 @@ void merge(np &t, np s, double tpos, double spos){
 // @param p The key of the current transport key nodes parent node.
 // @return None
 //
-void treegkr_dfs(Tree &T, std::vector<double> &a, Rcpp::NumericVector &creation, Rcpp::NumericVector &destruction, std::vector<TH> &dp, int v, int p){
+void treegkr_dfs(Tree &T,
+                 std::vector<double> &a,
+                 Rcpp::NumericVector &creation,
+                 Rcpp::NumericVector &destruction,
+                 std::vector<TH> &dp,
+                 int v,
+                 int p){
 
     // Setting the slope and keys of the leftmost and rightmost segments. These have length
     // infinity and are not stored in the segment tree.
@@ -523,7 +534,9 @@ void printTree(np t){
 //' @param length A vector to store the keys
 //' @return by reference: Key and length vectors
 //' @noRd
-void getKeysLengths(np t, Rcpp::NumericVector &keys, Rcpp::NumericVector &lengths){
+void getKeysLengths(np t,
+                    Rcpp::NumericVector &keys,
+                    Rcpp::NumericVector &lengths){
 
     if(t->chl != &dummy){
         getKeysLengths(t->chl, keys, lengths);
@@ -562,8 +575,11 @@ void getKeysLengths(np t, Rcpp::NumericVector &keys, Rcpp::NumericVector &length
 //' @param destruction A numeric vector giving the destruction cost at each node.
 //' @return A list containing the optimal transport cost and the import vector.
 //[[Rcpp::export]]
-Rcpp::List treegkr_Rcpp(Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::NumericVector &demand,
-                         Rcpp::NumericVector &creation, Rcpp::NumericVector &destruction){
+Rcpp::List treegkr_Rcpp(Rcpp::List &tree,
+                        Rcpp::NumericVector &supply,
+                        Rcpp::NumericVector &demand,
+                        Rcpp::NumericVector &creation,
+                        Rcpp::NumericVector &destruction){
     // Number of nodes
     int n = supply.length();
 
@@ -582,7 +598,9 @@ Rcpp::List treegkr_Rcpp(Rcpp::List &tree, Rcpp::NumericVector &supply, Rcpp::Num
     Rcpp::NumericVector currentEdge;
     for (int i = 0; i < n-1; i++){
         currentEdge = tree[i];
-        T.add_edge((int)currentEdge[0]-1, (int) currentEdge[1]-1,  (double) currentEdge[2]);
+        T.add_edge((int)currentEdge[0]-1,
+                   (int) currentEdge[1]-1,
+                   (double) currentEdge[2]);
     }
 
 

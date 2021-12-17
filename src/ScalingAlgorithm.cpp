@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <chrono>
+//#include <chrono>
 #include <RcppEigen.h>
 #include <math.h>
 #include <Rcpp.h>
@@ -23,36 +23,47 @@
 //' @param beta num value
 //' @return A vector holding the proxdiv evaluation
 //' @noRd
-Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eigen::VectorXd u, double eps, int DivFun, double alpha, double beta){
+Eigen::VectorXd proxdiv(double lambda,
+                        Eigen::VectorXd p,
+                        Eigen::VectorXd s,
+                        Eigen::VectorXd u,
+                        double eps,
+                        int DivFun,
+                        double alpha,
+                        double beta){
   
   Eigen::VectorXd temp;
+    
   if (DivFun == 1){
       
     temp = s.array()*exp(u.array()/lambda);
     temp = div0(p,temp);
     temp = temp.array().pow(lambda/(lambda+eps));
-
     return temp;
 
   }else if(DivFun == 2){
-      //remove exp
+      
       temp = ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
       
       for (int i =0 ; i < u.size(); i++){
           
           if(isinf(u(i))){
+              
                 temp(i) = 0;
               }
           
           }
       
     return (temp);
+      
   }else{
+      
       temp= (beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp()));
       
       for (int i =0 ; i < u.size(); i++){
           
           if(isinf(u(i))){
+              
               temp(i) = 0;
           }
           
@@ -88,14 +99,25 @@ Eigen::VectorXd proxdiv(double lambda, Eigen::VectorXd p, Eigen::VectorXd s, Eig
 //' @return The optimal transport plan
 //' @noRd
 //[[Rcpp::export]]
-Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::Map<Eigen::VectorXd> supply,
-                                  Eigen::Map<Eigen::VectorXd> demand, double lambdaSupply, double alphaSupply,
-                                  double betaSupply, double lambdaDemand, double alphaDemand, double betaDemand,
-                                  int DivSupply, int DivDemand, int iterMax, Eigen::Map<Eigen::VectorXd> epsvec,
-                                  double tol = 1e-3){
-    
-    
-    
+Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
+                                  Eigen::Map<Eigen::VectorXd> supply,
+                                  Eigen::Map<Eigen::VectorXd> demand,
+                                  double lambdaSupply,
+                                  double alphaSupply,
+                                  double betaSupply,
+                                  double lambdaDemand,
+                                  double alphaDemand,
+                                  double betaDemand,
+                                  int DivSupply,
+                                  int DivDemand,
+                                  int iterMax,
+                                  Eigen::Map<Eigen::VectorXd> epsvec,
+                                  double tol = 1e-7){
+   
+   
+   
+   
+   //return Rcpp::List::create(Rcpp::Named("TransportPlan") = 0);
     
     // number of absorptions
     int numAbs = 0;
@@ -115,6 +137,9 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     // stabilization vectors
     Eigen::VectorXd u = Eigen::VectorXd::Zero(Nx);
     Eigen::VectorXd v = Eigen::VectorXd::Zero(Ny);
+    
+    Eigen::VectorXd uPrev = Eigen::VectorXd::Zero(Nx);
+    
 
     Eigen::VectorXd u0 = Eigen::VectorXd::Zero(Nx);
     Eigen::VectorXd v0 = Eigen::VectorXd::Zero(Ny);
@@ -133,10 +158,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
     // computing the initial kernel
     // since u and v are 0, the updateK function returns the Gibbs kernel
     Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
-    
     Eigen::MatrixXd gaussKernel = Kernel;
-    //ProfilerStart("scaling.prof");
-    
 
     double pCost;
     double dCost;
@@ -169,6 +191,8 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
             static_cast<double>(epsind + 1)/static_cast<double>(epsvec.size()) ||
             i == iterMax - 1  || i % 50 == 0 || incEps){
                 
+            uPrev = u;
+                
             // absorbing a/b in u/v
             u = u.array() + eps*(a.array().log());
             v = v.array() + eps*(b.array().log());
@@ -198,91 +222,31 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
             //reset a and b
             a = Eigen::VectorXd::Ones(Nx);
             b = Eigen::VectorXd::Ones(Ny);
-
-
-            pCost =  vectorDivergence(KVec,
-                                      gKVec,
-                                      1,
-                                      eps);
-            
-            pCost += vectorDivergence(Kernel.rowwise().sum(),
-                                      supply,
-                                      DivSupply,
-                                      lambdaSupply,
-                                      alphaSupply,
-                                      betaSupply);
-            
-            pCost += vectorDivergence(Kernel.colwise().sum(),
-                                      demand,
-                                      DivDemand,
-                                      lambdaDemand,
-                                      alphaDemand,
-                                      betaDemand);
-
-
-            dCost = -dualSolSummand(u,v,eps,gaussKernel);
+            Rcpp::Rcout << abs((u.array()-uPrev.array()).maxCoeff()) << "\n";
         
-
-            u0 = u;
-            v0 = v;
-
-            for(int itransportPlan = 0; i < u.size(); i++){
-                
-                if(supply(i) == 0){
-                    
-                    u0(i) = 0;
-                }
-            }
+            if( abs((u.array()-uPrev.array()).maxCoeff()) < tol){
             
-            for(int i = 0; i < u.size(); i++){
-                
-                if(demand(i) == 0){
-                    
-                    v0(i) = 0;
-                }
-            }
-            
-            dCost -= fVectorDivergence(supply,
-                                     -u0,
-                                       DivSupply,
-                                       lambdaSupply,
-                                       alphaSupply,
-                                       betaSupply);
-        
-            dCost -= fVectorDivergence(demand,
-                                       -v0,
-                                       DivDemand,
-                                       lambdaDemand,
-                                       alphaDemand,
-                                       betaDemand);
-        
-            // Rcpp::Rcout << "gap: " << abs(dCost-pCost) << "\n";
-            
-            if(not(isnan(abs(dCost- pCost))) ){
-                if(abs(dCost- pCost)< tol ){
-                    if(epsind == epsvec.size()-1){
+                if(epsind == epsvec.size()-1){
 
-                        // Rcpp::Rcout << "Primal-Dual gap after " << i << " Iterations: " << abs(pCost- dCost) << "\n";
 
-                        return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
+                    return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
                                                   Rcpp::Named("dual_f") = u,
                                                   Rcpp::Named("dual_g") = v,
                                                   Rcpp::Named("pCost") = pCost,
                                                   Rcpp::Named("dCost") = dCost,
                                                   Rcpp::Named("iterations") = i);
-                    }else{
+                }else{
                         incEps = true;
-                    }
                 }
-            }
-    
+            
+            } 
+            
         }
     
-        
-        
         }
   
         for(int i = 0; i < Nx; i ++){
+            
             for(int j= 0; j < Ny; j++){
         
                 Kernel(i,j) = Kernel(i,j)*a(i)*b(j);  
@@ -290,8 +254,6 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,Eigen::
             }
       
         }
-  
-  
   
     u0 = u;
     v0 = v;

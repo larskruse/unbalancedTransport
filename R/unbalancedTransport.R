@@ -4,6 +4,7 @@
 #' @importFrom graphics Axis image lines plot polygon points segments text
 #' @importFrom diagram curvedarrow
 #' @importFrom Rdpack reprompt
+#' @importFrom RcppParallel RcppParallelLibs
 
 #'
 #'

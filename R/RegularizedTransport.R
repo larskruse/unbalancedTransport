@@ -174,7 +174,13 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     }else if(demandDivList[[1]] == "Power"){
         Div2 <- 4
         demandReg <- demandDivList[[2]]
+        
         demandAlpha <- demandDivList[[3]]
+        
+        if(demandAlpha > 1 || demandAlpha < 0){
+            stop("The entropy exponent is not admissible (should be positive and <1)")
+        }
+        
     }else{
         stop("Please supply a divergence")
     }
@@ -193,18 +199,21 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
     
     supdem <- supply %*% t(demand)
     
+    
+    if(is.null(costMatrix)){
+
+        costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
+    }  
+    
+    
     if(algorithm == "sinkhorn"){
         
-        if(is.null(costMatrix)){
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
-        }    
-            
         res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                     supplyBeta, demandReg, demandAlpha, demandBeta, Div1, 
                     Div2, maxIteration, epsVector, tol, supdem)
             
             
-        
+
             
             
         
@@ -267,18 +276,12 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         
     }else if(algorithm == "scaling"){
         
-        if(is.null(costMatrix)){
-            
-            costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
-            
-        }
-        
-        supdem <- supply %*% t(demand)
-        
         
         res <- StabilizedScaling_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
                              supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
                              Div2, maxIteration, epsVector, tol)
+        
+        
         
 
         TransportPlan <- res$TransportPlan
@@ -292,14 +295,14 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         if(any(is.nan(TransportPlan))){
             
             print("NaNs in Transport Plan")
-            return(0)
+            return(list("DualCost" = dCost,"dual_f" = res$dual_f, "dual_g" = res$dual_g,"Iterations" = res$iterations ))
         }
         
         
         if(!is.nan(pdGap)){
             
             if(duals){
-                returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost, "DualCost" = dCost,
+                returnList <- list("TransportPlan" = TransportPlan, "cost" = pCost,"DualCost" = dCost ,
                                    "dual_f" = res$dual_f, "dual_g" = res$dual_g, "PrimalDualGap" = pdGap,
                                    "Iterations" = res$iterations)
                 return(returnList)
