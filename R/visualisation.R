@@ -1,16 +1,15 @@
 #' Plotting transport between single points.
 #'
 #' Visualizing mass transport between point clouds. 
-#' 
-#' 
+#' #' 
 #'
 #' @param transportPlan A non negative numeric matrix that indicates where the mass is
-#' transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
+#' transported from each point in the supply measure. The value at point \eqn{\[i,j\]} is the amount of mass transported from
 #' supply point \eqn{i} to demand point \eqn{j}.
-#' @param supplyList A list containing the information about the supply measure. The first element hast to be the mass
+#' @param supplyList A list containing the information about the supply measure. The first element has to be the mass
 #' distribution followed by
-#' a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points. 
-#' Has to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.
+#' a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points 
+#' have to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.
 #' @param demandList A list similar to the supplyList but holding the information about the demand distribution.
 #' 
 #' \if{html}{\figure{plotTransportPoints.png}}
@@ -107,8 +106,10 @@ plotTransportPoints <- function(transportPlan, supplyList, demandList){
     
     if(length(xS)+length(xD) > 10){
         plot(1, type = "n", xlab = "", ylab = "",
-             xlim = c(min(c(xS,xD))-0.1*abs(max(c(xS,xD))-min(c(xS,xD))),max(c(xS,xD))+0.1*abs(max(c(xS,xD))-min(c(xS,xD)))),
-             ylim =c(min(c(yS,yD))-0.1*abs(max(c(yS,yD))-min(c(yS,yD))),max(c(yS,yD))+0.1*abs(max(c(yS,yD))-min(c(yS,yD)))),
+             xlim = c(min(c(xS,xD))-0.1*abs(max(c(xS,xD))-min(c(xS,xD))),
+                      max(c(xS,xD))+0.1*abs(max(c(xS,xD))-min(c(xS,xD)))),
+             ylim =c(min(c(yS,yD))-0.1*abs(max(c(yS,yD))-min(c(yS,yD))),
+                     max(c(yS,yD))+0.1*abs(max(c(yS,yD))-min(c(yS,yD)))),
              asp = 1)
         if(!is.null(transportPlan)){
             for(i in 1:length(xS)){
@@ -245,7 +246,6 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
     # If no import or export vector is given, only the transport plan is plotted
     if(is.null(import) | is.null(export)){
 
-
         transportPlan <- t(transportPlan[(nrow(transportPlan)):1,])
 
         image(transportPlan, asp = 1, axes = FALSE, ylab = "Supply", xlab = "Demand",
@@ -255,14 +255,18 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
     }else{
 
         # Distance between import/export vectors and transport plan
-        emptyColRow <- max(1, ceiling(max(nrow(transportPlan), ncol(transportPlan))/20))
-
+        emptyColRow <- max(1, ceiling(max(nrow(transportPlan), ncol(transportPlan))/40))
+        
+        widthimpex <- max(1, ceiling(max(nrow(transportPlan), ncol(transportPlan))/100))
+        
         leftCol <- export
-        leftCol[(length(leftCol)+1):(length(leftCol)+1+emptyColRow)] <- NaN
+        leftCol[(length(leftCol)+1):(length(leftCol)+widthimpex+emptyColRow)] <- NaN
+        
+        leftCol <- matrix(rep(leftCol, widthimpex), ncol = widthimpex)
 
         # Binding the import vector to the transport plan
         addRows <- matrix(rep(NaN, ncol(transportPlan)*emptyColRow), ncol = ncol(transportPlan))
-        printObj <- rbind(transportPlan, addRows ,import)
+        printObj <- rbind(transportPlan, addRows , t(matrix(rep(import, widthimpex), ncol = widthimpex)))
 
         # Binding the export vector to the transport plan
         addCols <- matrix(rep(NaN, nrow(printObj)*emptyColRow), nrow = nrow(printObj))
@@ -274,16 +278,16 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
               col=hcl.colors(20, palette = "viridis", alpha = NULL, rev = TRUE, fixup = TRUE))
 
         # Adding the labels and axes.
-        att2 <- ((emptyColRow+1):(nrow(printObj)-1))/(nrow(printObj)-1)
-        att2 <- att2[seq(1,length(att2), length.out = 10)]
-        lab2 <- nrow(transportPlan):1
-        lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
-        att1 <- ((emptyColRow+1):(ncol(printObj)-1))/(ncol(printObj)-1)
-        att1 <- att1[seq(1,length(att1), length.out = 10)]
-        lab1 <- 1:ncol(transportPlan)
-        lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
-        Axis(side = 2, at = att2, labels = lab2)
-        Axis(side = 1, at = att1, labels = lab1)
+        # att2 <- ((emptyColRow+1):(nrow(printObj)-1))/(nrow(printObj)-1)
+        # att2 <- att2[seq(1,length(att2), length.out = 10)]
+        # lab2 <- nrow(transportPlan):1
+        # lab2 <- lab2[seq(1, length(lab2), length.out = 10)]
+        # att1 <- ((emptyColRow+1):(ncol(printObj)-1))/(ncol(printObj)-1)
+        # att1 <- att1[seq(1,length(att1), length.out = 10)]
+        # lab1 <- 1:ncol(transportPlan)
+        # lab1 <- lab1[seq(1, length(lab1), length.out = 10)]
+        # Axis(side = 2, at = att2, labels = lab2)
+        # Axis(side = 1, at = att1, labels = lab1)
 
     }
 
@@ -470,33 +474,6 @@ findPath <- function(from, to, treeDF){
 
 
     }
-    
-    
-    
-    
-    # 
-    # # if the node has children, check if one of them is the wanted node
-    # if(length(treeDF[treeDF$parent == from,]$child) > 0){
-    #     children <- treeDF[treeDF$parent == from,]$child
-    # 
-    #     # if one child is the wanted node, return the current node and the child
-    #     if(to %in% children){
-    #         return(c(from,to))
-    #     }
-    # 
-    #     # if non of the children is the wanted node, search in all child nodes
-    #     for(i in 1:length(children)){
-    #         path <- findPath(children[i], to, treeDF)
-    #         # if the node is found in a child node, add the current node to the return list
-    #         if(!is.null(path)){
-    #             return(c(from,path))
-    #         }
-    #     }
-    # 
-    #     return(NULL)
-    # }else{
-    #     return(NULL)
-    # }
 
 }
 

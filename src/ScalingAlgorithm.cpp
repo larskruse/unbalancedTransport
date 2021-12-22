@@ -34,6 +34,7 @@ Eigen::VectorXd proxdiv(double lambda,
   
   Eigen::VectorXd temp;
     
+    // Kullback-Leibler
   if (DivFun == 1){
       
     temp = s.array()*exp(u.array()/lambda);
@@ -41,6 +42,7 @@ Eigen::VectorXd proxdiv(double lambda,
     temp = temp.array().pow(lambda/(lambda+eps));
     return temp;
 
+    //Total variation
   }else if(DivFun == 2){
       
       temp = ((lambda-u.array())/eps).array().exp().array().min(div0(p,s).array().max((-(lambda+u.array())/eps).array().exp()));
@@ -55,7 +57,7 @@ Eigen::VectorXd proxdiv(double lambda,
           }
       
     return (temp);
-      
+      // Range Constraint 
   }else{
       
       temp= (beta*div0(p,s)).array().min((alpha*div0(p,s)).array().max((-u.array()/eps).array().exp()));
@@ -117,12 +119,9 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
    
    
    
-   //return Rcpp::List::create(Rcpp::Named("TransportPlan") = 0);
-    
+
     // number of absorptions
     int numAbs = 0;
-    
-
 
     // number of points in the reference measures
     int Nx = supply.size();
@@ -160,11 +159,14 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
     Eigen::MatrixXd Kernel = updateK(u, v, eps, costMatrix);
     Eigen::MatrixXd gaussKernel = Kernel;
 
+    // primal and dual cost variables
     double pCost;
     double dCost;
     
+    // if true: decrease epsilon
     bool incEps = false;
     
+    // Vector representatin of the kernel and gauss kernel
     Eigen::VectorXd KVec;
     Eigen::VectorXd gKVec(Eigen::Map<Eigen::VectorXd>(gaussKernel.data(), gaussKernel.cols()*gaussKernel.rows()));  
 
@@ -185,6 +187,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
         //  1. a or b are too large,
         //  2. a new value for epsilon has to be assigned
         //  3. in the last iteration to calculate the transport map
+        //  4. to calculate the difference between ´
         if ((abs(a.array()) > 1e+100).any() ||
             (abs(b.array()) > 1e+100).any() ||
             (static_cast<double>(i)/static_cast<double>(iterMax)) >
@@ -222,8 +225,8 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
             //reset a and b
             a = Eigen::VectorXd::Ones(Nx);
             b = Eigen::VectorXd::Ones(Ny);
-            Rcpp::Rcout << abs((u.array()-uPrev.array()).maxCoeff()) << "\n";
-        
+
+            // check if stopping criterion is reached
             if( abs((u.array()-uPrev.array()).maxCoeff()) < tol){
             
                 if(epsind == epsvec.size()-1){
@@ -243,25 +246,26 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
             
         }
     
-        }
+    }
   
-        for(int i = 0; i < Nx; i ++){
-            
-            for(int j= 0; j < Ny; j++){
         
-                Kernel(i,j) = Kernel(i,j)*a(i)*b(j);  
+    for(int i = 0; i < Nx; i ++){
+            
+        for(int j= 0; j < Ny; j++){
+        
+            Kernel(i,j) = Kernel(i,j)*a(i)*b(j);  
 
-            }
-      
         }
+      
+    }
   
+  
+    // calculate primal cost
     u0 = u;
     v0 = v;
-   
     KVec = Eigen::Map<Eigen::VectorXd>(Kernel.data(),
                                        Kernel.cols()*Kernel.rows());
     
- 
     pCost =  vectorDivergence(KVec,
                               gKVec,
                               1,
@@ -282,7 +286,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
                               betaDemand);
   
 
-  
+    // calculate dual cost
     dCost = -dualSolSummand(u,v,eps,gaussKernel);
     for(int i = 0; i < u.size(); i++){
           if(supply(i) == 0){
@@ -315,7 +319,7 @@ Rcpp::List StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd> costMatrix,
 
  
   // returning the transport plan
-  // since the absorbtion is called in the last iteration of the loop,
+  // since the absorption is called in the last iteration of the loop,
   // the transport plan is equal to the kernel.
     return Rcpp::List::create(Rcpp::Named("TransportPlan") = Kernel,
                           Rcpp::Named("dual_f") = u,

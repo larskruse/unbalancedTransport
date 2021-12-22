@@ -1,5 +1,3 @@
-//#include <bits/stdc++.h>
-
 #include "Rcpp.h"
 #include "utilTree.cpp"
 

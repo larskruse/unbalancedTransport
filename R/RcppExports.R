@@ -46,7 +46,7 @@ StabilizedScaling_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, alp
     .Call(`_unbalancedTransport_StabilizedScaling_Rcpp`, costMatrix, supply, demand, lambdaSupply, alphaSupply, betaSupply, lambdaDemand, alphaDemand, betaDemand, DivSupply, DivDemand, iterMax, epsvec, tol)
 }
 
-#' init the lambert w function
+#' initial value for the lambert W function
 #' @param x numeric vector
 #' @return initial value 
 #' @noRd
@@ -58,7 +58,7 @@ NULL
 #' @noRd 
 NULL
 
-#' computing the inital values for f and g
+#' computing the inital values for the iterators
 #' @param x numeric vector
 #' @return the function value
 #' @noRd
@@ -117,33 +117,18 @@ NULL
 #' @noRd
 NULL
 
-#' The Sinkhorn Algorithm
+#' Log-Sum-Exp Operator
 #'
-#' C++ implementation of the Sinkhorn Algorithm.
+#' A parallel implementation of the LSE operator used in the iterators of the
+#' Sinkhorn algorithm.
 #'
-#' @param logSup A numeric vector
-#' @param f f
-#' @param costMatrix cm
-#' @param eps eps
-#' @param Ny y
-#' @export
-logFunc <- function(logSup, f, costMatrix, eps, Ny) {
-    .Call(`_unbalancedTransport_logFunc`, logSup, f, costMatrix, eps, Ny)
-}
-
-#' The Sinkhorn Algorithm
-#'
-#' C++ implementation of the Sinkhorn Algorithm.
-#'
-#' @param logSup A numeric vector
-#' @param f f
-#' @param costMatrix cm
-#' @param eps eps
-#' @param Ny y
-#' @export
-parallelVectorLse <- function(logSup, f, costMatrix, eps, Ny) {
-    .Call(`_unbalancedTransport_parallelVectorLse`, logSup, f, costMatrix, eps, Ny)
-}
+#' @param logSup The log values of the input measures
+#' @param f the current value of the dual iterator
+#' @param costMatrix the cost matrix
+#' @param eps Regularization Parameter
+#' @param Ny Number of elements in the result vector
+#' @noRd
+NULL
 
 #' The Sinkhorn Algorithm
 #'
@@ -170,10 +155,9 @@ Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply
     .Call(`_unbalancedTransport_Sinkhorn_Rcpp`, costMatrix, supply, demand, lambdaSupply, param1Supply, param2Supply, lambdaDemand, param1Demand, param2Demand, DivSupply, DivDemand, iterMax, epsvec, tol, supdem)
 }
 
-#' The symmetric stabilized Scaling Algorithm
+#' Helper Function Hausdorff divergence
 #'
-#' C++ implementation of the log-domain stabilized Version of the Scaling
-#' Algorithm.
+#' Extending the symmetrical dual solution to the support of the other input measure
 #'
 #' @param costMatrix A numeric matrix.
 #' @param f A numeric vector
@@ -188,76 +172,6 @@ Sinkhorn_Rcpp <- function(costMatrix, supply, demand, lambdaSupply, param1Supply
 #' @noRd
 Hausdorff_Vec_Rcpp <- function(costMatrix, distribution, f, lambda, param1, param2, Div, eps) {
     .Call(`_unbalancedTransport_Hausdorff_Vec_Rcpp`, costMatrix, distribution, f, lambda, param1, param2, Div, eps)
-}
-
-#' Elementwise division of two vectors with 'x/0 = 0'
-#'
-#' @param a The dividend vector
-#' @param b The divisor vector
-#' @return solution of elementwise division of a and b
-#' @noRd
-NULL
-
-#' Elementwise multiplication of two vectors with 'x/0 = 0'
-#'
-#' @param a The dividend vector
-#' @param b The divisor vector
-#' @return solution of elementwise division of a and b
-#' @noRd
-NULL
-
-#' Computing the divergence functions values
-#'
-#' @param r input vector
-#' @param s comparision vector
-#' @param DivFun kind of function to use
-#' @param param1 lambda or alpha
-#' @param param2 beta or 0
-#' @param param3 beta or 0
-#'
-#' @noRd
-NULL
-
-#' Computing the entropy term of the dual solution
-#'
-#' @param u dual potential 
-#' @param v dual potential
-#' @param eps regularization parameter
-#' @param Kernel the Kernel
-NULL
-
-#' Computing the entropy term of the dual solution
-#'
-#' @param u dual potential 
-#' @param v dual potential
-#' @param eps regularization parameter
-#' @param Kernel the Kernel
-NULL
-
-#' Updating the Kernel
-#'
-#' Calculating and updating the log-domain stabilized kernel.
-#' For 0 vectors u and v it calculates the Gibbs kernel.
-#'
-#' @param u A numeric vector
-#' @param v A numeric vector
-#' @param eps The epsilon value
-#' @param costMatrix A numeric matrix
-#' @return The updated kernel
-#' @noRd
-NULL
-
-#' Computing the divergence functions values
-#'
-#' @param p input vector
-#' @param u comparision vector
-#' @param DivFun kind of function to use
-#' @param param1 lambda or alpha
-#' @param param2 beta or 0
-#' @param param3 beta or 0
-#' @export
-fVectorDivergence <- function(p, u, DivFun, param1, param2 = 0, param3 = 0) {
-    .Call(`_unbalancedTransport_fVectorDivergence`, p, u, DivFun, param1, param2, param3)
 }
 
 #' Updating the segment node values in x < 0

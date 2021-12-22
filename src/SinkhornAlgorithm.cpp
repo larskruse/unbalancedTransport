@@ -7,16 +7,16 @@
 #include "divergences.h"
 
 
+// Worker for RcppParallel 
 struct Lse : public RcppParallel::Worker
 {
-    // source vector
+    
     const RcppParallel::RVector<double> logMeasure;
     const RcppParallel::RVector<double> dualPot;
     const RcppParallel::RMatrix<double> costMatrix;
     const double eps;
     
-    
-    // accumulated value
+        
     RcppParallel::RVector<double> lseVec;
     
     tthread::mutex mutexDualPot_;
@@ -34,20 +34,17 @@ struct Lse : public RcppParallel::Worker
         lseVec(lseVec) {}
     
     
-    // accumulate just the element of the range I've been asked to
     void operator()(std::size_t begin, std::size_t end) {
         
         for(std::size_t i = begin; i < end; i++){
             
-            
-            RcppParallel::RMatrix<double>::Column row = costMatrix.column(i);
-            std::vector<double> resVec(row.length());
-            
-            
+            // the lse is calcualted for each colum of the cost matrix
+            RcppParallel::RMatrix<double>::Column col = costMatrix.column(i);
+            std::vector<double> resVec(col.length());
             
             
             mutexDualPot_.lock();
-            std::transform(row.begin(), row.end(), dualPot.begin(), resVec.begin(),
+            std::transform(col.begin(), col.end(), dualPot.begin(), resVec.begin(),
                            [](double i, double j){return (j - i);});
             mutexDualPot_.unlock();
 
@@ -78,7 +75,7 @@ struct Lse : public RcppParallel::Worker
 
 
 
-//' init the lambert w function
+//' initial value for the lambert W function
 //' @param x numeric vector
 //' @return initial value 
 //' @noRd
@@ -95,7 +92,6 @@ Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
     temp = temp*(3+6*temp+temp*temp)/(3+9*temp+5*temp*temp);
     z[x<=1 & x>= -2] = temp;
     z[z == 0] = 1e-6;
-    
     
     return(z);
 }
@@ -129,7 +125,7 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
 
 
 
-//' computing the inital values for f and g
+//' computing the inital values for the iterators
 //' @param x numeric vector
 //' @return the function value
 //' @noRd
@@ -200,12 +196,12 @@ Rcpp::NumericVector aprox(double lambda,
     // Power
     }else if(DivFun == 4){
         
-        temp = p/(eps*(1-param1));
+        temp = -p/(eps*(1-param1));
         temp = temp + lambda/eps;
         temp = temp + std::log(lambda/eps);
         temp = (1-param1)*(lambda-eps*lambertWFunctionLog(temp));
         
-        return(-temp);
+        return(temp);
         
     }else{
         
@@ -292,8 +288,7 @@ Rcpp::NumericVector init_vectors(double lambda,
         temp.fill(-lambda*std::log(Rcpp::sum(distribution)));
 
         return temp;
-        
-        
+
     //TV
     }else if(DivFun == 2){
         
@@ -365,67 +360,18 @@ double logsumexp(Rcpp::NumericVector vec){
 
 
 
-//' The Sinkhorn Algorithm
+
+//' Log-Sum-Exp Operator
 //'
-//' C++ implementation of the Sinkhorn Algorithm.
+//' A parallel implementation of the LSE operator used in the iterators of the
+//' Sinkhorn algorithm.
 //'
-//' @param logSup A numeric vector
-//' @param f f
-//' @param costMatrix cm
-//' @param eps eps
-//' @param Ny y
-//' @export
-//[[Rcpp::export]]
-Rcpp::NumericVector logFunc(Rcpp::NumericVector logSup,
-                            Rcpp::NumericVector f,
-                            Rcpp::NumericMatrix costMatrix,
-                            double eps,
-                            int Ny){
-    
-    Rcpp::NumericVector g(Ny);
-    
-    // Rcpp::NumericVector cc;
-    // Rcpp::NumericVector ccc;
-    // Rcpp::NumericVector cccc;
-    
-    for(int j = 0; j < Ny; j++){
-        // cc = costMatrix(Rcpp::_,j);
-        // Rcpp::Rcout << cc << "\n";
-        // 
-        // ccc = ((f-costMatrix(Rcpp::_,j))/eps);
-        // Rcpp::Rcout << ccc << "\n";
-        // 
-        // cccc = (logSup + (f-costMatrix(Rcpp::_,j))/eps);
-        // Rcpp::Rcout << cccc << "\n";
-        // 
-        // Rcpp::Rcout << logsumexp(logSup + (f-costMatrix(Rcpp::_,j))/eps) << "\n";
-        // Rcpp::Rcout << eps * logsumexp(logSup + (f-costMatrix(Rcpp::_,j))/eps) << "\n";
-        
-        g(j) = eps * logsumexp(logSup + (f-costMatrix(Rcpp::_,j))/eps);
-    }
-    
-    
-    
-    return(g);
-    
-}
-
-
-
-
-
-
-//' The Sinkhorn Algorithm
-//'
-//' C++ implementation of the Sinkhorn Algorithm.
-//'
-//' @param logSup A numeric vector
-//' @param f f
-//' @param costMatrix cm
-//' @param eps eps
-//' @param Ny y
-//' @export
-//[[Rcpp::export]]
+//' @param logSup The log values of the input measures
+//' @param f the current value of the dual iterator
+//' @param costMatrix the cost matrix
+//' @param eps Regularization Parameter
+//' @param Ny Number of elements in the result vector
+//' @noRd
 Rcpp::NumericVector parallelVectorLse(Rcpp::NumericVector logSup,
                                       Rcpp::NumericVector f,
                                       Rcpp::NumericMatrix costMatrix,
@@ -434,17 +380,15 @@ Rcpp::NumericVector parallelVectorLse(Rcpp::NumericVector logSup,
     
     Rcpp::NumericVector ret(Ny);
     
-    
-    // declare the Sum instance 
+    // declare the Lse instance 
     Lse lse(logSup, f, costMatrix, eps, ret);
     
-    // call parallel_reduce to start the work
+    // call parallel_For to start the parallel computation.
     parallelFor(0, costMatrix.ncol(), lse);
     
     ret = lse.lseVec;
     
-    
-    // return the computed sum
+    // return the computed lse vector
     return eps * ret;
 }
 
@@ -491,6 +435,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
                                   Eigen::Map<Eigen::MatrixXd> supdem){
                                   
                                  
+    // set first epsilon
     int epsind = 0;
     double eps = epsvec(0);
     
@@ -501,10 +446,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
     int Ny = demand.length();
     
    
-
-    Rcpp::NumericVector logSup = Rcpp::log(supply);
     
-
+    Rcpp::NumericVector logSup = Rcpp::log(supply);
     Rcpp::NumericVector logDem = Rcpp::log(demand);
 
     // initializing vectors
@@ -525,18 +468,15 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
                                              param1Supply,
                                              param2Supply,
                                              Nx, Ny, eps); 
+    
+    
+    
     Rcpp::NumericVector f_prev(Nx);
-    Rcpp::NumericVector f_alt(Nx);
-    Rcpp::NumericVector f_alt2(Nx);
-    
-    Rcpp::NumericVector g_alt(Ny);
-    
-    Rcpp::NumericMatrix temp(Nx,Ny);
     
     //Transport map
     Rcpp::NumericMatrix Kernel(Nx,Ny);
     
-    
+    // indicates of eps has to be decreased
     bool incEps = false;
     
     
@@ -546,30 +486,15 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
         
         f_prev = Rcpp::clone(f);
         
-     
-        // g = logFunc(logSup, f, costMatrix, eps, Ny);
+        // calculating the iterators
         g = parallelVectorLse(logSup, f, costMatrix, eps, Ny);
-        
-        // Rcpp::Rcout << "g: " << g << "\n\n";
-        // Rcpp::Rcout << "g_alt: " << g_alt << "\n\n";
-        
         g = -aprox(lambdaDemand, g, eps, DivDemand, param1Demand, param2Demand);
-
-
-        // for(int i = 0; i < Nx; i++){
-        //     f(i) = eps *  logsumexp((logDem+(g-costMatrix(i,Rcpp::_))/eps)) ; 
-        // }
         
-        // f = logFunc(logDem, g, Rcpp::transpose(costMatrix), eps , Nx);
         f = parallelVectorLse(logDem, g, Rcpp::transpose(costMatrix), eps , Nx);
-
-        // Rcpp::Rcout << "f: " << f << "\n\n";
-        // Rcpp::Rcout << "f_alt: " << f_alt << "\n\n";
-        // Rcpp::Rcout << "f_alt2: " << f_alt2 << "\n\n";
-
         f = -aprox(lambdaSupply, f, eps, DivSupply, param1Supply, param2Supply);
 
-
+        
+        // check if difference of iterators is smaller than the given tolerance
         if(Rcpp::max(Rcpp::abs(f-f_prev)) < tol ){
             
             if(epsind == epsvec.length()-1){
@@ -584,7 +509,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
             
         }
 
-            
+        // decrease epsilon 
         if((static_cast<double>(k)/static_cast<double>(iterMax)) >
                static_cast<double>(epsind + 1)/static_cast<double>(epsvec.length()) || 
            incEps){
@@ -602,7 +527,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
 
 
     
-    
+    // compute transport plan
     for(int i = 0; i < Nx; i++){
         
         for(int j = 0; j < Ny ; j++){
@@ -619,6 +544,8 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
     
     Eigen::Map<Eigen::VectorXd> f0(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(f));
     Eigen::Map<Eigen::VectorXd> g0(Rcpp::as<Eigen::Map<Eigen::VectorXd> >(g));
+    
+    // vectorized versions of the kernels
     Eigen::VectorXd gKVec;
     Eigen::VectorXd KVec;
 
@@ -639,10 +566,9 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
                                         gaussKernel.cols()*gaussKernel.rows());
 
     
+    
+    // calcualte primal cost
     pCost =  vectorDivergence(KVec, gKVec, 1, eps);
-    
-    
-
     
     pCost += vectorDivergence(EKernel.rowwise().sum(),
                               Rcpp::as<Eigen::Map<Eigen::VectorXd> >(supply),
@@ -659,7 +585,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
                               lambdaDemand,
                               param1Demand,
                               param2Demand);
-    
+    // calcualte dual cost
     dCost  = - dualSolSummandSink(f0,
                                   g0,
                                   eps,
@@ -697,10 +623,9 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
 
 
 
-//' The symmetric stabilized Scaling Algorithm
+//' Helper Function Hausdorff divergence
 //'
-//' C++ implementation of the log-domain stabilized Version of the Scaling
-//' Algorithm.
+//' Extending the symmetrical dual solution to the support of the other input measure
 //'
 //' @param costMatrix A numeric matrix.
 //' @param f A numeric vector
@@ -729,26 +654,9 @@ Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,
     Rcpp::NumericMatrix temp(Nx,Ny);
     Rcpp::NumericVector g(Ny);
  
-    //Rcpp::Environment LogSumExp("package:logSumExp");
-    Rcpp::Environment LogSumExp = Rcpp::Environment::namespace_env("logSumExp");
-    Rcpp::Function lse = LogSumExp["colLogSumExps"]; 
- 
     Rcpp::NumericVector logDistribution = Rcpp::log(distribution);
- 
-    //Rcpp::Rcout << "f: " << f << "\n" << "g: " << g << "\n\n";
-    //Rcpp::Rcout << "temp: " << temp << "\n\n";
- 
-    for(int j = 0; j < Ny; j++){
-        temp(Rcpp::_,j) = logDistribution + (f-costMatrix(Rcpp::_,j))/eps;
-    }
-    //Rcpp::Rcout << "temp: " << temp << "\n\n";
-    
- 
-    g = lse(temp);
-    g = -eps*g;
-    
-    
-    g = aprox(lambda, g, eps, Div, param1, param2);
+    g = parallelVectorLse(logDistribution, f, costMatrix, eps, Ny);
+    g = - aprox(lambda, g, eps, Div, param1, param2);
     
     return g;
     

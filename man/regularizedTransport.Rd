@@ -9,7 +9,7 @@ regularizedTransport(
   demandList,
   supplyDivList,
   demandDivList,
-  epsVector,
+  epsVector = 1,
   maxIteration = 5000,
   tol = 1e-07,
   exp = 1,

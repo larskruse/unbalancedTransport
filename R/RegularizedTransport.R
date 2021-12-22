@@ -98,7 +98,7 @@
 #' plot1DTransport(res$TransportPlan, supply, demand)
 #'
 #' @export
-regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector,
+regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDivList, epsVector = 1,
                                  maxIteration = 5000, tol = 1e-7, exp = 1, p = 2, wfr = FALSE,
                                  costMatrix = NULL, duals = FALSE, algorithm = "scaling"){
     
@@ -167,7 +167,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         Div2 <- 4
         demandReg <- demandDivList[[2]]
         demandAlpha <- 0
-    }else if(demandDivList[[2]] == "Hellinger"){
+    }else if(demandDivList[[1]] == "Hellinger"){
         Div2 <- 4
         demandReg <- demandDivList[[2]]
         demandAlpha <- -1
@@ -177,8 +177,8 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
         
         demandAlpha <- demandDivList[[3]]
         
-        if(demandAlpha > 1 || demandAlpha < 0){
-            stop("The entropy exponent is not admissible (should be positive and <1)")
+        if(demandAlpha > 1){
+            stop("The entropy exponent is not admissible")
         }
         
     }else{
@@ -214,41 +214,8 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
             
             
 
-            
-            
-        
-        # else{
-        #     #supply %*% t(demand)
-        #     # res <- Sinkhorn_SpaceOptim_Rcpp(supplyList[[2]], demandList[[2]], supply, demand, supplyReg, supplyAlpha,
-        #     #                      supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-        #     #                      Div2, maxIteration, epsVector, tol)
-        #     # 
-        #     # 
-        #     
-        #     costMatrix <- costMatrix(supplyList[[2]], demandList[[2]], exp, p, wfr)
-        #     res <- Sinkhorn_Rcpp(costMatrix, supply, demand, supplyReg, supplyAlpha,
-        #                          supplyBeta, demandReg, demandAlpha, demandBeta, Div1,
-        #                          Div2, maxIteration, epsVector, tol)
-        #     
-        # }
-        
-        
-        #print(res$TransportPlan)
-        TransportPlan <- res$TransportPlan #*(supply %*% t(demand))
-        #print(TransportPlan)
-        
-        # if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
-        #     
-        #     cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
-        #     
-        # }else{
-        #     
-            # cost = -epsVector[length(epsVector)]*(sum((res$TransportPlan-1)*(supply %*% t(demand))))-
-            #     sum(supply * legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta))-
-            #     sum(demand * legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta))
-            # print(cost)
-            
-        # }
+        TransportPlan <- res$TransportPlan 
+
         
         
         
@@ -353,32 +320,7 @@ regularizedTransport <- function(supplyList, demandList, supplyDivList, demandDi
             
             
         }
-        
-        
-        # if(Div1 == Div2 & supplyReg == demandReg & supplyAlpha == demandAlpha & supplyBeta == demandBeta){
-        #     cost <- regularized_ot_intern(supplyList, demandList, supplyDivList, demandDivList, res$dual_f, res$dual_g, epsVector[length(epsVector)], costMatrix)
-        #     
-        # }else{
-        #     
-        #     outf_xy <- legendre_entropy(supplyReg, -res$dual_f, Div1, supplyAlpha, supplyBeta)
-        #     outg_xy <- legendre_entropy(demandReg, -res$dual_g, Div2, demandAlpha, demandBeta)
-        #     
-        #     # outf_xy <- legendre_entropy(supplyReg, -res$dual_f, supplyList[[2]], supplyAlpha, supplyBeta)
-        #     # outg_xy <- legendre_entropy(demandReg, -res$dual_g, demandList[[2]], demandAlpha, demandBeta)
-        #     # 
-        #     outf_xy[!is.finite(outf_xy) & supplyList[[1]] == 0] <- 0
-        #     outg_xy[!is.finite(outg_xy) & demandList[[1]] == 0] <- 0
-        #     
-        #     
-        #     cost = -epsVector[length(epsVector)]*(sum((TransportPlan-1)*(supply %*% t(demand))))-
-        #         sum(supply * outf_xy)-
-        #         sum(demand * outg_xy)
-        #     
-        # }
-        
 
-        
-        
     }
     
     

@@ -35,7 +35,7 @@ Eigen::VectorXd div0(Eigen::VectorXd a, Eigen::VectorXd b){
     }
 
 }
-//' Elementwise multiplication of two vectors with 'x/0 = 0'
+//' Elementwise multiplication of two vectors with infinity * 0 = 0
 //'
 //' @param a The dividend vector
 //' @param b The divisor vector
@@ -51,8 +51,7 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
         
     }else{
         
-        // compute the standard division and check for elements that
-        // violate the rule x/0 = 0
+        // check for elements that are zero and set the corresponding result to 0
         Eigen::VectorXd res = a.array()*b.array();
         
         for(int i = 0; i < a.size(); i++){
@@ -82,7 +81,6 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
 //' @param param1 lambda or alpha
 //' @param param2 beta or 0
 //' @param param3 beta or 0
-//'
 //' @noRd
 double vectorDivergence (Eigen::VectorXd r,
                          Eigen::VectorXd s,
@@ -101,13 +99,13 @@ double vectorDivergence (Eigen::VectorXd r,
         temp = (temp.array() - r.array() + s.array());
         return(param1 * temp.sum());
         
-        // Total variation
+    // Total variation
     }else if(DivFun == 2){
         
         Eigen::VectorXd temp = (r.array()-s.array()).array().abs();
         return(param1 * temp.sum());
         
-        // Range Constraint
+    // Range Constraint
     }else if(DivFun == 3){
         
         Eigen::VectorXd temp1 = (param2*s.array()).array()-r.array();
@@ -120,6 +118,7 @@ double vectorDivergence (Eigen::VectorXd r,
         
         return(temp1.sum());
         
+    // Power divergence
     }else if(DivFun == 4){
         
         if(param2 == 0){
@@ -173,7 +172,7 @@ double vectorDivergence (Eigen::VectorXd r,
 
 
 
-//' Computing the divergence functions values
+//' Computing the legendre transformations of the divergence functions 
 //'
 //' @param p input vector
 //' @param u comparision vector
@@ -181,8 +180,7 @@ double vectorDivergence (Eigen::VectorXd r,
 //' @param param1 lambda or alpha
 //' @param param2 beta or 0
 //' @param param3 beta or 0
-//' @export
-//[[Rcpp::export]]
+//' @noRd
 double fVectorDivergence (Eigen::VectorXd p,
                           Eigen::VectorXd u,
                           int DivFun,
@@ -191,22 +189,24 @@ double fVectorDivergence (Eigen::VectorXd p,
                           double param3 = 0){
     
     Eigen::VectorXd temp;
-    
+    // Kullback-Leibler
     if (DivFun == 1){
         
         temp = (u.array()/param1).array().exp().array()-1;
         temp = axb0(p,temp);
         return(param1  * temp.sum());
-        
+    // Total variation
     }else if(DivFun == 2){
         
         temp = p.array().min((-p).array().max(p.array()*u.array()/param1));
         return(param1 * temp.sum());
         
+    // Range Constraint
     }else if(DivFun == 3 && param2 <= param3 && 0 <= param2){
         
         return((((param2*p.array()*u.array())).max(param3*p.array()*u.array())).sum());
         
+    // Power divergence
     }else if (DivFun == 4){
         
         if(param2 == 0.5){
@@ -242,6 +242,7 @@ double fVectorDivergence (Eigen::VectorXd p,
 //' @param v dual potential
 //' @param eps regularization parameter
 //' @param Kernel the Kernel
+//' @noRd
 double dualSolSummand(Eigen::VectorXd u,
                       Eigen::VectorXd v,
                       double eps,
@@ -272,12 +273,13 @@ double dualSolSummand(Eigen::VectorXd u,
     
 }
 
-//' Computing the entropy term of the dual solution
+//' Computing the entropy term of the dual solution for the Sinkhorn algorithm
 //'
 //' @param u dual potential 
 //' @param v dual potential
 //' @param eps regularization parameter
 //' @param Kernel the Kernel
+//' @noRd
 double dualSolSummandSink(Eigen::VectorXd u,
                           Eigen::VectorXd v,
                           double eps,

@@ -186,10 +186,7 @@ treeTransport <- function(tree, supplyList, demandList, output = "cost", costMat
         }
 
     }
-    # print(export[export > 0])
-    # print(sum(supply-export))
-    # print(import[import > 0])
-    # print(sum(demand-import))
+
     
 
     if(output != "cost"){

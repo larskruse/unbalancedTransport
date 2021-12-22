@@ -1,6 +1,6 @@
 #' Example supply Distribution
 #' 
-#' This 1 dimensional distribution was used as example in the paper describing
+#' This 1 dimensional distribution was used as example in the paper introducing
 #' the Scaling algorithm. It can be used to test the implemented algorithms.
 #'
 #'

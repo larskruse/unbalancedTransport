@@ -8,13 +8,13 @@ plotTransportPoints(transportPlan, supplyList, demandList)
 }
 \arguments{
 \item{transportPlan}{A non negative numeric matrix that indicates where the mass is
-transported. The value at point \eqn{\[i,j\]} is the amount of mass transported from
+transported from each point in the supply measure. The value at point \eqn{\[i,j\]} is the amount of mass transported from
 supply point \eqn{i} to demand point \eqn{j}.}
 
-\item{supplyList}{A list containing the information about the supply measure. The first element hast to be the mass
+\item{supplyList}{A list containing the information about the supply measure. The first element has to be the mass
 distribution followed by
-a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points. 
-Has to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.}
+a vector specifying the cost for destruction of mass at each supply point. Lastly, the positions of the supply points 
+have to be provided. This can either be a vector or a matrix where each row gives the coordinates for one point.}
 
 \item{demandList}{A list similar to the supplyList but holding the information about the demand distribution.
 
@@ -22,7 +22,8 @@ Has to be provided. This can either be a vector or a matrix where each row gives
 \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}}
 }
 \description{
-Visualizing mass transport between point clouds.
+Visualizing mass transport between point clouds. 
+#'
 }
 \examples{
 

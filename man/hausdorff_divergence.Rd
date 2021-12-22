@@ -7,8 +7,7 @@
 hausdorff_divergence(
   supplyList,
   demandList,
-  supplyDivList,
-  demandDivList,
+  DivList,
   epsVector,
   iterMax = 1000,
   tol = 0.001,
@@ -25,7 +24,7 @@ hausdorff_divergence(
 
 \item{demandList}{A list containing the demand measure and if the cost matrix is not provided the support of the demand distribution.}
 
-\item{supplyDivList}{A list containing the information about the divergence function for the supply measure. The first element is the
+\item{DivList}{A list containing the information about the divergence function for the supply and demand measures. The first element is the
 abbreviation of the divergence function. The following values are available: 
 
 \itemize{
@@ -37,12 +36,10 @@ abbreviation of the divergence function. The following values are available:
   \item "Berg" for the Power divergence with conjugate exponent r = 0: \eqn{F_1 = \lambda \cdot Power_0()}{F1 = lambda * Power_0()}
 }
 
-The next elements in supplyDivList are the additional parameters for the divergence functions. For "KL", "TV", "Hellinger"
+The next elements in DivList are the additional parameters for the divergence functions. For "KL", "TV", "Hellinger"
 and "Berg" the only required parameter is the regularization parameter \eqn{\lambda}{lambda}. The "RG" divergence function requires two parameters
 alpha and beta with \eqn{0 \leq \alpha \leq \beta}{0 <= alpha <= beta} that define the lower and upper bounds. Lastly, "Power" requires
 two parameters as well. The first is the regularization parameter \eqn{\lambda}{lambda}, followed by the conjugate exponent \eqn{r}.}
-
-\item{demandDivList}{A list containing the information about the divergence function for the demand measure in the same form as the supplyDivList.}
 
 \item{epsVector}{A numeric value or vector holding the regularization parameter. If a vector is given, epsilon scaling will be performed.}
 
@@ -82,23 +79,19 @@ with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
 }
 \examples{
 
-\donttest{
-I <- 1000
-J <- 1000
-X <- seq(0,1,length.out = I)
-Y <- seq(0,1,length.out = J)
-p <- supplyExample
-q <- demandExample
+x <- c(0,1)
+y <- c(0,1)
+a <- c(1.5,0.0)
+b <- c(0.0,1.0)
 
-supply <- list(p,X)
-demand <- list(q,Y)
+supplyList <- list(a,x)
+demandList <- list(b,y)
 
-eps <- 1e-3 
-supplyDiv <- list("KL", 1.05)
-demandDiv <- list("KL", 1.05)
+eps <- 0.1
+reg <- list("KL", 1.5 )
 
-hausdorff_divergence(supply, demand, supplyDiv, demandDiv, eps, exp = 2)
-}
+hausdorff_divergence(supplyList, demandList, reg, eps)
+
 
 
 
