@@ -142,7 +142,6 @@ expC <- function(f, g, C){
 #' 
 #' 
 #' @examples 
-#' 
 #' x <- c(0,1)
 #'y <- c(0,1)
 #'a <- c(1.5,0.0)
@@ -372,8 +371,6 @@ sinkhorn_divergence <- function(supplyList, demandList, DivList, epsVector, iter
 #' 
 #' 
 #' @examples 
-#' 
-
 #' x <- c(0,1)
 #' y <- c(0,1)
 #' a <- c(1.5,0.0)

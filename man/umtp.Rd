@@ -4,15 +4,7 @@
 \alias{umtp}
 \title{Solver for the unbalanced mass transportation problem}
 \usage{
-umtp(
-  supplyList,
-  demandList,
-  exp = 1,
-  p = 2,
-  wfr = FALSE,
-  costMatrix = NULL,
-  algo = "networkflow"
-)
+umtp(supplyList, demandList, exp = 1, p = 2, wfr = FALSE, costMatrix = NULL)
 }
 \arguments{
 \item{supplyList}{A list containing the information about the supply. The first element hast to be the distribution followed by
@@ -33,8 +25,6 @@ The default value is "false".}
 
 \item{costMatrix}{(optional) Instead of having the algorithm compute the
 cost matrix, a custom cost matrix can be passed to the algorithm.}
-
-\item{algo}{www}
 }
 \description{
 Solving the unbalanced mass transportation problem by extending to a balanced
@@ -53,7 +43,6 @@ transport plan \eqn{r} and construction and destruction costs \eqn{p} and
 The resulting transport problem is then solved using the networkflow algorithm provided by the \code{\link[transport]{transport}} package.
 }
 \examples{
-
 supplyPoints <- matrix(c(0,0,0,0,1,2), ncol = 2)
 demandPoints <- matrix(c(3,3.5,4,1.7,1,0.2), ncol = 2)
 

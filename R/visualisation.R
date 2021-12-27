@@ -16,7 +16,6 @@
 #' \if{latex}{\figure{plotTransportPoints.png}{options: width=0.5in}}
 #' 
 #' @examples 
-#' 
 #' supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
 #' demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 #' 
@@ -311,7 +310,6 @@ plotGridTransport <- function(transportPlan, import = NULL, export =  NULL){
 #'
 #'
 #' @examples 
-#'  
 #' I <- 1000
 #' J <- 1000
 #' X <- seq(0,1,length.out = I)

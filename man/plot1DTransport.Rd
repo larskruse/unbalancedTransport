@@ -22,7 +22,6 @@ gives the mass transported from supply point \eqn{i} to demand point \eqn{j}.}
 A function to plot optimal transport between discretizations of continuous supply and demand measures in 1D.
 }
 \examples{
- 
 I <- 1000
 J <- 1000
 X <- seq(0,1,length.out = I)

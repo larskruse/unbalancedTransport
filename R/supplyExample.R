@@ -5,7 +5,8 @@
 #'
 #'
 #' @format A vector containing 1000 numeric values.
-#
+#'
+#' @references
 #' \insertRef{Chizat2016}{unbalancedTransport}   
 #'         
 #' \if{html}{\figure{supplyExample.png}}

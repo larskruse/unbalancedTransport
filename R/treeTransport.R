@@ -18,7 +18,6 @@ getCostMatrix <- function(tree){
 
     # Calulate the path between every pair of nodes
     for(i in uniqueNodes){
-        print(paste("i: ", i))
         for(j in uniqueNodes[uniqueNodes < i]){
             # Finding the paths between the root node and the two current nodes
             pathFrom <- unlist(findPath(rootNode,i,treeDF))

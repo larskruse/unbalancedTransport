@@ -81,7 +81,6 @@ and supply and demand mass \eqn{m(\alpha)}{m(a)} and \eqn{m(\beta)}{m(b)}.
 The transport costs are calculated using the Sinkhorn algorithm \code{\link[unbalancedTransport]{regularizedTransport}}.
 }
 \examples{
-
 x <- c(0,1)
 y <- c(0,1)
 a <- c(1.5,0.0)

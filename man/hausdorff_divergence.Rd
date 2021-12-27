@@ -78,7 +78,6 @@ with supply and demand distributions \eqn{\alpha}{a} and \eqn{\beta}{b} and
 \frac{\varepsilon}{2}(m(\alpha)^2)}{F_eps(a) = -0.5 OT_eps(a,a) + 0.5eps * m(a)^2}.
 }
 \examples{
-
 x <- c(0,1)
 y <- c(0,1)
 a <- c(1.5,0.0)

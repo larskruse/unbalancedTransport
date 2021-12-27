@@ -572,6 +572,7 @@ void getKeysLengths(np t,
 //' @param creation A numeric vector giving the creation cost at each node.
 //' @param destruction A numeric vector giving the destruction cost at each node.
 //' @return A list containing the optimal transport cost and the import vector.
+//' @noRd
 //[[Rcpp::export]]
 Rcpp::List treegkr_Rcpp(Rcpp::List &tree,
                         Rcpp::NumericVector &supply,

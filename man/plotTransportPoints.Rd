@@ -26,7 +26,6 @@ Visualizing mass transport between point clouds.
 #'
 }
 \examples{
-
 supplyPoints <- matrix(c(0,0,0,1), ncol = 2)
 demandPoints <- matrix(c(3.5,4,1,0.2), ncol = 2)
 
