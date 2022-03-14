@@ -438,5 +438,445 @@
                 "column": 10
             }
         ]
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/ScalingAlgorithm.cpp",
+        "file_last_write": 1647210198.0,
+        "definitions": [
+            {
+                "usr": "c:@F@proxdiv#d#I#I#I#d#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "proxdiv(double, Eigen::VectorXd, Eigen::VectorXd, Eigen::VectorXd, double, int, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/ScalingAlgorithm.cpp",
+                "line": 26,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@StabilizedScaling_Rcpp#$@N@Eigen@S@Map>#I#VI0#$@N@Eigen@S@Stride>#VI0#VI0#S0_#S0_#d#d#d#d#d#d#I#I#I#S0_#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "StabilizedScaling_Rcpp(Eigen::Map<Eigen::MatrixXd>, Eigen::Map<Eigen::VectorXd>, Eigen::Map<Eigen::VectorXd>, double, double, double, double, double, double, int, int, int, Eigen::Map<Eigen::VectorXd>, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/ScalingAlgorithm.cpp",
+                "line": 104,
+                "column": 12
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+        "file_last_write": 1647210198.0,
+        "definitions": [
+            {
+                "usr": "c:@S@Lse",
+                "kind": 3,
+                "parent_name": "",
+                "name": "Lse",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 11,
+                "column": 8
+            },
+            {
+                "usr": "c:@S@Lse@F@operator()#l#l#",
+                "kind": 7,
+                "parent_name": "Lse",
+                "name": "operator(std::size_t, std::size_t)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 37,
+                "column": 10
+            },
+            {
+                "usr": "c:@F@lambertInit#&I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "lambertInit(Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 82,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@lambertWFunctionLog#&I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "lambertWFunctionLog(Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 106,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@inital#&I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "inital(Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 132,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@aprox#d#&I#d#I#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "aprox(double, Rcpp::NumericVector &, double, int, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 169,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@matMul#&I#S0_#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "matMul(Rcpp::NumericMatrix &, Rcpp::NumericVector &, int, int)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 219,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@init_vectors#d#I#&I#S0_#I#d#d#I#I#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "init_vectors(double, Rcpp::NumericMatrix, Rcpp::NumericVector &, Rcpp::NumericVector &, int, double, double, int, int, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 264,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@logsumexp#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "logsumexp(Rcpp::NumericVector)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 334,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@parallelVectorLse#I#I#I#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "parallelVectorLse(Rcpp::NumericVector, Rcpp::NumericVector, Rcpp::NumericMatrix, double, int)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 375,
+                "column": 21
+            },
+            {
+                "usr": "c:@F@Sinkhorn_Rcpp#&I#S0_#S0_#d#d#d#d#d#d#I#I#I#S0_#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "Sinkhorn_Rcpp(Rcpp::NumericMatrix &, Rcpp::NumericVector &, Rcpp::NumericVector &, double, double, double, double, double, double, int, int, int, Rcpp::NumericVector &, double, int)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 421,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@Hausdorff_Vec_Rcpp#I#&I#S0_#d#d#d#I#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix, Rcpp::NumericVector &, Rcpp::NumericVector &, double, double, double, int, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/SinkhornAlgorithm.cpp",
+                "line": 642,
+                "column": 21
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+        "file_last_write": 1647210198.0,
+        "definitions": [
+            {
+                "usr": "c:@F@div0#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "div0(Eigen::VectorXd, Eigen::VectorXd)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 12,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@axb0#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "axb0(Eigen::VectorXd, Eigen::VectorXd)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 44,
+                "column": 17
+            },
+            {
+                "usr": "c:@F@vectorDivergence#I#I#I#d#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "vectorDivergence(Eigen::VectorXd, Eigen::VectorXd, int, double, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 85,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@fVectorDivergence#I#I#I#d#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "fVectorDivergence(Eigen::VectorXd, Eigen::VectorXd, int, double, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 184,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@dualSolSummand#I#I#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "dualSolSummand(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 246,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@dualSolSummandSink#I#I#d#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "dualSolSummandSink(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd, Eigen::MatrixXd)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 283,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@updateK#I#I#d#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "updateK(Eigen::VectorXd, Eigen::VectorXd, double, Eigen::MatrixXd)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.cpp",
+                "line": 327,
+                "column": 17
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/divergences.h",
+        "file_last_write": 1647210198.0,
+        "definitions": []
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+        "file_last_write": 1647218236.0,
+        "definitions": [
+            {
+                "usr": "c:@S@node",
+                "kind": 3,
+                "parent_name": "",
+                "name": "node",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 37,
+                "column": 8
+            },
+            {
+                "usr": "c:@S@node@F@is_root#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "is_root",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 64,
+                "column": 10
+            },
+            {
+                "usr": "c:@S@node@F@pos#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "pos",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 76,
+                "column": 9
+            },
+            {
+                "usr": "c:@F@key#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "key(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 103,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@size#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "size(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 104,
+                "column": 15
+            },
+            {
+                "usr": "c:@F@nb#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "nb(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 105,
+                "column": 12
+            },
+            {
+                "usr": "c:@F@newnode#I#d#d#d#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "newnode(int, double, double, double, np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 109,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@push#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "push(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 116,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@update#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "update(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 126,
+                "column": 4
+            },
+            {
+                "usr": "c:@S@node@F@rot#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "rot",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 134,
+                "column": 12
+            },
+            {
+                "usr": "c:@S@node@F@splay#",
+                "kind": 7,
+                "parent_name": "node",
+                "name": "splay",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 157,
+                "column": 10
+            },
+            {
+                "usr": "c:@F@le#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "le(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 177,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@re#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "re(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 186,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@find#*$@S@node#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "find(np, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 208,
+                "column": 4
+            },
+            {
+                "usr": "c:@S@TH",
+                "kind": 3,
+                "parent_name": "",
+                "name": "TH",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 259,
+                "column": 8
+            },
+            {
+                "usr": "c:@F@insert#&*$@S@node#S1_#d#d#I#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "insert(np &, np, double, double, int, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 287,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@insert#&*$@S@node#S1_#S1_#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "insert(np &, np, np, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 321,
+                "column": 4
+            },
+            {
+                "usr": "c:@F@merge#&*$@S@node#S1_#d#d#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "merge(np &, np, double, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 357,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@treegkr_dfs#&$@S@Tree#&$@N@std@S@vector>#d#$@N@std@S@allocator>#d#&I#S5_#&$@N@std@S@vector>#$@S@TH#$@N@std@S@allocator>#S8_#I#I#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "treegkr_dfs(Tree &, std::vector<double> &, Rcpp::NumericVector &, Rcpp::NumericVector &, std::vector<TH> &, int, int)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 383,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@printTree#*$@S@node#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "printTree(np)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 532,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@getKeysLengths#*$@S@node#&I#S2_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "getKeysLengths(np, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 566,
+                "column": 6
+            },
+            {
+                "usr": "c:@F@treegkr_Rcpp#&I#S0_#S0_#S0_#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "treegkr_Rcpp(Rcpp::List &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &, Rcpp::NumericVector &)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/treegkr.cpp",
+                "line": 608,
+                "column": 12
+            }
+        ]
+    },
+    {
+        "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/utilTree.cpp",
+        "file_last_write": 1647212891.0,
+        "definitions": [
+            {
+                "usr": "c:@S@Tree",
+                "kind": 3,
+                "parent_name": "",
+                "name": "Tree",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/utilTree.cpp",
+                "line": 32,
+                "column": 8
+            },
+            {
+                "usr": "c:@S@Tree@F@add_edge#I#I#d#",
+                "kind": 7,
+                "parent_name": "Tree",
+                "name": "add_edge(int, int, double)",
+                "file": "/home/lars/Documents/github/R_MasterThesis_2021/src/utilTree.cpp",
+                "line": 49,
+                "column": 10
+            }
+        ]
     }
 ]
