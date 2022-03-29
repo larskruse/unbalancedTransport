@@ -27,6 +27,7 @@ See https://github.com/joisino/treegkr for the original version
 Changes in this version:
   - usage of Rcpp to make the algorithm accessible from R
   - calculation of import and export vectors
+  - added comments
 */
 
 #include "Rcpp.h"
