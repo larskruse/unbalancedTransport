@@ -381,9 +381,9 @@ void merge(np &t, np s, double tpos, double spos){
 // @return None
 //
 void treegkr_dfs(Tree &T,
-                 std::vector<double> &a,
-                 Rcpp::NumericVector &creation,
-                 Rcpp::NumericVector &destruction,
+                 const std::vector<double> &a,
+                 const Rcpp::NumericVector &creation,
+                 const Rcpp::NumericVector &destruction,
                  std::vector<TH> &dp,
                  int v,
                  int p){
@@ -606,10 +606,10 @@ void getKeysLengths(np t,
 //' @noRd
 //[[Rcpp::export]]
 Rcpp::List treegkr_Rcpp(Rcpp::List &tree,
-                        Rcpp::NumericVector &supply,
-                        Rcpp::NumericVector &demand,
-                        Rcpp::NumericVector &creation,
-                        Rcpp::NumericVector &destruction){
+                        const Rcpp::NumericVector &supply,
+                        const Rcpp::NumericVector &demand,
+                        const Rcpp::NumericVector &creation,
+                        const Rcpp::NumericVector &destruction){
     // Number of nodes
     int n = supply.length();
 

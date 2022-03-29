@@ -84,10 +84,10 @@ Eigen::VectorXd axb0(Eigen::VectorXd a, Eigen::VectorXd b){
 //' @noRd
 double vectorDivergence (Eigen::VectorXd r,
                          Eigen::VectorXd s,
-                         int DivFun,
-                         double param1,
-                         double param2 = 0,
-                         double param3 = 0){
+                         const int DivFun,
+                         const double param1,
+                         const double param2 = 0,
+                         const double param3 = 0){
     
     // Kullback-Leibler
     Eigen::VectorXd temp;
@@ -181,12 +181,12 @@ double vectorDivergence (Eigen::VectorXd r,
 //' @param param2 beta or 0
 //' @param param3 beta or 0
 //' @noRd
-double fVectorDivergence (Eigen::VectorXd p,
-                          Eigen::VectorXd u,
-                          int DivFun,
-                          double param1,
-                          double param2 = 0,
-                          double param3 = 0){
+double fVectorDivergence (const Eigen::VectorXd p,
+                          const Eigen::VectorXd u,
+                          const int DivFun,
+                          const double param1,
+                          const double param2 = 0,
+                          const double param3 = 0){
     
     Eigen::VectorXd temp;
     // Kullback-Leibler
@@ -243,19 +243,19 @@ double fVectorDivergence (Eigen::VectorXd p,
 //' @param eps regularization parameter
 //' @param Kernel the Kernel
 //' @noRd
-double dualSolSummand(Eigen::VectorXd u,
-                      Eigen::VectorXd v,
-                      double eps,
-                      Eigen::MatrixXd Kernel){
+double dualSolSummand(const Eigen::VectorXd u,
+                      const Eigen::VectorXd v,
+                      const double eps,
+                      const Eigen::MatrixXd Kernel){
     
-    int Nx = u.size();
-    int Ny = v.size();
+    size_t Nx = u.size();
+    size_t Ny = v.size();
     
     Eigen::MatrixXd K = Eigen::MatrixXd::Zero(Nx, Ny);
     
-    for(int i = 0; i < Nx; i++){
+    for(size_t i = 0; i < Nx; i++){
         
-        for(int j = 0; j < Ny ; j++){
+        for(size_t j = 0; j < Ny ; j++){
             
             K(i,j) = (u(i) + v(j));
             
@@ -280,20 +280,20 @@ double dualSolSummand(Eigen::VectorXd u,
 //' @param eps regularization parameter
 //' @param Kernel the Kernel
 //' @noRd
-double dualSolSummandSink(Eigen::VectorXd u,
-                          Eigen::VectorXd v,
-                          double eps,
-                          Eigen::MatrixXd costMatrix,
-                          Eigen::MatrixXd supdem){
+double dualSolSummandSink(const Eigen::VectorXd u,
+                          const Eigen::VectorXd v,
+                          const double eps,
+                          const Eigen::MatrixXd costMatrix,
+                          const Eigen::MatrixXd supdem){
     
-    int Nx = u.size();
-    int Ny = v.size();
+    size_t Nx = u.size();
+    size_t Ny = v.size();
     
     Eigen::MatrixXd K = Eigen::MatrixXd::Zero(Nx, Ny);
     
-    for(int i = 0; i < Nx; i++){
+    for(size_t i = 0; i < Nx; i++){
         
-        for(int j = 0; j < Ny ; j++){
+        for(size_t j = 0; j < Ny ; j++){
             
             K(i,j) = (u(i) + v(j) - costMatrix(i,j));
             
@@ -324,19 +324,19 @@ double dualSolSummandSink(Eigen::VectorXd u,
 //' @param costMatrix A numeric matrix
 //' @return The updated kernel
 //' @noRd
-Eigen::MatrixXd updateK(Eigen::VectorXd u,
-                        Eigen::VectorXd v,
-                        double eps,
-                        Eigen::MatrixXd costMatrix){
+Eigen::MatrixXd updateK(const Eigen::VectorXd u,
+                        const Eigen::VectorXd v,
+                        const double eps,
+                        const Eigen::MatrixXd costMatrix){
     
-    int Nx = u.size();
-    int Ny = v.size();
+    size_t Nx = u.size();
+    size_t Ny = v.size();
     
     Eigen::MatrixXd K = Eigen::MatrixXd::Zero(Nx, Ny);
     
-    for(int i = 0; i < Nx; i++){
+    for(size_t i = 0; i < Nx; i++){
         
-        for(int j = 0; j < Ny ; j++){
+        for(size_t j = 0; j < Ny ; j++){
             
             K(i,j) = exp((u(i) + v(j) - costMatrix(i,j))/eps);
             

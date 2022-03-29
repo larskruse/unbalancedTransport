@@ -79,7 +79,7 @@ struct Lse : public RcppParallel::Worker
 //' @param x numeric vector
 //' @return initial value 
 //' @noRd
-Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
+Rcpp::NumericVector lambertInit(const Rcpp::NumericVector& x){
     Rcpp::NumericVector temp;
     Rcpp::NumericVector z(x.length());
     z[x>1] = x[x>1];
@@ -103,7 +103,7 @@ Rcpp::NumericVector lambertInit(Rcpp::NumericVector& x){
 //' @return the function value
 //' @noRd 
 // 
-Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
+Rcpp::NumericVector lambertWFunctionLog(const Rcpp::NumericVector& x){
     
     
     Rcpp::NumericVector z = lambertInit(x);
@@ -129,7 +129,7 @@ Rcpp::NumericVector lambertWFunctionLog(Rcpp::NumericVector& x){
 //' @param x numeric vector
 //' @return the function value
 //' @noRd
-Rcpp::NumericVector inital(Rcpp::NumericVector& x){
+Rcpp::NumericVector inital(const Rcpp::NumericVector& x){
     
     Rcpp::NumericVector z = lambertInit(x);
     Rcpp::NumericVector c;
@@ -166,12 +166,12 @@ Rcpp::NumericVector inital(Rcpp::NumericVector& x){
 //' @param param2 num value
 //' @return A vector holding the proxdiv evaluation
 //' @noRd
-Rcpp::NumericVector aprox(double lambda,
-                          Rcpp::NumericVector& p,
-                          double eps,
-                          int DivFun,
-                          double param1,
-                          double param2){
+Rcpp::NumericVector aprox(const double lambda,
+                          const Rcpp::NumericVector& p,
+                          const double eps,
+                          const int DivFun,
+                          const double param1,
+                          const double param2){
     
     Rcpp::NumericVector temp(p.length());
     
@@ -216,9 +216,9 @@ Rcpp::NumericVector aprox(double lambda,
 //' @param Nx num val
 //' @param Ny num val
 //' @noRd
-Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat,
-                           Rcpp::NumericVector& vec,
-                           int Nx, int Ny){
+Rcpp::NumericVector matMul(const Rcpp::NumericMatrix& mat,
+                           const Rcpp::NumericVector& vec,
+                           size_t Nx, size_t Ny){
     
     Rcpp::NumericVector res(Nx);
     
@@ -261,29 +261,23 @@ Rcpp::NumericVector matMul(Rcpp::NumericMatrix& mat,
 //' @param eps eps value
 //' @return A vector holding the proxdiv evaluation
 //' @noRd
-Rcpp::NumericVector init_vectors(double lambda,
-                                 Rcpp::NumericMatrix costMatrix,
-                                 Rcpp::NumericVector& distribution, 
-                                 Rcpp::NumericVector& secDistribution,
-                                 int DivFun,
-                                 double param1,
-                                 double param2,
-                                 int Nx,
-                                 int Ny,
-                                 double eps){
+Rcpp::NumericVector init_vectors(const double lambda,
+                                 const Rcpp::NumericMatrix costMatrix,
+                                 const Rcpp::NumericVector& distribution, 
+                                 const Rcpp::NumericVector& secDistribution,
+                                 const int DivFun,
+                                 const double param1,
+                                 const double param2,
+                                 const size_t Nx,
+                                 const size_t Ny,
+                                 const double eps){
     
     
     Rcpp::NumericVector temp(Nx);
 
-    double val;
-    
-    
-   
     
     //KL
     if (DivFun == 1){
-        
-        // val = Rcpp::sum(distribution);
         
         temp.fill(-lambda*std::log(Rcpp::sum(distribution)));
 
@@ -331,10 +325,9 @@ Rcpp::NumericVector init_vectors(double lambda,
 //' @param vec a numeric vector
 //' @return The function LogSumExp applied to vec
 //' @noRd
-double logsumexp(Rcpp::NumericVector vec){
+double logsumexp(const Rcpp::NumericVector vec){
     
-    if(vec.length() >  0){
-        
+    if(vec.length() > 0){
         
         double maxVal = Rcpp::max(vec);
         size_t len = vec.length();
@@ -372,23 +365,18 @@ double logsumexp(Rcpp::NumericVector vec){
 //' @param eps Regularization Parameter
 //' @param Ny Number of elements in the result vector
 //' @noRd
-Rcpp::NumericVector parallelVectorLse(Rcpp::NumericVector logSup,
-                                      Rcpp::NumericVector f,
-                                      Rcpp::NumericMatrix costMatrix,
-                                      double eps,
-                                      int Ny) {
+Rcpp::NumericVector parallelVectorLse(const Rcpp::NumericVector logSup,
+                                      const Rcpp::NumericVector f,
+                                      const Rcpp::NumericMatrix costMatrix,
+                                      const double eps,
+                                      const size_t Ny) {
     
     Rcpp::NumericVector ret(Ny);
     
-    // declare the Lse instance 
     Lse lse(logSup, f, costMatrix, eps, ret);
-    
-    // call parallel_For to start the parallel computation.
     parallelFor(0, costMatrix.ncol(), lse);
-    
     ret = lse.lseVec;
-    
-    // return the computed lse vector
+
     return eps * ret;
 }
 
@@ -419,36 +407,36 @@ Rcpp::NumericVector parallelVectorLse(Rcpp::NumericVector logSup,
 //' @noRd
 //[[Rcpp::export]]
 Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
-                                  Rcpp::NumericVector& supply,
-                                  Rcpp::NumericVector& demand,
-                                  double lambdaSupply,
-                                  double param1Supply,
-                                  double param2Supply,
-                                  double lambdaDemand,
-                                  double param1Demand,
-                                  double param2Demand,
-                                  int DivSupply,
-                                  int DivDemand,
-                                  int iterMax,
-                                  Rcpp::NumericVector& epsvec,
-                                  double tol,
+                                  const Rcpp::NumericVector& supply,
+                                  const Rcpp::NumericVector& demand,
+                                  const double lambdaSupply,
+                                  const double param1Supply,
+                                  const double param2Supply,
+                                  const double lambdaDemand,
+                                  const double param1Demand,
+                                  const double param2Demand,
+                                  const int DivSupply,
+                                  const int DivDemand,
+                                  const size_t iterMax,
+                                  const Rcpp::NumericVector& epsvec,
+                                  const double tol,
                                   Eigen::Map<Eigen::MatrixXd> supdem){
                                   
                                  
     // set first epsilon
-    int epsind = 0;
+    size_t epsind = 0;
     double eps = epsvec(0);
     
     
    
     // number of points in the reference measures
-    int Nx = supply.length();
-    int Ny = demand.length();
+    const size_t Nx = supply.length();
+    const size_t Ny = demand.length();
     
    
     
-    Rcpp::NumericVector logSup = Rcpp::log(supply);
-    Rcpp::NumericVector logDem = Rcpp::log(demand);
+    const Rcpp::NumericVector logSup = Rcpp::log(supply);
+    const Rcpp::NumericVector logDem = Rcpp::log(demand);
 
     // initializing vectors
     Rcpp::NumericVector f = init_vectors(lambdaDemand,
@@ -480,7 +468,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
     bool incEps = false;
     
     
-    size_t k = 0;
+    size_t k {0};
     
     while(k < iterMax){
         
@@ -555,9 +543,7 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
 
 
  
-    Eigen::MatrixXd gaussKernel;
-
-    gaussKernel = updateK(Eigen::VectorXd::Zero(Nx),
+    Eigen::MatrixXd gaussKernel = updateK(Eigen::VectorXd::Zero(Nx),
                           Eigen::VectorXd::Zero(Ny),
                           eps,
                           Rcpp::as<Eigen::Map<Eigen::MatrixXd> >(costMatrix));
@@ -639,21 +625,19 @@ Rcpp::List Sinkhorn_Rcpp(Rcpp::NumericMatrix &costMatrix,
 //' @return The optimal transport plan
 //' @noRd
 //[[Rcpp::export]]
-Rcpp::NumericVector Hausdorff_Vec_Rcpp(Rcpp::NumericMatrix costMatrix,
-                                       Rcpp::NumericVector& distribution,
-                                       Rcpp::NumericVector& f,
-                                       double lambda,
-                                       double param1,
-                                       double param2,
-                                       int Div,
-                                       double eps){
+Rcpp::NumericVector Hausdorff_Vec_Rcpp(const Rcpp::NumericMatrix costMatrix,
+                                       const Rcpp::NumericVector& distribution,
+                                       const Rcpp::NumericVector& f,
+                                       const double lambda,
+                                       const double param1,
+                                       const double param2,
+                                       const int Div,
+                                       const double eps){
     
-    int Nx = costMatrix.nrow();
-    int Ny = costMatrix.ncol();
+    const size_t Nx = costMatrix.nrow();
+    const size_t Ny = costMatrix.ncol();
     
-    Rcpp::NumericMatrix temp(Nx,Ny);
     Rcpp::NumericVector g(Ny);
- 
     Rcpp::NumericVector logDistribution = Rcpp::log(distribution);
     g = parallelVectorLse(logDistribution, f, costMatrix, eps, Ny);
     g = - aprox(lambda, g, eps, Div, param1, param2);
